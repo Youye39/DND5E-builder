@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import SectionContainer from "../common/SectionContainer";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
+import SectionContainer from "../../shared/components/SectionContainer";
 
 interface ProficiencyPanelProps {
   className?: string;

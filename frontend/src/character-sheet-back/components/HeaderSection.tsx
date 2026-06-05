@@ -1,4 +1,4 @@
-import HeaderBrand from "../common/logo.tsx";
+import HeaderBrand from "../../shared/components/logo";
 
 export default function HeaderSection() {
   return (

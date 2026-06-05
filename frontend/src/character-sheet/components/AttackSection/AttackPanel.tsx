@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../ui/dialog";
 import AttackComponent from './AttackComponent';
-import SectionContainer from "../../common/SectionContainer";
+import SectionContainer from "../../../shared/components/SectionContainer";
 
 interface AttackPanelProps {
   className?: string;

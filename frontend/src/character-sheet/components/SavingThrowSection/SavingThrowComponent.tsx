@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ButtonComponent from "../../common/ButtonComponent";
+import ButtonComponent from "../../../shared/components/ButtonComponent";
 
 interface SavingThrowComponentProps {
   className?: string;

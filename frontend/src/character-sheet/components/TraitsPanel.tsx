@@ -1,5 +1,5 @@
 import { useState } from "react";
-import SectionContainer from "../common/SectionContainer";
+import SectionContainer from "../../shared/components/SectionContainer";
 
 interface TraitsPanelProps {
   className?: string;

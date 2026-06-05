@@ -1,6 +1,6 @@
-import SectionContainer from "../common/SectionContainer";
-import EditableInfoField from "./EditableInfoField";
-import EditableScrollArea from "../common/EditableScrollArea";
+import SectionContainer from "../../shared/components/SectionContainer";
+import EditableInfoField from "./CharacterInfoField";
+import EditableScrollArea from "../../shared/components/EditableScrollArea";
 import EmblemSection from "./EmblemSection";
 
 interface CharacterInfoData {

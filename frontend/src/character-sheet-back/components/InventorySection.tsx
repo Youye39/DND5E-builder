@@ -1,5 +1,5 @@
-import SectionContainer from "../common/SectionContainer";
-import EditableScrollArea from "../common/EditableScrollArea";
+import SectionContainer from "../../shared/components/SectionContainer";
+import EditableScrollArea from "../../shared/components/EditableScrollArea";
 
 interface InventorySectionProps {
   value: string;

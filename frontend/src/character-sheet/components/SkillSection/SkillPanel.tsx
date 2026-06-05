@@ -1,5 +1,5 @@
 import SkillComponent from "./SkillComponent";
-import SectionContainer from "../../common/SectionContainer";
+import SectionContainer from "../../../shared/components/SectionContainer";
 
 interface Attributes {
   str_value: number;

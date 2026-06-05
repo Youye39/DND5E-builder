@@ -1,5 +1,5 @@
 import SavingThrowComponent from "./SavingThrowComponent";
-import SectionContainer from "../../common/SectionContainer";
+import SectionContainer from "../../../shared/components/SectionContainer";
 
 interface SavingThrowPanelProps {
   className?: string;

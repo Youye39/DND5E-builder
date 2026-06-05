@@ -1,22 +1,22 @@
 import { useState } from "react";
 import svgPaths from "../assets/dnd.ts";
-import AttributeComponent from "./character-sheet/AttributeComponent.tsx";
-import PersonalityTraitComponent from "../components/character-sheet/PersonalityTraitComponent";
-import ProficiencyBonusComponent from "./character-sheet/ProficiencyBonusComponent.tsx";
-import SavingThrowPanel from "./character-sheet/SavingThrowSection/SavingThrowPanel.tsx";
-import SkillPanel from "./character-sheet/SkillSection/SkillPanel.tsx";
-import AttackPanel from "./character-sheet/AttackSection/AttackPanel.tsx";
-import ProficiencyPanel from "./character-sheet/ProficiencyPanel.tsx";
-import EquipmentPanel from "../components/character-sheet/EquipmentPanel";
-import TraitsPanel from "../components/character-sheet/TraitsPanel";
-import DeathSaveComponent from "../components/character-sheet/DeathSaveComponent";
-import CoinComponent from "../components/character-sheet/CoinComponent";
-import PassivePerception from "../components/character-sheet/PassivePerception";
-import LevelDisplay from "../components/character-sheet/LevelDisplay";
-import CharacterName from "../components/character-sheet/CharacterName";
-import BasicInfo from "../components/character-sheet/BasicInfo";
-import CombatStatBox from "../components/character-sheet/CombatStatBox";
-import HeaderBrand from "./common/logo.tsx";
+import AttributeComponent from "./components/AttributeComponent.tsx";
+import PersonalityTraitComponent from "./components/PersonalityTraitComponent.tsx";
+import ProficiencyBonusComponent from "./components/ProficiencyBonusComponent.tsx";
+import SavingThrowPanel from "./components/SavingThrowSection/SavingThrowPanel.tsx";
+import SkillPanel from "./components/SkillSection/SkillPanel.tsx";
+import AttackPanel from "./components/AttackSection/AttackPanel.tsx";
+import ProficiencyPanel from "./components/ProficiencyPanel.tsx";
+import EquipmentPanel from "./components/EquipmentPanel.tsx";
+import TraitsPanel from "./components/TraitsPanel.tsx";
+import DeathSaveComponent from "./components/DeathSaveComponent.tsx";
+import CoinComponent from "./components/CoinComponent.tsx";
+import PassivePerception from "./components/PassivePerception.tsx";
+import LevelDisplay from "./components/LevelDisplay.tsx";
+import CharacterName from "./components/CharacterName.tsx";
+import BasicInfo from "./components/BasicInfo.tsx";
+import CombatStatBox from "./components/CombatStatBox.tsx";
+import HeaderBrand from "../shared/components/logo";
 
 // ============================================================================
 // Logo 和图标组件

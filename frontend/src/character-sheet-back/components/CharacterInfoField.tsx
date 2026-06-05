@@ -1,11 +1,11 @@
-interface EditableInfoFieldProps {
+interface CharacterInfoFieldProps {
   label: string;
   value: string;
   onChange: (value: string) => void;
   className?: string;
 }
 
-export default function EditableInfoField({ label, value, onChange, className = "" }: EditableInfoFieldProps) {
+export default function CharacterInfoField({ label, value, onChange, className = "" }: CharacterInfoFieldProps) {
   return (
     <div className={`absolute h-[51px] w-[209px] ${className}`} data-name="基本信息">
       <p

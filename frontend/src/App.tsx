@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./components/ui/dialog";
-import BottomToolbar from "./components/common/BottomToolbar";
-import CharacterSheet from "./components/CharacterSheet";
-import CharacterBackSide from "./components/CharacterSheetBack";
-import SpellSheet from "./components/SpellSheet";
+import BottomToolbar from "./shared/components/BottomToolbar";
+import CharacterSheet from "./character-sheet/CharacterSheet";
+import CharacterBackSide from "./character-sheet-back/CharacterSheetBack";
+import SpellSheet from "./spell-sheet/SpellSheet";
 
 // ============================================================================
 // 页面导航栏

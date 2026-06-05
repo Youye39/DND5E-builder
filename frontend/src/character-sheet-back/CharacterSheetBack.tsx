@@ -1,11 +1,11 @@
 import { useState, useRef } from "react";
-import BackgroundStorySection from "./character-sheet-back/BackgroundStorySection";
-import InventorySection from "./character-sheet-back/InventorySection";
-import AdventureLogSection from "./character-sheet-back/AdventureLogSection";
-import HeaderSection from "./character-sheet-back/HeaderSection";
-import AppearanceSection from "./character-sheet-back/AppearanceSection";
-import DateDisplay from "./character-sheet-back/DateDisplay";
-import CharacterInfoSection, { type CharacterInfoData } from "./character-sheet-back/CharacterInfoSection";
+import BackgroundStorySection from "./components/BackgroundStorySection";
+import InventorySection from "./components/InventorySection";
+import AdventureLogSection from "./components/AdventureLogSection";
+import HeaderSection from "./components/HeaderSection";
+import AppearanceSection from "./components/AppearanceSection";
+import DateDisplay from "./components/DateDisplay";
+import CharacterInfoSection, { type CharacterInfoData } from "./components/CharacterInfoSection";
 
 interface CharacterBackSideProps {
   characterName?: string;

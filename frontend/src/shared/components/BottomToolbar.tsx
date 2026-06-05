@@ -1,4 +1,4 @@
-import FunctionButton from "../character-sheet/FunctionButton";
+import FunctionButton from "./FunctionButton";
 
 interface BottomToolbarProps {
   onExportFileClick: () => void;
