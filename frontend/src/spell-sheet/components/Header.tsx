@@ -1,5 +1,5 @@
 import { useState } from "react";
-import HeaderBrand from "../common/logo";
+import HeaderBrand from "../../shared/components/logo";
 
 /** Shared shell for an info field (label + value box + border) */
 function InfoFieldShell({ label, children }: { label: string; children: React.ReactNode }) {

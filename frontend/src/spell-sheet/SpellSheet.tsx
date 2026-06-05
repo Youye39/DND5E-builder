@@ -1,6 +1,6 @@
 import { useState } from "react";
-import SpellBox from "./spell-sheet/SpellBox";
-import Header from "./spell-sheet/Header";
+import SpellBox from "./components/SpellBox";
+import Header from "./components/Header";
 
 const ROW_HEIGHT = 34;
 const BASE_HEIGHT = 53;
