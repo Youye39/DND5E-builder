@@ -1,0 +1,3 @@
+export default {
+p35ea5900: "M23 38L0 25V0H46V25L24 38H23Z",
+}
