@@ -25,17 +25,17 @@ interface CharacterInfoSectionProps {
 function NameField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   return (
     <div className="absolute contents left-[14px] top-[calc(50%-160px)]" data-name="姓名">
-      <div className="-translate-y-1/2 absolute bg-[#efefef] h-[55px] left-[14px] overflow-clip top-[calc(50%-150.5px)] w-[344px]">
+      <div className="-translate-y-1/2 absolute bg-sheet-content-bg h-[55px] left-[14px] overflow-clip top-[calc(50%-150.5px)] w-[344px]">
         <input
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal h-[55px] justify-center leading-[0] left-[10px] text-[24px] text-black top-[27.5px] w-[334px] bg-transparent outline-none"
+          className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular font-normal h-[55px] justify-center leading-[0] left-[10px] text-[24px] text-black top-[27.5px] w-[334px] bg-transparent outline-none"
           style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
         />
       </div>
       <div
-        className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal h-[16px] justify-center leading-[0] left-[17px] text-[#595959] text-[14px] top-[calc(50%-189px)] w-[341px]"
+        className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular font-normal h-[16px] justify-center leading-[0] left-[17px] text-sheet-text-secondary text-[14px] top-[calc(50%-189px)] w-[341px]"
         style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
       >
         <p className="leading-[normal]">姓名</p>
@@ -48,7 +48,7 @@ function AppearanceDescField({ value, onChange }: { value: string; onChange: (v:
   return (
     <div className="absolute h-[128px] left-[14px] top-[252px] w-[651px]" data-name="形象">
       <p
-        className="[word-break:break-word] absolute font-['Noto_Serif:Regular',sans-serif] font-normal h-[17px] leading-[normal] left-[3px] text-[#595959] text-[12px] top-0 w-[648px]"
+        className="[word-break:break-word] absolute font-serif-regular font-normal h-[17px] leading-[normal] left-[3px] text-sheet-text-secondary text-[12px] top-0 w-[648px]"
         style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
       >
         形象
@@ -56,7 +56,7 @@ function AppearanceDescField({ value, onChange }: { value: string; onChange: (v:
       <EditableScrollArea
         value={value}
         onChange={onChange}
-        className="absolute bg-[#efefef] h-[111px] left-0 top-[17px] w-[651px]"
+        className="absolute bg-sheet-content-bg h-[111px] left-0 top-[17px] w-[651px]"
         innerClassName="pl-[10px] pt-[6px] pb-[6px]"
       />
     </div>

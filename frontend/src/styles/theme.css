@@ -78,4 +78,60 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* ===== 角色卡片自定义颜色 ===== */
+  --color-sheet-bg: #f5f5f5;
+  --color-sheet-card-bg: #ffffff;
+  --color-sheet-panel-bg: #f6f6f6;
+  --color-sheet-content-bg: #efefef;
+  --color-sheet-header-bg: #f9f9f9;
+  --color-sheet-dark-section-bg: #f0f0f0;
+  --color-sheet-nav-bg: #efefef;
+
+  --color-sheet-text-primary: #000000;
+  --color-sheet-text-dark: #333333;
+  --color-sheet-text-medium: #666666;
+  --color-sheet-text-secondary: #595959;
+  --color-sheet-text-placeholder: #b3b3b3;
+  --color-sheet-text-lighter: #999999;
+  --color-sheet-text-white: #ffffff;
+  --color-sheet-text-page-active: #444444;
+  --color-sheet-text-spell-placeholder: #cccccc;
+
+  --color-sheet-accent-blue: #0066cc;
+
+  --color-sheet-button-dark-bg: #1e1e1e;
+  --color-sheet-button-dark-hover: #2a2a2a;
+
+  --color-sheet-border-light: #cccccc;
+  --color-sheet-border-input: #999999;
+  --color-sheet-border-section: #333333;
+  --color-sheet-border-secondary: #595959;
+  --color-sheet-border-placeholder: #cccccc;
+
+  --color-sheet-border-primary: #000000;
+  --color-sheet-border-hover-light: #b3b3b3;
+
+  --color-sheet-hover-bg: #e7e7e7;
+  --color-sheet-hover-light: #b3b3b3;
+
+  --color-sheet-icon-default: #b6b6b6;
+  --color-sheet-icon-hover: #595959;
+  --color-sheet-icon-disabled: #d0d0d0;
+  --color-sheet-icon-nav-default: #b0b0b0;
+
+  --color-sheet-svg-fill: #1e1e1e;
+  --color-sheet-svg-stroke: #444444;
+
+  /* ===== 角色卡片自定义字体 (统一 CJK) ===== */
+  --font-serif-regular: 'Noto_Serif:Regular', sans-serif;
+  --font-serif-medium: 'Noto_Serif:Medium', sans-serif;
+  --font-serif-bold: 'Noto_Serif:Bold', sans-serif;
+  --font-serif-regular-cjk: 'Noto_Serif:Regular', 'Noto_Sans_CJK:Regular', sans-serif;
+  --font-serif-medium-cjk: 'Noto_Serif:Medium', 'Noto_Sans_CJK:Medium', sans-serif;
+  --font-serif-bold-cjk: 'Noto_Serif:Bold', 'Noto_Sans_CJK:Bold', sans-serif;
+  --font-sans-medium-cjk: 'Noto_Sans:Medium', 'Noto_Sans_CJK:Medium', sans-serif;
+  --font-serif-bold-logo: 'Noto_Serif:Bold', serif;
+  --font-serif-medium-logo: 'Noto_Serif:Medium', serif;
+  --font-serif-regular-logo: 'Noto_Serif:Regular', serif;
 }

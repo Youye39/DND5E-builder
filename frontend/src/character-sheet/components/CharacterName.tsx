@@ -46,13 +46,13 @@ export default function CharacterName({ value = "", onChange }: CharacterNamePro
             onChange={(e) => setEditValue(e.target.value)}
             onBlur={handleFinishEdit}
             onKeyDown={handleKeyDown}
-            className="absolute inset-0 w-full h-full flex items-center justify-center font-['Noto_Serif:Regular','Noto_Sans_JP:Regular',sans-serif] font-normal text-[24px] text-black text-center bg-transparent border-none outline-none"
+            className="absolute inset-0 w-full h-full flex items-center justify-center font-serif-regular-cjk font-normal text-[24px] text-black text-center bg-transparent border-none outline-none"
             style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
           />
         </div>
-        <div aria-hidden="true" className="absolute border-2 border-[#595959] border-solid inset-[-1px] pointer-events-none rounded-[3px]" />
+        <div aria-hidden="true" className="absolute border-2 border-sheet-border-secondary border-solid inset-[-1px] pointer-events-none rounded-[3px]" />
       </div>
-      <div className="[word-break:break-word] absolute flex flex-col font-['Noto_Serif:Medium','Noto_Sans_JP:Medium',sans-serif] font-medium inset-[16.2%_81.51%_75.42%_2.87%] justify-center leading-[0] text-[#b3b3b3] text-[14px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+      <div className="[word-break:break-word] absolute flex flex-col font-serif-medium-cjk font-medium inset-[16.2%_81.51%_75.42%_2.87%] justify-center leading-[0] text-sheet-text-placeholder text-[14px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
         <p className="leading-[normal]">角色名</p>
       </div>
     </div>

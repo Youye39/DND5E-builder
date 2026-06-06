@@ -26,7 +26,7 @@ export default function EmblemSection({
   };
 
   const hasOrgInput = organization.trim().length > 0;
-  const orgTextColor = hasOrgInput ? "text-[#595959]" : "text-[#e7e7e7]";
+  const orgTextColor = hasOrgInput ? "text-sheet-text-secondary" : "text-sheet-hover-bg";
 
   return (
     <div className="absolute contents left-[555px] top-[14px]" data-name="徽记">
@@ -39,14 +39,14 @@ export default function EmblemSection({
           value={organization}
           onChange={(e) => onOrganizationChange(e.target.value)}
           placeholder="信仰/组织/家族"
-          className={`w-full h-full bg-transparent outline-none border-0 p-0 text-center font-['Noto_Serif:Regular',sans-serif] text-[12px] leading-[normal] ${orgTextColor}`}
+          className={`w-full h-full bg-transparent outline-none border-0 p-0 text-center font-serif-regular text-[12px] leading-[normal] ${orgTextColor}`}
           style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
         />
       </div>
 
       {/* 徽记 — clickable emblem area with image upload */}
       <div
-        className="absolute border border-[#efefef] border-solid left-[555px] overflow-clip size-[110px] top-[31px] cursor-pointer"
+        className="absolute border border-sheet-content-bg border-solid left-[555px] overflow-clip size-[110px] top-[31px] cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
         onMouseEnter={() => setIsEmblemHovered(true)}
         onMouseLeave={() => setIsEmblemHovered(false)}
@@ -62,7 +62,7 @@ export default function EmblemSection({
           {/* "徽记" text — hidden when image is uploaded */}
           {!emblemImage && (
             <p
-              className="absolute inset-0 flex items-center justify-center font-['Noto_Serif:Regular',sans-serif] font-normal text-[#efefef] text-[12px]"
+              className="absolute inset-0 flex items-center justify-center font-serif-regular font-normal text-sheet-content-bg text-[12px]"
               style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
             >
               徽记
@@ -72,11 +72,11 @@ export default function EmblemSection({
 
         {/* Hover overlay with plus sign */}
         {isEmblemHovered && (
-          <div className="absolute inset-0 bg-[#b3b3b3]/20 flex items-center justify-center">
+          <div className="absolute inset-0 bg-sheet-hover-light/20 flex items-center justify-center">
             <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
               <path
                 d="M16 6v20M6 16h20"
-                stroke="#b3b3b3"
+                stroke="var(--color-sheet-hover-light)"
                 strokeWidth="3"
                 strokeLinecap="round"
               />

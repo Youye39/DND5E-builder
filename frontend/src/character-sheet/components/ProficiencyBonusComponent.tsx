@@ -66,7 +66,7 @@ export default function ProficiencyBonusComponent({
     <div className={className} data-name="熟练加值">
       <div className="absolute bg-white inset-[2.27%_0] rounded-[2px]">
         <div className="overflow-clip relative rounded-[inherit] size-full">
-          <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Medium','Noto_Sans_CJK:Medium',sans-serif] font-medium h-[42px] justify-center leading-[0] left-[136px] text-[12px] text-black text-center top-[21px] w-[174px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+          <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-medium-cjk font-medium h-[42px] justify-center leading-[0] left-[136px] text-[12px] text-black text-center top-[21px] w-[174px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
             <p className="leading-[normal]">{label}</p>
           </div>
         </div>
@@ -81,12 +81,12 @@ export default function ProficiencyBonusComponent({
         >
           <div className="overflow-clip relative rounded-[inherit] size-full">
             {showInput && (
-              <div className="absolute bg-[#efefef] inset-[18.18%_11.36%] overflow-clip">
+              <div className="absolute bg-sheet-content-bg inset-[18.18%_11.36%] overflow-clip">
                 <input
                   type="text"
                   value={value === "" ? "" : formatValue(value)}
                   onChange={handleInputChange}
-                  className="[word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal inset-[-25%_-17.65%_-25%_-23.53%] justify-center leading-[0] text-[21px] text-black text-center bg-transparent border-none outline-none"
+                  className="[word-break:break-word] absolute flex flex-col font-serif-regular font-normal inset-[-25%_-17.65%_-25%_-23.53%] justify-center leading-[0] text-[21px] text-black text-center bg-transparent border-none outline-none"
                   style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
                 />
               </div>
@@ -105,9 +105,9 @@ export default function ProficiencyBonusComponent({
                     <g filter={diceActive ? undefined : "url(#filter0_i_dice)"}>
                       <path
                         d={svgPath}
-                        fill={diceActive ? "#000000" : "white"}
+                        fill={diceActive ? 'var(--color-sheet-text-primary)' : 'white'}
                         fillOpacity={diceActive ? "1" : "0.1"}
-                        stroke="#595959"
+                        stroke="var(--color-sheet-text-secondary)"
                         strokeWidth="8"
                       />
                     </g>

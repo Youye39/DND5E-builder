@@ -31,7 +31,7 @@ export default function ButtonComponent({
     >
       <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="xMidYMid meet" viewBox="0 0 14 14">
         {/* 外层灰底圆 */}
-        <circle cx="7" cy="7" fill="var(--fill-0, #EFEFEF)" r="7" />
+        <circle cx="7" cy="7" fill="var(--color-sheet-content-bg)" r="7" />
         {/* 内层白底 + 黑色描边 */}
         <circle cx="7" cy="7" fill="var(--fill-0, white)" r="5.5" stroke="var(--stroke-0, black)" />
         {/* 选中时的黑圆点 */}

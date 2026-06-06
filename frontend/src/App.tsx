@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./shared/ui/dialog";
 import BottomToolbar from "./shared/components/BottomToolbar";
 import CharacterSheet from "./character-sheet/CharacterSheet";
 import CharacterBackSide from "./character-sheet-back/CharacterSheetBack";
@@ -11,15 +11,15 @@ import SpellSheet from "./spell-sheet/SpellSheet";
 
 function PageNavigationBar() {
   return (
-    <div className="absolute bg-[#efefef] h-[75px] left-0 overflow-clip rounded-tl-[5px] rounded-tr-[5px] top-0 w-[1224px]" data-name="page-navigation">
+    <div className="absolute bg-sheet-nav-bg h-[75px] left-0 overflow-clip rounded-tl-[5px] rounded-tr-[5px] top-0 w-[1224px]" data-name="page-navigation">
       <div className="-translate-x-1/2 absolute h-[67px] left-1/2 overflow-clip top-[8px] w-[1208px]" data-name="page-turner">
         <div className="absolute h-[67px] left-[1137px] overflow-clip rounded-[3px] top-0 w-[71px]" data-name="add-page">
           <div className="absolute inset-[20.9%_22.54%]">
             <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 39 39">
               <g clipPath="url(#clip0_4_1163)" id="add-page-icon">
                 <g id="Vector" />
-                <path d="M19.5 9.75V29.25" id="Vector_2" stroke="var(--stroke-0, #595959)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
-                <path d="M9.75 19.5H29.25" id="Vector_3" stroke="var(--stroke-0, #595959)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
+                <path d="M19.5 9.75V29.25" id="Vector_2" stroke="var(--color-sheet-text-secondary)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
+                <path d="M9.75 19.5H29.25" id="Vector_3" stroke="var(--color-sheet-text-secondary)" strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" />
               </g>
               <defs>
                 <clipPath id="clip0_4_1163">
@@ -81,7 +81,7 @@ export default function App() {
                         <div className="absolute inset-0 bg-white rounded-tl-[3px] rounded-tr-[3px]" />
                         <div className="relative h-full flex items-center justify-center">
                           <span
-                            className="font-['Noto_Sans:Medium','Noto_Sans_JP:Medium',sans-serif] font-medium text-[20px] text-[#444]"
+                            className="font-sans-medium-cjk font-medium text-[20px] text-sheet-text-page-active"
                             style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
                           >
                             {page === 0 ? '第一页' : page === 1 ? '第二页' : '第三页'}
@@ -92,13 +92,13 @@ export default function App() {
                     {[0, 1, 2].map((page) => (
                       <div
                         key={`mask-${page}`}
-                        className={`absolute top-0 h-[67px] w-[379px] rounded-tl-[3px] rounded-tr-[3px] bg-[#efefef] flex items-center justify-center transition-opacity duration-200 ${
+                        className={`absolute top-0 h-[67px] w-[379px] rounded-tl-[3px] rounded-tr-[3px] bg-sheet-nav-bg flex items-center justify-center transition-opacity duration-200 ${
                           currentPage === page ? 'opacity-0' : 'opacity-100'
                         }`}
                         style={{ left: `${page * 379}px` }}
                       >
                         <span
-                          className="font-['Noto_Sans:Medium','Noto_Sans_JP:Medium',sans-serif] font-medium text-[20px] text-[#595959]"
+                          className="font-sans-medium-cjk font-medium text-[20px] text-sheet-text-secondary"
                           style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
                         >
                           {page === 0 ? '第一页' : page === 1 ? '第二页' : '第三页'}
@@ -142,9 +142,9 @@ export default function App() {
                               <path
                                 clipRule="evenodd"
                                 d="M24.2151 6.61821C24.8171 7.22027 24.8171 8.19639 24.2151 8.79846L14.5136 18.5L24.2151 28.2016C24.8171 28.8036 24.8171 29.7798 24.2151 30.3818C23.6131 30.9838 22.6369 30.9838 22.0349 30.3818L11.2432 19.5901C10.9541 19.301 10.7917 18.9088 10.7917 18.5C10.7917 18.0911 10.9541 17.6989 11.2432 17.4099L22.0349 6.61821C22.6369 6.01615 23.6131 6.01615 24.2151 6.61821Z"
-                                fill="#b0b0b0"
+                                fill="var(--color-sheet-icon-nav-default)"
                                 fillRule="evenodd"
-                                className="group-hover:fill-[#595959] transition-colors duration-200 group-disabled:fill-[#d0d0d0]"
+                                className="group-hover:fill-sheet-icon-hover transition-colors duration-200 group-disabled:fill-sheet-icon-disabled"
                               />
                             </g>
                           </svg>
@@ -172,9 +172,9 @@ export default function App() {
                               <path
                                 clipRule="evenodd"
                                 d="M12.7849 6.61821C12.1829 7.22027 12.1829 8.19639 12.7849 8.79846L22.4864 18.5L12.7849 28.2016C12.1829 28.8036 12.1829 29.7798 12.7849 30.3818C13.3869 30.9838 14.3631 30.9838 14.9651 30.3818L25.7568 19.5901C26.0459 19.301 26.2083 18.9088 26.2083 18.5C26.2083 18.0911 26.0459 17.6989 25.7568 17.4099L14.9651 6.61821C14.3631 6.01615 13.3869 6.01615 12.7849 6.61821Z"
-                                fill="#b0b0b0"
+                                fill="var(--color-sheet-icon-nav-default)"
                                 fillRule="evenodd"
-                                className="group-hover:fill-[#595959] transition-colors duration-200 group-disabled:fill-[#d0d0d0]"
+                                className="group-hover:fill-sheet-icon-hover transition-colors duration-200 group-disabled:fill-sheet-icon-disabled"
                               />
                             </g>
                           </svg>

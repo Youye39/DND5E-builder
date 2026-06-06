@@ -10,9 +10,9 @@ function InfoFieldShell({ label, children }: { label: string; children: React.Re
           <div className="relative rounded-[inherit] size-full">
             {children}
           </div>
-          <div aria-hidden className="absolute border-2 border-[#595959] border-solid inset-[-1px] pointer-events-none rounded-[3px] shadow-[1px_0px_0px_0px_#595959,-1px_0px_0px_0px_#595959]" />
+          <div aria-hidden className="absolute border-2 border-[#595959] border-solid inset-[-1px] pointer-events-none rounded-[3px] shadow-[1px_0px_0px_0px_var(--color-sheet-border-secondary),-1px_0px_0px_0px_var(--color-sheet-border-secondary)]" />
         </div>
-        <div className="[word-break:break-word] absolute flex flex-col font-['Noto_Serif:Medium','Noto_Sans_JP:Medium','Noto_Sans_SC:Medium',sans-serif] font-medium inset-[0_0_86.73%_2.11%] justify-center leading-[0] text-[#b3b3b3] text-[14px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
+        <div className="[word-break:break-word] absolute flex flex-col font-serif-medium-cjk font-medium inset-[0_0_86.73%_2.11%] justify-center leading-[0] text-[#b3b3b3] text-[14px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
           <p className="leading-[normal]">{label}</p>
         </div>
       </div>
@@ -24,8 +24,8 @@ function InfoFieldShell({ label, children }: { label: string; children: React.Re
 function StaticField({ label, value }: { label: string; value: string }) {
   return (
     <InfoFieldShell label={label}>
-      <div className="absolute bg-[#efefef] bottom-[11px] h-[73px] overflow-clip right-[15px] w-[140px]">
-        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular','Noto_Sans_JP:Regular',sans-serif] font-normal h-[73px] justify-center leading-[0] left-[70px] text-[40px] text-black text-center top-[36.5px] w-[140px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
+      <div className="absolute bg-sheet-content-bg bottom-[11px] h-[73px] overflow-clip right-[15px] w-[140px]">
+        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular-cjk font-normal h-[73px] justify-center leading-[0] left-[70px] text-[40px] text-black text-center top-[36.5px] w-[140px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
           <p className="leading-[normal]">{value}</p>
         </div>
       </div>
@@ -41,19 +41,19 @@ function AbilityField({ value, onChange }: { value: string; onChange: (v: string
   return (
     <InfoFieldShell label="施法关键属性">
       <div
-        className="absolute bottom-[11px] h-[73px] right-[15px] w-[140px] cursor-pointer bg-[#efefef] hover:bg-[#e7e7e7]"
+        className="absolute bottom-[11px] h-[73px] right-[15px] w-[140px] cursor-pointer bg-sheet-content-bg hover:bg-sheet-hover-bg"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular','Noto_Sans_JP:Regular',sans-serif] font-normal h-[73px] justify-center leading-[0] left-[70px] text-[40px] text-black text-center top-[36.5px] w-[140px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
+        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular-cjk font-normal h-[73px] justify-center leading-[0] left-[70px] text-[40px] text-black text-center top-[36.5px] w-[140px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
           <p className="leading-[normal]">{value}</p>
         </div>
 
         {isOpen && (
-          <div className="absolute left-0 right-0 top-full z-10 bg-white border border-[#ccc] rounded-[2px] shadow-lg">
+          <div className="absolute left-0 right-0 top-full z-10 bg-white border border-sheet-border-placeholder rounded-[2px] shadow-lg">
             {options.map((opt) => (
               <div
                 key={opt}
-                className={`px-3 py-1.5 text-[14px] cursor-pointer hover:bg-[#e7e7e7] ${opt === value ? "bg-[#efefef] font-bold" : ""}`}
+                className={`px-3 py-1.5 text-[14px] cursor-pointer hover:bg-[#e7e7e7] ${opt === value ? "bg-sheet-content-bg font-bold" : ""}`}
                 onClick={() => { onChange(opt); setIsOpen(false); }}
               >
                 {opt}
@@ -79,13 +79,13 @@ export default function Header() {
         {/* Component2 - Character name and label */}
         <div className="absolute bg-white inset-[26.26%_66.52%_44.13%_2.6%] rounded-[2px]">
           <div className="overflow-clip relative rounded-[inherit] size-full">
-            <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal h-[53px] justify-center leading-[0] left-[173.5px] text-[24px] text-black text-center top-1/2 w-[327px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
+            <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular font-normal h-[53px] justify-center leading-[0] left-[173.5px] text-[24px] text-black text-center top-1/2 w-[327px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
               <p className="leading-[normal]">占位符</p>
             </div>
           </div>
           <div aria-hidden className="absolute border-2 border-[#595959] border-solid inset-[-1px] pointer-events-none rounded-[3px]" />
         </div>
-        <div className="[word-break:break-word] absolute flex flex-col font-['Noto_Serif:Medium',sans-serif] font-medium inset-[16.2%_81.51%_75.42%_2.87%] justify-center leading-[0] text-[#b3b3b3] text-[14px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
+        <div className="[word-break:break-word] absolute flex flex-col font-serif-medium font-medium inset-[16.2%_81.51%_75.42%_2.87%] justify-center leading-[0] text-[#b3b3b3] text-[14px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
           <p className="leading-[normal]">施法职业</p>
         </div>
       </div>

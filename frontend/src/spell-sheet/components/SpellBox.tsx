@@ -158,11 +158,11 @@ export default function SpellBox({
               preserveAspectRatio="none"
               viewBox="0 0 46 38"
             >
-              <path d={svgPaths.p35ea5900} fill="#1E1E1E" />
+              <path d={svgPaths.p35ea5900} fill="var(--color-sheet-svg-fill)" />
             </svg>
           </div>
           <div
-            className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Bold',sans-serif] font-bold h-[30px] justify-center leading-[0] left-px right-px text-[20px] text-center text-white top-[16px]"
+            className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-bold font-bold h-[30px] justify-center leading-[0] left-px right-px text-[20px] text-center text-white top-[16px]"
             style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
           >
             <p className="leading-[normal]">{level}</p>
@@ -173,7 +173,7 @@ export default function SpellBox({
       {/* Cantrip label */}
       {isCantrip && (
         <div
-          className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Bold','Noto_Sans_JP:Bold','Noto_Sans_SC:Bold',sans-serif] font-bold h-[24px] justify-center leading-[0] left-[70px] right-[258px] text-[12px] text-center text-white top-[13px]"
+          className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-bold-cjk font-bold h-[24px] justify-center leading-[0] left-[70px] right-[258px] text-[12px] text-center text-white top-[13px]"
           style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
         >
           <p className="leading-[normal]">戏法</p>
@@ -183,7 +183,7 @@ export default function SpellBox({
       {/* Resize handle — hidden for the last box in column */}
       {!isLastInColumn && (
         <div
-          className="absolute bottom-0 left-0 right-0 h-[6px] cursor-s-resize hover:bg-[#EFEFEF] active:bg-[#e7e7e7] z-10"
+          className="absolute bottom-0 left-0 right-0 h-[6px] cursor-s-resize hover:bg-sheet-content-bg active:bg-sheet-hover-bg z-10"
           onMouseDown={handleMouseDown}
         />
       )}

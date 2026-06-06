@@ -12,7 +12,7 @@ export default function SectionContainer({ title, className = "", children }: Se
       <div className="overflow-clip relative rounded-[inherit] size-full">
         <div className="absolute bg-black bottom-0 h-[24px] overflow-clip w-full" data-name="边栏">
           <div
-            className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Bold','Noto_Sans_JP:Bold',sans-serif] font-bold justify-center leading-[0] left-[100px] right-[101px] text-[10px] text-center text-white top-[12px]"
+            className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-bold-cjk font-bold justify-center leading-[0] left-[100px] right-[101px] text-[10px] text-center text-white top-[12px]"
             style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
           >
             <p className="leading-[normal]">{title}</p>

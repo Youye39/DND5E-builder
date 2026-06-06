@@ -27,15 +27,15 @@ export default function CoinComponent({
   return (
     <div className={className || "bg-white h-[58px] relative rounded-[2px] w-[56px]"} data-name="钱币">
       <div className="overflow-clip relative rounded-[inherit] size-full">
-        <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal justify-center leading-[0] left-0 right-0 text-[#595959] text-[8px] text-center top-[10.5px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+        <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular font-normal justify-center leading-[0] left-0 right-0 text-sheet-text-secondary text-[8px] text-center top-[10.5px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           <p className="leading-[normal]">{label}</p>
         </div>
-        <div className="absolute bg-[#efefef] left-[6px] right-[6px] top-[19px] h-[33px]">
+        <div className="absolute bg-sheet-content-bg left-[6px] right-[6px] top-[19px] h-[33px]">
           <input
             type="number"
             value={value}
             onChange={handleInputChange}
-            className="absolute inset-0 w-full h-full flex items-center justify-center font-['Noto_Serif:Regular',sans-serif] font-normal text-[14px] text-black text-center bg-transparent border-none outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+            className="absolute inset-0 w-full h-full flex items-center justify-center font-serif-regular font-normal text-[14px] text-black text-center bg-transparent border-none outline-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
             min="0"
           />

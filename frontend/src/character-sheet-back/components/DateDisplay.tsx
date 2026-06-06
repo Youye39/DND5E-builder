@@ -11,7 +11,7 @@ export default function DateDisplay({ value, onChange }: DateDisplayProps) {
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Medium',sans-serif] font-medium h-[20px] justify-center leading-[0] right-[14px] text-[12px] text-right text-white top-[10px] w-[110px] bg-transparent outline-none transition-colors hover:bg-[#1e1e1e] hover:text-[#efefef]"
+          className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-medium font-medium h-[20px] justify-center leading-[0] right-[14px] text-[12px] text-right text-white top-[10px] w-[110px] bg-transparent outline-none transition-colors hover:bg-sheet-button-dark-bg hover:text-sheet-content-bg"
           style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
         />
       </div>

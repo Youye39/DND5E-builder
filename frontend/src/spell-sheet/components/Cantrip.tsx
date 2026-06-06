@@ -8,15 +8,15 @@ export default function Cantrip() {
     <div className="bg-white h-[24px] overflow-clip relative w-[348px]" data-name="戏法">
       {/* Text area — click to open modal */}
       <div
-        className="absolute bg-white bottom-[3px] left-[22px] overflow-clip right-[12px] top-0 hover:bg-[#b3b3b3]/20 cursor-pointer"
+        className="absolute bg-white bottom-[3px] left-[22px] overflow-clip right-[12px] top-0 hover:bg-sheet-hover-light/20 cursor-pointer"
         onClick={() => setIsModalOpen(true)}
       >
         {spellName ? (
-          <div className="-translate-y-full [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular','Noto_Sans_JP:Regular','Noto_Sans_SC:Regular',sans-serif] font-normal h-[23px] justify-end leading-[0] left-[16px] text-[16px] text-black top-[22px] w-[316px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
+          <div className="-translate-y-full [word-break:break-word] absolute flex flex-col font-serif-regular-cjk font-normal h-[23px] justify-end leading-[0] left-[16px] text-[16px] text-black top-[22px] w-[316px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
             <p className="leading-[normal]">{spellName}</p>
           </div>
         ) : (
-          <div className="-translate-y-full [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular','Noto_Sans_JP:Regular','Noto_Sans_SC:Regular',sans-serif] font-normal h-[23px] justify-end leading-[0] left-[16px] text-[16px] text-[#ccc] top-[22px] w-[316px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
+          <div className="-translate-y-full [word-break:break-word] absolute flex flex-col font-serif-regular-cjk font-normal h-[23px] justify-end leading-[0] left-[16px] text-[16px] text-sheet-text-spell-placeholder top-[22px] w-[316px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
             <p className="leading-[normal]"></p>
           </div>
         )}
@@ -25,7 +25,7 @@ export default function Cantrip() {
       <div className="absolute left-[20px] right-[10px] top-[23px] h-0">
         <div className="relative h-px">
           <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 318 1">
-            <line id="Line 2" stroke="var(--stroke-0, #444444)" x2="318" y1="0.5" y2="0.5" />
+            <line id="Line 2" stroke="var(--color-sheet-svg-stroke)" x2="318" y1="0.5" y2="0.5" />
           </svg>
         </div>
       </div>

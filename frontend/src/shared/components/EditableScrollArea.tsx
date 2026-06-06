@@ -30,14 +30,14 @@ export default function EditableScrollArea({
   };
 
   return (
-    <div className={`group bg-[#efefef] overflow-y-scroll ${className}`}>
+    <div className={`group bg-sheet-content-bg overflow-y-scroll ${className}`}>
       <div
         ref={divRef}
         contentEditable
         suppressContentEditableWarning
         onInput={handleInput}
         data-placeholder={placeholder}
-        className={`font-['Noto_Serif:Regular',sans-serif] font-normal leading-[normal] text-[18px] text-black bg-transparent outline-none min-h-full [&:empty:before]:content-[attr(data-placeholder)] [&:empty:before]:text-gray-400 ${innerClassName}`}
+        className={`font-serif-regular font-normal leading-[normal] text-[18px] text-black bg-transparent outline-none min-h-full [&:empty:before]:content-[attr(data-placeholder)] [&:empty:before]:text-gray-400 ${innerClassName}`}
         style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100', whiteSpace: "pre-wrap", wordBreak: "break-word" }}
       />
       <style>{`

@@ -27,11 +27,11 @@ export default function HeaderBrand({ className = "" }: { className?: string }) 
         <p className="font-['Noto_Serif:Bold',serif] font-bold text-[16px] text-[#595959] h-[21px] -ml-[8px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           DRAGONS
         </p>
-        <p className="font-['Noto_Serif:Medium',serif] font-medium text-[12px] text-[#595959] h-[18px] ml-[7px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+        <p className="font-serif-medium-logo font-medium text-[12px] text-[#595959] h-[18px] ml-[7px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           5e2014
         </p>
       </div>
-      <p className="font-['Noto_Serif:Regular',serif] font-normal text-[10px] text-[#595959] h-[10px] -mt-[10px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+      <p className="font-serif-regular-logo font-normal text-[10px] text-[#595959] h-[10px] -mt-[10px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
         Builder Version 1.0
       </p>
     </div>

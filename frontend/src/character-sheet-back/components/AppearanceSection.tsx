@@ -18,7 +18,7 @@ export default function AppearanceSection() {
 
   return (
     <div
-      className="absolute bg-[#f6f6f6] h-[433px] left-[55px] overflow-clip shadow-[0px_0px_2px_0px_rgba(0,0,0,0.25)] top-[136px] w-[415px]"
+      className="absolute bg-sheet-panel-bg h-[433px] left-[55px] overflow-clip shadow-[0px_0px_2px_0px_rgba(0,0,0,0.25)] top-[136px] w-[415px]"
       data-name="角色外貌"
     >
       <div
@@ -39,10 +39,10 @@ export default function AppearanceSection() {
                 className="size-full object-cover"
               />
             ) : (
-              <div className="absolute inset-0 bg-[#efefef]" />
+              <div className="absolute inset-0 bg-sheet-content-bg" />
             )}
             {isHovered && (
-              <div className="absolute inset-0 bg-[#b3b3b3]/20 flex items-center justify-center transition-colors">
+              <div className="absolute inset-0 bg-sheet-hover-light/20 flex items-center justify-center transition-colors">
                 <svg
                   width="48"
                   height="48"
@@ -51,7 +51,7 @@ export default function AppearanceSection() {
                 >
                   <path
                     d="M24 10v28M10 24h28"
-                    stroke="#b3b3b3"
+                    stroke="var(--color-sheet-hover-light)"
                     strokeWidth="4"
                     strokeLinecap="round"
                   />
@@ -67,7 +67,7 @@ export default function AppearanceSection() {
             onChange={handleFileChange}
           />
           <div
-            className="[word-break:break-word] absolute bottom-[12px] flex flex-col font-['Noto_Serif:Medium',sans-serif] font-medium justify-center leading-[0] left-[100px] right-[101px] text-[10px] text-black text-center translate-y-1/2"
+            className="[word-break:break-word] absolute bottom-[12px] flex flex-col font-serif-medium font-medium justify-center leading-[0] left-[100px] right-[101px] text-[10px] text-black text-center translate-y-1/2"
             style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
           >
             <p className="leading-[normal]">角色外貌</p>

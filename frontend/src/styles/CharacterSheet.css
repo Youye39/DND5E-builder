@@ -1,5 +1,5 @@
 .character-sheet {
-  background: #f5f5f5;
+  background: var(--color-sheet-bg);
   padding: 20px;
   min-height: 100vh;
 }
@@ -8,7 +8,7 @@
   max-width: 1400px;
   margin: 0 auto;
   background: white;
-  border: 2px solid #333;
+  border: 2px solid var(--color-sheet-border-section);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -17,19 +17,19 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  border-bottom: 2px solid #333;
-  background: #f9f9f9;
+  border-bottom: 2px solid var(--color-sheet-border-section);
+  background: var(--color-sheet-header-bg);
 }
 
 .sheet-header h1 {
   margin: 0;
   font-size: 24px;
-  color: #333;
+  color: var(--color-sheet-text-dark);
 }
 
 .save-status {
   font-size: 14px;
-  color: #666;
+  color: var(--color-sheet-text-medium);
   font-weight: 500;
   min-width: 100px;
   text-align: right;
@@ -56,9 +56,9 @@
 
 /* Character Name Box */
 .character-name-box {
-  border: 2px solid #333;
+  border: 2px solid var(--color-sheet-border-section);
   padding: 12px;
-  background: #f0f0f0;
+  background: var(--color-sheet-dark-section-bg);
 }
 
 .character-name-box label {
@@ -73,7 +73,7 @@
   font-size: 18px;
   font-weight: bold;
   padding: 8px;
-  border: 1px solid #999;
+  border: 1px solid var(--color-sheet-border-input);
   border-radius: 3px;
 }
 
@@ -82,9 +82,9 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 10px;
-  border: 2px solid #333;
+  border: 2px solid var(--color-sheet-border-section);
   padding: 12px;
-  background: #f0f0f0;
+  background: var(--color-sheet-dark-section-bg);
 }
 
 .info-field {
@@ -100,16 +100,16 @@
 
 .info-field input {
   padding: 6px;
-  border: 1px solid #999;
+  border: 1px solid var(--color-sheet-border-input);
   border-radius: 3px;
   font-size: 12px;
 }
 
 /* Attributes Section */
 .attributes-section {
-  border: 2px solid #333;
+  border: 2px solid var(--color-sheet-border-section);
   padding: 12px;
-  background: #f0f0f0;
+  background: var(--color-sheet-dark-section-bg);
 }
 
 .attributes-section h2 {
@@ -124,7 +124,7 @@
 }
 
 .attribute-box {
-  border: 2px solid #333;
+  border: 2px solid var(--color-sheet-border-section);
   padding: 10px;
   text-align: center;
   background: white;
@@ -139,7 +139,7 @@
 .attribute-input {
   width: 100%;
   padding: 6px;
-  border: 1px solid #999;
+  border: 1px solid var(--color-sheet-border-input);
   border-radius: 3px;
   text-align: center;
   font-weight: bold;
@@ -149,14 +149,14 @@
 .attribute-modifier {
   font-size: 13px;
   font-weight: bold;
-  color: #0066cc;
+  color: var(--color-sheet-accent-blue);
 }
 
 /* Skills Section */
 .skills-section {
-  border: 2px solid #333;
+  border: 2px solid var(--color-sheet-border-section);
   padding: 12px;
-  background: #f0f0f0;
+  background: var(--color-sheet-dark-section-bg);
 }
 
 .skills-section h2 {
@@ -179,7 +179,7 @@
   align-items: center;
   padding: 6px;
   background: white;
-  border: 1px solid #ccc;
+  border: 1px solid var(--color-sheet-border-light);
   border-radius: 3px;
 }
 
@@ -216,27 +216,27 @@
   font-size: 12px;
   font-weight: bold;
   text-align: right;
-  color: #0066cc;
+  color: var(--color-sheet-accent-blue);
   padding-right: 6px;
 }
 
 /* Placeholder Boxes */
 .placeholder-box {
-  border: 2px solid #ccc;
+  border: 2px solid var(--color-sheet-border-placeholder);
   padding: 15px;
-  background: #f9f9f9;
+  background: var(--color-sheet-header-bg);
   min-height: 100px;
 }
 
 .placeholder-box h2 {
   margin: 0 0 10px 0;
   font-size: 13px;
-  color: #666;
+  color: var(--color-sheet-text-medium);
 }
 
 .placeholder-box p {
   margin: 0;
-  color: #999;
+  color: var(--color-sheet-text-lighter);
   font-size: 12px;
 }
 

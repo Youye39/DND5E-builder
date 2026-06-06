@@ -22,8 +22,8 @@ export default function SavingThrowComponent({
   return (
     <div className={className || "h-[16px] relative w-[87px]"} data-name="豁免">
       <div className="absolute contents inset-[0_41.38%_0_26.44%]">
-        <div className="absolute bg-[#efefef] inset-[6.25%_42.53%_12.5%_27.59%]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal inset-[0_41.38%_12.5%_26.44%] justify-center leading-[0] text-[10px] text-black text-center" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+        <div className="absolute bg-sheet-content-bg inset-[6.25%_42.53%_12.5%_27.59%]" />
+        <div className="[word-break:break-word] absolute flex flex-col font-serif-regular font-normal inset-[0_41.38%_12.5%_26.44%] justify-center leading-[0] text-[10px] text-black text-center" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           <p className="leading-[normal]">{modifierText}</p>
         </div>
         <div className="absolute bottom-0 left-[26.44%] right-[41.38%] top-full">
@@ -34,7 +34,7 @@ export default function SavingThrowComponent({
           </div>
         </div>
       </div>
-      <div className="[word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular','Noto_Sans_CJK:Regular',sans-serif] font-normal inset-[0_0_0_70.11%] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+      <div className="[word-break:break-word] absolute flex flex-col font-serif-regular-cjk font-normal inset-[0_0_0_70.11%] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
         <p className="leading-[normal]">{label}</p>
       </div>
       <ButtonComponent

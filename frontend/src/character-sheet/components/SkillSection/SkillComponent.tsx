@@ -37,8 +37,8 @@ export default function SkillComponent({
   return (
     <div className={className || "h-[16px] relative w-[127px]"} data-name="技能">
       <div className="absolute contents inset-[0_59.84%_0_18.11%]">
-        <div className="absolute bg-[#efefef] inset-[6.25%_60.63%_12.5%_18.9%]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal inset-[0_59.84%_12.5%_18.11%] justify-center leading-[0] text-[10px] text-black text-center" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
+        <div className="absolute bg-sheet-content-bg inset-[6.25%_60.63%_12.5%_18.9%]" />
+        <div className="[word-break:break-word] absolute flex flex-col font-serif-regular font-normal inset-[0_59.84%_12.5%_18.11%] justify-center leading-[0] text-[10px] text-black text-center" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
           <p className="leading-[normal]">{modifierText}</p>
         </div>
         <div className="absolute bottom-0 left-[18.11%] right-[59.84%] top-full">
@@ -49,10 +49,10 @@ export default function SkillComponent({
           </div>
         </div>
       </div>
-      <div className="[word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal inset-[0_31.5%_0_48.03%] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
+      <div className="[word-break:break-word] absolute flex flex-col font-serif-regular font-normal inset-[0_31.5%_0_48.03%] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
         <p className="leading-[normal]">{skillName}</p>
       </div>
-      <div className="[word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal inset-[0_0_0_68.5%] justify-center leading-[0] text-[#595959] text-[10px] text-center" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
+      <div className="[word-break:break-word] absolute flex flex-col font-serif-regular font-normal inset-[0_0_0_68.5%] justify-center leading-[0] text-sheet-text-secondary text-[10px] text-center" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
         <p className="leading-[normal]">（{attributeName}）</p>
       </div>
       <SkillButtonComponent state={skillState} onChange={setSkillState} />

@@ -97,11 +97,11 @@ function TempHPDisplay() {
   return (
     <div className="absolute bg-white h-[103px] left-[14px] rounded-[2px] top-[268px] w-[330px]" data-name="temp-hp">
       <div className="overflow-clip relative rounded-[inherit] size-full">
-        <div className="[word-break:break-word] absolute bottom-[16px] flex flex-col font-['Noto_Serif:Medium','Noto_Sans_JP:Medium','Noto_Sans_SC:Medium',sans-serif] font-medium justify-center leading-[0] left-0 right-0 text-[12px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+        <div className="[word-break:break-word] absolute bottom-[16px] flex flex-col font-serif-medium-cjk font-medium justify-center leading-[0] left-0 right-0 text-[12px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           <p className="leading-[normal]">临时生命值</p>
         </div>
-        <div className="absolute bg-[#efefef] h-[62px] left-[9px] top-[10px] w-[312px]" />
-        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal h-[60px] justify-center leading-[0] left-[165px] text-[36px] text-black text-center top-[41px] w-[312px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+        <div className="absolute bg-sheet-content-bg h-[62px] left-[9px] top-[10px] w-[312px]" />
+        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular font-normal h-[60px] justify-center leading-[0] left-[165px] text-[36px] text-black text-center top-[41px] w-[312px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           <p className="leading-[normal]"></p>
         </div>
       </div>
@@ -114,21 +114,21 @@ function HPDisplay() {
   return (
     <div className="absolute bg-white bottom-[234px] h-[124px] right-[14px] rounded-[2px] w-[330px]" data-name="hp">
       <div className="overflow-clip relative rounded-[inherit] size-full">
-        <div className="[word-break:break-word] absolute bottom-[16px] flex flex-col font-['Noto_Serif:Medium','Noto_Sans_JP:Medium','Noto_Sans_SC:Medium',sans-serif] font-medium justify-center leading-[0] left-[165px] right-0 text-[12px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+        <div className="[word-break:break-word] absolute bottom-[16px] flex flex-col font-serif-medium-cjk font-medium justify-center leading-[0] left-[165px] right-0 text-[12px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           <p className="leading-[normal]">生命值上限</p>
         </div>
-        <div className="[word-break:break-word] absolute bottom-[16px] flex flex-col font-['Noto_Serif:Medium','Noto_Sans_JP:Medium','Noto_Sans_SC:Medium',sans-serif] font-medium justify-center leading-[0] left-0 right-[165px] text-[12px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+        <div className="[word-break:break-word] absolute bottom-[16px] flex flex-col font-serif-medium-cjk font-medium justify-center leading-[0] left-0 right-[165px] text-[12px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           <p className="leading-[normal]">当前生命值</p>
         </div>
-        <div className="absolute bg-[#efefef] h-[83px] left-[9px] top-[10px] w-[141px]" />
+        <div className="absolute bg-sheet-content-bg h-[83px] left-[9px] top-[10px] w-[141px]" />
         <div className="absolute bg-[#efefef] h-[83px] left-[180px] top-[10px] w-[141px]" />
-        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal h-[60px] justify-center leading-[0] left-[79px] text-[48px] text-black text-center top-[50px] w-[82px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular font-normal h-[60px] justify-center leading-[0] left-[79px] text-[48px] text-black text-center top-[50px] w-[82px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           <p className="leading-[normal]">8</p>
         </div>
-        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal h-[60px] justify-center leading-[0] left-[250px] text-[48px] text-black text-center top-[50px] w-[82px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular font-normal h-[60px] justify-center leading-[0] left-[250px] text-[48px] text-black text-center top-[50px] w-[82px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           <p className="leading-[normal]">8</p>
         </div>
-        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal h-[60px] justify-center leading-[0] left-[165px] text-[48px] text-black text-center top-[50px] w-[20px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+        <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular font-normal h-[60px] justify-center leading-[0] left-[165px] text-[48px] text-black text-center top-[50px] w-[20px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           <p className="leading-[normal]">/</p>
         </div>
       </div>
@@ -158,7 +158,7 @@ function RestIcon({ type }: { type: "short" | "long" }) {
       <div className="overflow-visible relative rounded-[inherit] size-full">
         <div className="relative h-full w-full cursor-pointer transition-all duration-200 hover:scale-110 active:scale-100">
           <Icon />
-          <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Medium','Noto_Sans_JP:Medium',sans-serif] font-medium h-[8px] justify-center leading-[0] left-1/2 text-[10px] text-center text-white top-[calc(50%+10px)] w-[21px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+          <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-medium-cjk font-medium h-[8px] justify-center leading-[0] left-1/2 text-[10px] text-center text-white top-[calc(50%+10px)] w-[21px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
             <p className="leading-[normal]">{label}</p>
           </div>
         </div>
@@ -173,12 +173,12 @@ function HitDiceDisplay() {
     <div className="absolute bg-white h-[90px] left-[62px] rounded-[2px] top-[386px] w-[149px]" data-name="hit-dice">
       <div className="overflow-clip relative rounded-[inherit] size-full">
         <div className="absolute contents right-[9px] top-[10px]">
-          <div className="absolute bg-[#efefef] h-[56px] overflow-clip right-[9px] top-[10px] w-[131px]">
-            <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular',sans-serif] font-normal h-[56px] justify-center leading-[0] left-[65.5px] text-[24px] text-black text-center top-[28px] w-[131px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+          <div className="absolute bg-sheet-content-bg h-[56px] overflow-clip right-[9px] top-[10px] w-[131px]">
+            <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular font-normal h-[56px] justify-center leading-[0] left-[65.5px] text-[24px] text-black text-center top-[28px] w-[131px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
               <p className="leading-[normal]">1d6</p>
             </div>
           </div>
-          <div className="[word-break:break-word] absolute bottom-[12px] flex flex-col font-['Noto_Serif:Medium','Noto_Sans_JP:Medium',sans-serif] font-medium justify-center leading-[0] right-[74.5px] text-[10px] text-black text-center translate-x-1/2 translate-y-1/2 w-[131px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+          <div className="[word-break:break-word] absolute bottom-[12px] flex flex-col font-serif-medium-cjk font-medium justify-center leading-[0] right-[74.5px] text-[10px] text-black text-center translate-x-1/2 translate-y-1/2 w-[131px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
             <p className="leading-[normal]">生命骰</p>
           </div>
         </div>
@@ -193,7 +193,7 @@ function DeathSaveDisplay() {
     <div className="absolute bg-white h-[90px] left-[226px] rounded-[2px] top-[386px] w-[118px]" data-name="death-save">
       <div className="overflow-clip relative rounded-[inherit] size-full">
         <div className="-translate-x-1/2 -translate-y-1/2 absolute h-[24px] left-[calc(50%-0.5px)] overflow-clip top-[calc(50%+33px)] w-[117px]">
-          <div className="[word-break:break-word] absolute bottom-[12px] flex flex-col font-['Noto_Serif:Medium','Noto_Sans_JP:Medium',sans-serif] font-medium justify-center leading-[0] left-0 right-0 text-[10px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+          <div className="[word-break:break-word] absolute bottom-[12px] flex flex-col font-serif-medium-cjk font-medium justify-center leading-[0] left-0 right-0 text-[10px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
             <p className="leading-[normal]">死亡豁免</p>
           </div>
         </div>
@@ -234,7 +234,7 @@ function RestsAndDeathSection() {
 
 function CombatSection({ attributes }: { attributes?: Record<string, number> }) {
   return (
-    <div className="absolute bg-[#f6f6f6] h-[491px] left-[433px] overflow-clip shadow-[0px_0px_2px_0px_rgba(0,0,0,0.25)] top-[254px] w-[358px]" data-name="combat">
+    <div className="absolute bg-sheet-panel-bg h-[491px] left-[433px] overflow-clip shadow-[0px_0px_2px_0px_rgba(0,0,0,0.25)] top-[254px] w-[358px]" data-name="combat">
       <CombatStatsRow attributes={attributes} />
       <HealthSection />
       <RestsAndDeathSection />
@@ -248,7 +248,7 @@ function CombatSection({ attributes }: { attributes?: Record<string, number> }) 
 
 function PersonalityPanel() {
   return (
-    <div className="absolute bg-[#f6f6f6] h-[491px] left-[811px] overflow-clip shadow-[0px_0px_2px_0px_rgba(0,0,0,0.25)] top-[254px] w-[358px]" data-name="personality">
+    <div className="absolute bg-sheet-panel-bg h-[491px] left-[811px] overflow-clip shadow-[0px_0px_2px_0px_rgba(0,0,0,0.25)] top-[254px] w-[358px]" data-name="personality">
       <PersonalityTraitComponent
         className="absolute bg-white h-[107px] left-[14px] rounded-[2px] top-[15px] w-[330px]"
         label="个性特点"
@@ -339,7 +339,7 @@ function AttributesPanel({
   };
 
   return (
-    <div className="absolute bg-[#f6f6f6] h-[903px] left-[55px] overflow-clip shadow-[0px_0px_2px_0px_rgba(0,0,0,0.25)] top-[254px] w-[121px]" data-name="attributes">
+    <div className="absolute bg-sheet-panel-bg h-[903px] left-[55px] overflow-clip shadow-[0px_0px_2px_0px_rgba(0,0,0,0.25)] top-[254px] w-[121px]" data-name="attributes">
       <div className="absolute contents left-[12px] top-[29px]">
         <AttributeComponent 
           className="absolute h-[125px] left-[12px] top-[29px] w-[97px]" 

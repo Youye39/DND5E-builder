@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "../../../shared/ui/dialog";
 import AttackComponent from './AttackComponent';
 import SectionContainer from "../../../shared/components/SectionContainer";
 
@@ -13,7 +13,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
     <>
       <SectionContainer title="攻击" className={`${className || ""} w-[358px] h-[304px]`}>
         {/* 表头 */}
-        <div className="absolute top-[7px] left-[13px] right-[14px] flex text-[10px] text-[#595959] font-['Noto_Serif:Regular',sans-serif] gap-[5px]">
+        <div className="absolute top-[7px] left-[13px] right-[14px] flex text-[10px] text-sheet-text-secondary font-serif-regular gap-[5px]">
           <span className="w-[130px]">武器</span>
           <span className="w-[61px]">攻击加值</span>
           <span className="w-[130px]">伤害/类型</span>

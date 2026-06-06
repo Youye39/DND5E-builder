@@ -23,8 +23,8 @@ export default function DeathSaveComponent({
 
   return (
     <div className={className || "h-[14px] relative w-[80px]"} data-name="死豁">
-      <div className="absolute bg-[#efefef] inset-[21.43%_8.75%_21.43%_51.25%]" />
-      <div className="[word-break:break-word] absolute bottom-0 flex flex-col font-['Noto_Serif:Regular','Noto_Sans_CJK:Regular',sans-serif] font-normal justify-center leading-[0] left-0 right-3/4 text-[10px] text-black top-0" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+      <div className="absolute bg-sheet-content-bg inset-[21.43%_8.75%_21.43%_51.25%]" />
+      <div className="[word-break:break-word] absolute bottom-0 flex flex-col font-serif-regular-cjk font-normal justify-center leading-[0] left-0 right-3/4 text-[10px] text-black top-0" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
         <p className="leading-[normal]">{label}</p>
       </div>
       <ButtonComponent

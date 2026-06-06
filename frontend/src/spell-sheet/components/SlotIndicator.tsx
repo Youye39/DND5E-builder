@@ -15,7 +15,7 @@ function SlotButton({ filled }: { filled: boolean }) {
         preserveAspectRatio="none"
         viewBox="0 0 14 14"
       >
-        <circle cx="7" cy="7" fill="white" r="6.5" stroke="#1E1E1E" />
+        <circle cx="7" cy="7" fill="white" r="6.5" stroke="var(--color-sheet-svg-fill)" />
       </svg>
       <div
         className={`absolute left-[2px] rounded-[5px] size-[10px] top-[2px] ${

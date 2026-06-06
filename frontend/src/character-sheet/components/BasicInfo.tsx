@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../shared/ui/dialog";
 
 interface BasicInfoProps {
   className?: string;
@@ -24,17 +24,17 @@ function SelectableInfoField({
     <>
       <div className="absolute h-[54px] w-[180px]" style={{ left: `${left}px`, top: `${top}px` }}>
         <div
-          className="absolute bg-white inset-[31.48%_0_1.85%_0] rounded-[2px] cursor-pointer transition-all hover:bg-[#e7e7e7]"
+          className="absolute bg-white inset-[31.48%_0_1.85%_0] rounded-[2px] cursor-pointer transition-all hover:bg-sheet-hover-bg"
           onClick={() => setDialogOpen(true)}
         >
           <div className="overflow-clip relative rounded-[inherit] size-full">
-            <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-['Noto_Serif:Regular','Noto_Sans_JP:Regular','Noto_Sans_SC:Regular',sans-serif] font-normal h-[36px] justify-center leading-[0] left-[calc(50%-80px)] text-[18px] text-black top-1/2 w-[160px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+            <div className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular-cjk font-normal h-[36px] justify-center leading-[0] left-[calc(50%-80px)] text-[18px] text-black top-1/2 w-[160px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
               <p className="leading-[normal]">{value || ""}</p>
             </div>
           </div>
           <div aria-hidden="true" className="absolute border-2 border-[#595959] border-solid inset-[-1px] pointer-events-none rounded-[3px]" />
         </div>
-        <div className="[word-break:break-word] absolute flex flex-col font-['Noto_Serif:Medium','Noto_Sans_SC:Medium',sans-serif] font-medium inset-[0_1.67%_72.22%_1.67%] justify-center leading-[0] text-[#b3b3b3] text-[12px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+        <div className="[word-break:break-word] absolute flex flex-col font-serif-medium-cjk font-medium inset-[0_1.67%_72.22%_1.67%] justify-center leading-[0] text-[#b3b3b3] text-[12px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
           <p className="leading-[normal]">{label}</p>
         </div>
       </div>
@@ -104,13 +104,13 @@ function InlineInfoField({
             onChange={(e) => setEditValue(e.target.value)}
             onBlur={handleFinishEdit}
             onKeyDown={handleKeyDown}
-            className="absolute inset-0 w-full h-full text-left px-[10px] font-['Noto_Serif:Regular','Noto_Sans_JP:Regular','Noto_Sans_SC:Regular',sans-serif] font-normal text-[18px] text-black bg-transparent border-none outline-none"
+            className="absolute inset-0 w-full h-full text-left px-[10px] font-serif-regular-cjk font-normal text-[18px] text-black bg-transparent border-none outline-none"
             style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
           />
         </div>
-        <div aria-hidden="true" className="absolute border-2 border-[#595959] border-solid inset-[-1px] pointer-events-none rounded-[3px]" />
+        <div aria-hidden="true" className="absolute border-2 border-sheet-border-secondary border-solid inset-[-1px] pointer-events-none rounded-[3px]" />
       </div>
-      <div className="[word-break:break-word] absolute flex flex-col font-['Noto_Serif:Medium','Noto_Sans_SC:Medium',sans-serif] font-medium inset-[0_1.67%_72.22%_1.67%] justify-center leading-[0] text-[#b3b3b3] text-[12px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+      <div className="[word-break:break-word] absolute flex flex-col font-serif-medium-cjk font-medium inset-[0_1.67%_72.22%_1.67%] justify-center leading-[0] text-sheet-text-placeholder text-[12px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
         <p className="leading-[normal]">{label}</p>
       </div>
     </div>
