@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { saveImage, loadImage, imageIdToUrl } from "../../shared/storage/imageStore";
 
 interface EmblemSectionProps {
-  emblem: string;
+  emblem: string;          // IndexedDB 中的图片 ID
   organization: string;
   onEmblemChange: (value: string) => void;
   onOrganizationChange: (value: string) => void;
@@ -15,14 +16,27 @@ export default function EmblemSection({
 }: EmblemSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEmblemHovered, setIsEmblemHovered] = useState(false);
-  const [emblemImage, setEmblemImage] = useState<string | null>(emblem || null);
+  const [emblemImageUrl, setEmblemImageUrl] = useState<string | null>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 加载已持久化的图片
+  useEffect(() => {
+    let url: string | null = null;
+    if (emblem) {
+      imageIdToUrl(emblem).then((u) => {
+        url = u;
+        setEmblemImageUrl(u);
+      }).catch(() => setEmblemImageUrl(null));
+    } else {
+      setEmblemImageUrl(null);
+    }
+    return () => { if (url) URL.revokeObjectURL(url); };
+  }, [emblem]);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setEmblemImage(url);
-    onEmblemChange(url);
+    const id = await saveImage(file);
+    onEmblemChange(id);
   };
 
   const hasOrgInput = organization.trim().length > 0;
@@ -53,14 +67,14 @@ export default function EmblemSection({
       >
         {/* Content container with 2px padding */}
         <div className="absolute inset-[2px] overflow-hidden">
-          {emblemImage ? (
-            <img src={emblemImage} alt="徽记" className="size-full object-cover" />
+          {emblemImageUrl ? (
+            <img src={emblemImageUrl} alt="徽记" className="size-full object-cover" />
           ) : (
             <div className="size-full bg-white" />
           )}
 
           {/* "徽记" text — hidden when image is uploaded */}
-          {!emblemImage && (
+          {!emblemImageUrl && (
             <p
               className="absolute inset-0 flex items-center justify-center font-serif-regular font-normal text-sheet-content-bg text-[12px]"
               style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}

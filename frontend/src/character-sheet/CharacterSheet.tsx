@@ -1,22 +1,24 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import svgPaths from "../assets/dnd.ts";
-import AttributeComponent from "./components/AttributeComponent.tsx";
-import PersonalityTraitComponent from "./components/PersonalityTraitComponent.tsx";
-import ProficiencyBonusComponent from "./components/ProficiencyBonusComponent.tsx";
-import SavingThrowPanel from "./components/SavingThrowSection/SavingThrowPanel.tsx";
-import SkillPanel from "./components/SkillSection/SkillPanel.tsx";
-import AttackPanel from "./components/AttackSection/AttackPanel.tsx";
-import ProficiencyPanel from "./components/ProficiencyPanel.tsx";
-import EquipmentPanel from "./components/EquipmentPanel.tsx";
-import TraitsPanel from "./components/TraitsPanel.tsx";
-import DeathSaveComponent from "./components/DeathSaveComponent.tsx";
-import CoinComponent from "./components/CoinComponent.tsx";
-import PassivePerception from "./components/PassivePerception.tsx";
-import LevelDisplay from "./components/LevelDisplay.tsx";
-import CharacterName from "./components/CharacterName.tsx";
-import BasicInfo from "./components/BasicInfo.tsx";
-import CombatStatBox from "./components/CombatStatBox.tsx";
+import AttributeComponent from "./Basic/AttributeComponent.tsx";
+import PersonalityTraitComponent from "./Basic/PersonalityTraitComponent.tsx";
+import ProficiencyBonusComponent from "./Basic/ProficiencyBonusComponent.tsx";
+import SavingThrowPanel from "./SavingThrowSection/SavingThrowPanel.tsx";
+import SkillPanel from "./SkillSection/SkillPanel.tsx";
+import AttackPanel from "./AttackSection/AttackPanel.tsx";
+import ProficiencyPanel from "./Items/ProficiencyPanel.tsx";
+import EquipmentPanel from "./Items/EquipmentPanel.tsx";
+import TraitsPanel from "./Basic/TraitsPanel.tsx";
+import DeathSaveComponent from "./Battle/DeathSaveComponent.tsx";
+import CoinComponent from "./Items/CoinComponent.tsx";
+import PassivePerception from "./SkillSection/PassivePerception.tsx";
+import LevelDisplay from "./Basic/LevelDisplay.tsx";
+import CharacterName from "./Basic/CharacterName.tsx";
+import BasicInfo from "./Basic/BasicInfo.tsx";
+import CombatStatBox from "./Battle/CombatStatBox.tsx";
 import HeaderBrand from "../shared/components/logo";
+import { useCharacter } from "../shared/storage/CharacterContext";
+import type { Attributes } from "../shared/storage/types";
 
 // ============================================================================
 // Logo 和图标组件
@@ -73,7 +75,7 @@ const calculateModifier = (attrValue: number): string => {
   return modifier >= 0 ? `+${modifier}` : `${modifier}`;
 };
 
-function CombatStatsRow({ attributes }: { attributes?: Record<string, number> }) {
+function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
   return (
     <div className="absolute contents">
       <div className="absolute left-[14px] top-[15px]">
@@ -189,6 +191,9 @@ function HitDiceDisplay() {
 }
 
 function DeathSaveDisplay() {
+  const { character, updateCharacter } = useCharacter();
+  const deathSaves = character?.deathSaves ?? { success: 0, failure: 0 };
+
   return (
     <div className="absolute bg-white h-[90px] left-[226px] rounded-[2px] top-[386px] w-[118px]" data-name="death-save">
       <div className="overflow-clip relative rounded-[inherit] size-full">
@@ -200,10 +205,14 @@ function DeathSaveDisplay() {
         <DeathSaveComponent
           className="-translate-x-1/2 -translate-y-1/2 absolute h-[14px] left-1/2 top-[calc(50%-18px)] w-[80px]"
           label="成功"
+          value={deathSaves.success}
+          onChange={(v) => updateCharacter({ deathSaves: { ...deathSaves, success: v } })}
         />
         <DeathSaveComponent
           className="-translate-x-1/2 -translate-y-1/2 absolute h-[14px] left-1/2 top-[calc(50%+4px)] w-[80px]"
           label="失败"
+          value={deathSaves.failure}
+          onChange={(v) => updateCharacter({ deathSaves: { ...deathSaves, failure: v } })}
         />
       </div>
       <div aria-hidden="true" className="absolute border-2 border-black border-solid inset-[-1px] pointer-events-none rounded-[3px] shadow-[0px_1px_0px_0px_black,0px_-1px_0px_0px_black]" />
@@ -232,7 +241,7 @@ function RestsAndDeathSection() {
 // 战斗面板容器
 // ============================================================================
 
-function CombatSection({ attributes }: { attributes?: Record<string, number> }) {
+function CombatSection({ attributes }: { attributes?: Attributes }) {
   return (
     <div className="absolute bg-sheet-panel-bg h-[491px] left-[433px] overflow-clip shadow-[0px_0px_2px_0px_rgba(0,0,0,0.25)] top-[254px] w-[358px]" data-name="combat">
       <CombatStatsRow attributes={attributes} />
@@ -247,27 +256,38 @@ function CombatSection({ attributes }: { attributes?: Record<string, number> }) 
 // ============================================================================
 
 function PersonalityPanel() {
+  const { character, updateCharacter } = useCharacter();
+  const personality = character?.personality ?? { 个性特点: "", 理想: "", 牵绊: "", 缺点: "" };
+
+  const setPersonalityField = (field: string, val: string) => {
+    updateCharacter({ personality: { ...personality, [field]: val } });
+  };
+
   return (
     <div className="absolute bg-sheet-panel-bg h-[491px] left-[811px] overflow-clip shadow-[0px_0px_2px_0px_rgba(0,0,0,0.25)] top-[254px] w-[358px]" data-name="personality">
       <PersonalityTraitComponent
         className="absolute bg-white h-[107px] left-[14px] rounded-[2px] top-[15px] w-[330px]"
         label="个性特点"
-        initialValue=""
+        value={personality.个性特点}
+        onValueChange={(v) => setPersonalityField("个性特点", v)}
       />
       <PersonalityTraitComponent
         className="absolute bg-white h-[107px] left-[14px] rounded-[2px] top-[133px] w-[330px]"
         label="理想"
-        initialValue=""
+        value={personality.理想}
+        onValueChange={(v) => setPersonalityField("理想", v)}
       />
       <PersonalityTraitComponent
         className="absolute bg-white h-[107px] left-[14px] rounded-[2px] top-[251px] w-[330px]"
         label="牵绊"
-        initialValue=""
+        value={personality.牵绊}
+        onValueChange={(v) => setPersonalityField("牵绊", v)}
       />
       <PersonalityTraitComponent
         className="absolute bg-white h-[107px] left-[14px] rounded-[2px] top-[369px] w-[330px]"
         label="缺点"
-        initialValue=""
+        value={personality.缺点}
+        onValueChange={(v) => setPersonalityField("缺点", v)}
       />
     </div>
   );
@@ -278,32 +298,44 @@ function PersonalityPanel() {
 // ============================================================================
 
 function CoinsGrid() {
+  const { character, updateCharacter } = useCharacter();
+  const coins = character?.coins ?? { cp: "", sp: "", ep: "", gp: "", pp: "" };
+
+  const setCoin = (key: keyof typeof coins, val: string) => {
+    updateCharacter({ coins: { ...coins, [key]: val } });
+  };
+
   return (
     <div className="absolute contents left-[448px] top-[1083px]" data-name="coins">
       <CoinComponent
         className="absolute bg-white h-[58px] left-[448px] rounded-[2px] top-[1083px] w-[56px]"
         label="CP"
-        initialValue=""
+        value={coins.cp}
+        onValueChange={(v) => setCoin("cp", v)}
       />
       <CoinComponent
         className="absolute bg-white h-[58px] left-[516px] rounded-[2px] top-[1083px] w-[56px]"
         label="SP"
-        initialValue=""
+        value={coins.sp}
+        onValueChange={(v) => setCoin("sp", v)}
       />
       <CoinComponent
         className="absolute bg-white h-[58px] left-[584px] rounded-[2px] top-[1083px] w-[56px]"
         label="EP"
-        initialValue=""
+        value={coins.ep}
+        onValueChange={(v) => setCoin("ep", v)}
       />
       <CoinComponent
         className="absolute bg-white h-[58px] left-[652px] rounded-[2px] top-[1083px] w-[56px]"
         label="GP"
-        initialValue=""
+        value={coins.gp}
+        onValueChange={(v) => setCoin("gp", v)}
       />
       <CoinComponent
         className="absolute bg-white h-[58px] left-[720px] rounded-[2px] top-[1083px] w-[56px]"
         label="PP"
-        initialValue=""
+        value={coins.pp}
+        onValueChange={(v) => setCoin("pp", v)}
       />
     </div>
   );
@@ -326,7 +358,7 @@ function AttributesPanel({
   attributes,
   onAttributeChange,
 }: {
-  attributes?: Record<string, number>;
+  attributes?: Attributes;
   onAttributeChange?: (field: string, value: number) => void;
 }) {
   const finalAttributes = attributes || {
@@ -388,11 +420,9 @@ function AttributesPanel({
 
 function SkillsPanel({
   attributes,
-  onPerceptionModifierChange,
   proficiencyBonus,
 }: {
-  attributes?: Record<string, number>;
-  onPerceptionModifierChange?: (modifier: number) => void;
+  attributes?: Attributes;
   proficiencyBonus?: number;
 }) {
   const finalAttributes = attributes
@@ -411,56 +441,57 @@ function SkillsPanel({
       className="absolute left-[190px] top-[613px]"
       attributes={finalAttributes}
       proficiencyBonus={proficiencyBonus ?? 2}
-      onPerceptionModifierChange={onPerceptionModifierChange}
     />
   );
 }
 
-function CharacterCardContent({
-  attributes,
-  onAttributeChange,
-  perceptionModifier,
-  onPerceptionModifierChange,
-  level,
-  onLevelChange,
-  proficiencyBonus,
-  onProficiencyBonusChange,
-  characterName,
-  onCharacterNameChange,
-}: {
-  attributes?: Record<string, number>;
-  onAttributeChange?: (field: string, value: number) => void;
-  perceptionModifier?: number;
-  onPerceptionModifierChange?: (modifier: number) => void;
-  level?: number | "";
-  onLevelChange?: (lvl: number | "") => void;
-  proficiencyBonus?: number;
-  onProficiencyBonusChange?: (value: number) => void;
-  characterName?: string;
-  onCharacterNameChange?: (name: string) => void;
-}) {
+function CharacterCardContent() {
+  const { character, setAttributes, setLevel, setProficiencyBonus, updateCharacter } = useCharacter();
+  if (!character) return null;
+
+  const { attributes, level, proficiencyBonus } = character;
+  const wisdomMod = Math.floor(((attributes?.wis_value ?? 10) - 10) / 2);
+
+  const handleAttributeChange = (field: string, value: number) => {
+    const updated = { ...attributes, [field]: value };
+    setAttributes(updated);
+  };
+
+  // 等级变化时自动重算熟练加值
+  const effectiveLevel = level === "" ? 1 : level;
+  useEffect(() => {
+    const calcBonus = Math.floor((effectiveLevel + 7) / 4);
+    if (proficiencyBonus !== calcBonus) {
+      setProficiencyBonus(calcBonus);
+    }
+  }, [effectiveLevel]);
+
   return (
     <div className="absolute bg-white h-[1584px] left-0 overflow-clip top-[75px] w-[1224px]" data-name="character-card">
-      <BasicInfoSection level={level} onLevelChange={onLevelChange} characterName={characterName} onCharacterNameChange={onCharacterNameChange} />
+      <BasicInfoSection level={level} onLevelChange={setLevel} characterName={character.name} onCharacterNameChange={(name) => {
+        const updated = { ...character, name };
+        updateCharacter({ name: updated.name, characterInfo: { ...character.characterInfo, name } });
+      }} />
       <TraitsPanel className="absolute left-[811px] top-[762px]" />
       <PersonalityPanel />
       <EquipmentAndCoinsSection />
       <AttackPanel className="absolute left-[433px] top-[762px]" />
       <CombatSection attributes={attributes} />
       <ProficiencyPanel className="absolute left-[55px] top-[1244px]" />
-      <SkillsPanel attributes={attributes} onPerceptionModifierChange={onPerceptionModifierChange} proficiencyBonus={proficiencyBonus} />
+      <SkillsPanel attributes={attributes} proficiencyBonus={proficiencyBonus} />
       <SavingThrowPanel className="absolute left-[190px] top-[383px]" attributes={attributes} proficiencyBonus={proficiencyBonus} />
-      <AttributesPanel attributes={attributes} onAttributeChange={onAttributeChange} />
+      <AttributesPanel attributes={attributes} onAttributeChange={handleAttributeChange} />
       <div className="absolute h-[44px] left-[56px] rounded-[2px] top-[1178px] w-[358px]" data-name="passive-perception">
-        <PassivePerception perceptionModifier={perceptionModifier ?? Math.floor(((attributes?.wis_value || 10) - 10) / 2)} />
+        <PassivePerception perceptionModifier={wisdomMod} />
       </div>
       <ProficiencyBonusComponent
         className="absolute h-[44px] left-[190px] rounded-[2px] top-[318px] w-[223px]"
         label="熟练加值"
         level={level}
+        initialValue={proficiencyBonus}
         showDice={false}
         showInput={true}
-        onValueChange={onProficiencyBonusChange}
+        onValueChange={setProficiencyBonus}
       />
       <ProficiencyBonusComponent
         className="absolute h-[44px] left-[190px] rounded-[2px] top-[255px] w-[223px]"
@@ -478,49 +509,10 @@ function CharacterCardContent({
 // 主要导出组件
 // ============================================================================
 
-interface CharacterSheetProps {
-  characterName?: string;
-  onCharacterNameChange?: (name: string) => void;
-}
-
-export default function CharacterSheet({ characterName: externalName, onCharacterNameChange: externalOnChange }: CharacterSheetProps = {}) {
-  const [attributes, setAttributes] = useState({
-    str_value: 10,
-    dex_value: 10,
-    con_value: 10,
-    int_value: 10,
-    wis_value: 10,
-    cha_value: 10,
-  });
-  const [perceptionModifier, setPerceptionModifier] = useState(0);
-  const [level, setLevel] = useState<number | "">(1);
-  const [proficiencyBonus, setProficiencyBonus] = useState(2);
-  const [internalName, setInternalName] = useState("");
-
-  const characterName = externalName ?? internalName;
-  const setCharacterName = externalOnChange ?? setInternalName;
-
-  const handleAttributeChange = (field: string, value: number) => {
-    setAttributes((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
+export default function CharacterSheet() {
   return (
     <div className="relative size-full">
-      <CharacterCardContent
-        attributes={attributes}
-        onAttributeChange={handleAttributeChange}
-        perceptionModifier={perceptionModifier}
-        onPerceptionModifierChange={setPerceptionModifier}
-        level={level}
-        onLevelChange={setLevel}
-        proficiencyBonus={proficiencyBonus}
-        onProficiencyBonusChange={setProficiencyBonus}
-        characterName={characterName}
-        onCharacterNameChange={setCharacterName}
-      />
+      <CharacterCardContent />
     </div>
   );
 }

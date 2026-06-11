@@ -1,0 +1,59 @@
+[
+  {
+    "label": "简易近战武器",
+    "options": [
+      { "id": "club",          "label": "短棒"   },
+      { "id": "dagger",        "label": "匕首"   },
+      { "id": "greatclub",     "label": "巨棒"   },
+      { "id": "handaxe",       "label": "手斧"   },
+      { "id": "javelin",       "label": "标枪"   },
+      { "id": "lighthammer",   "label": "轻锤"   },
+      { "id": "mace",          "label": "硬头锤" },
+      { "id": "quarterstaff",  "label": "长棍"   },
+      { "id": "sickle",        "label": "镰刀"   },
+      { "id": "spear",         "label": "矛"   }
+    ]
+  },
+  {
+    "label": "简易远程武器",
+    "options": [
+      { "id": "lightcrossbow", "label": "轻弩"   },
+      { "id": "dart",          "label": "飞镖"   },
+      { "id": "shortbow",      "label": "短弓"   },
+      { "id": "sling",         "label": "投石索" }
+    ]
+  },
+  {
+    "label": "军用近战武器",
+    "options": [
+      { "id": "battleaxe",   "label": "战斧"   },
+      { "id": "flail",       "label": "链枷"   },
+      { "id": "glaive",      "label": "长柄刀"     },
+      { "id": "greataxe",    "label": "巨斧"   },
+      { "id": "greatsword",  "label": "巨剑"   },
+      { "id": "halberd",     "label": "戟" },
+      { "id": "lance",       "label": "骑枪"   },
+      { "id": "longsword",   "label": "长剑"   },
+      { "id": "maul",        "label": "巨锤" },
+      { "id": "morningstar", "label": "钉头锤" },
+      { "id": "pike",        "label": "长矛"   },
+      { "id": "rapier",      "label": "刺剑"   },
+      { "id": "scimitar",    "label": "弯刀"   },
+      { "id": "shortsword",  "label": "短剑"   },
+      { "id": "trident",     "label": "三叉戟" },
+      { "id": "warpick",     "label": "战镐"   },
+      { "id": "warhammer",   "label": "战锤"   },
+      { "id": "whip",        "label": "鞭"     }
+    ]
+  },
+  {
+    "label": "军用远程武器",
+    "options": [
+      { "id": "blowgun",      "label": "吹箭筒"   },
+      { "id": "handcrossbow",  "label": "手弩" },
+      { "id": "heavycrossbow", "label": "重弩" },
+      { "id": "longbow",       "label": "长弓" },
+      { "id": "net",           "label": "捕网" }
+    ]
+  }
+]

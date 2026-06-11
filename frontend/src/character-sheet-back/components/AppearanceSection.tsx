@@ -1,19 +1,39 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { saveImage, imageIdToUrl } from "../../shared/storage/imageStore";
 
-export default function AppearanceSection() {
+interface AppearanceSectionProps {
+  imageId?: string;
+  onImageChange?: (id: string) => void;
+}
+
+export default function AppearanceSection({ imageId = "", onImageChange }: AppearanceSectionProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
+
+  // 加载已持久化的图片
+  useEffect(() => {
+    let url: string | null = null;
+    if (imageId) {
+      imageIdToUrl(imageId).then((u) => {
+        url = u;
+        setImageUrl(u);
+      }).catch(() => setImageUrl(null));
+    } else {
+      setImageUrl(null);
+    }
+    return () => { if (url) URL.revokeObjectURL(url); };
+  }, [imageId]);
 
   const handleClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    setImageUrl(url);
+    const id = await saveImage(file);
+    onImageChange?.(id);
   };
 
   return (

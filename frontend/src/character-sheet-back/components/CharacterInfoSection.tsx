@@ -12,8 +12,9 @@ interface CharacterInfoData {
   eyeColor: string;
   skinColor: string;
   hairColor: string;
-  appearance: string;
-  emblem: string;
+  appearance: string;       // 形象描述文本
+  appearanceImageId: string; // IndexedDB 中角色形象图片的 ID
+  emblem: string;            // IndexedDB 中徽记图片的 ID
   organization: string;
 }
 
@@ -57,7 +58,7 @@ function AppearanceDescField({ value, onChange }: { value: string; onChange: (v:
         value={value}
         onChange={onChange}
         className="absolute bg-sheet-content-bg h-[111px] left-0 top-[17px] w-[651px]"
-        innerClassName="pl-[10px] pt-[6px] pb-[6px]"
+        innerClassName="pl-[10px] pt-[3px] pb-[3px] pr-[5px]"
       />
     </div>
   );

@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./shared/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./shared/dialogs/dialog";
 import BottomToolbar from "./shared/components/BottomToolbar";
 import CharacterSheet from "./character-sheet/CharacterSheet";
 import CharacterBackSide from "./character-sheet-back/CharacterSheetBack";
 import SpellSheet from "./spell-sheet/SpellSheet";
+import ArchiveDialog from "./shared/components/ArchiveDialog";
+import { CharacterProvider } from "./shared/storage/CharacterContext";
 
 // ============================================================================
 // 页面导航栏
@@ -34,10 +36,9 @@ function PageNavigationBar() {
   );
 }
 
-export default function App() {
+function AppContent() {
   const [activeDialog, setActiveDialog] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
-  const [characterName, setCharacterName] = useState("");
 
   const closeDialog = () => setActiveDialog(null);
 
@@ -64,8 +65,8 @@ export default function App() {
                 {/* 角色卡内容（包含页码标签） */}
                 <div className="relative mx-auto" style={{ width: "1224px", height: "1659px", filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))' }}>
                   <PageNavigationBar />
-                  {currentPage === 0 && <CharacterSheet characterName={characterName} onCharacterNameChange={setCharacterName} />}
-                  {currentPage === 1 && <CharacterBackSide characterName={characterName} onCharacterNameChange={setCharacterName} />}
+                  {currentPage === 0 && <CharacterSheet />}
+                  {currentPage === 1 && <CharacterBackSide />}
                   {currentPage === 2 && <SpellSheet />}
 
                   {/* 页码标签样式控制层 */}
@@ -197,10 +198,10 @@ export default function App() {
       />
 
       {/* 对话框 */}
+      <ArchiveDialog open={activeDialog === "archive"} onOpenChange={(open) => { if (!open) closeDialog(); }} />
       {[
         { id: "export", title: "导出文件" },
         { id: "guide", title: "车卡指引" },
-        { id: "archive", title: "存档管理" },
         { id: "custom", title: "自定义项管理" },
       ].map((dialog) => (
         <Dialog key={dialog.id} open={activeDialog === dialog.id} onOpenChange={closeDialog}>
@@ -232,5 +233,13 @@ export default function App() {
         </Dialog>
       ))}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <CharacterProvider>
+      <AppContent />
+    </CharacterProvider>
   );
 }

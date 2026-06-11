@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCharacter } from "../shared/storage/CharacterContext";
 import SpellBox from "./components/SpellBox";
 import Header from "./components/Header";
 
@@ -117,27 +117,13 @@ function computeMaxAllowedHeight(
 
 
 export default function SpellSheet() {
-  // Spell box configurations: [level, spellCount, filledSlots, isCantrip]
-  const [spellBoxes] = useState([
-    // Column 1
-    { level: 0, spellCount: 6, filledSlots: 0, isCantrip: true, col: 0, row: 0 },
-    { level: 1, spellCount: 13, filledSlots: 4, isCantrip: false, col: 0, row: 1 },
-    { level: 2, spellCount: 13, filledSlots: 4, isCantrip: false, col: 0, row: 2 },
+  const { character, updateCharacter } = useCharacter();
 
-    // Column 2
-    { level: 3, spellCount: 14, filledSlots: 3, isCantrip: false, col: 1, row: 0 },
-    { level: 4, spellCount: 9, filledSlots: 4, isCantrip: false, col: 1, row: 1 },
-    { level: 5, spellCount: 9, filledSlots: 2, isCantrip: false, col: 1, row: 2 },
+  if (!character) return null;
 
-    // Column 3
-    { level: 6, spellCount: 9, filledSlots: 1, isCantrip: false, col: 2, row: 0 },
-    { level: 7, spellCount: 8, filledSlots: 1, isCantrip: false, col: 2, row: 1 },
-    { level: 8, spellCount: 7, filledSlots: 1, isCantrip: false, col: 2, row: 2 },
-    { level: 9, spellCount: 6, filledSlots: 0, isCantrip: false, col: 2, row: 3 },
-  ]);
-
-  // Track custom heights set by drag resize (keyed by level)
-  const [customHeights, setCustomHeights] = useState<Record<number, number>>({});
+  const spellBoxes = character.spellBoxes;
+  const customHeights = character.customHeights;
+  const setCustomHeights = (heights: Record<number, number>) => updateCharacter({ customHeights: heights });
   return (
     <div className="absolute bg-white h-[1584px] left-0 overflow-clip top-[75px] w-[1224px]">
       <Header />

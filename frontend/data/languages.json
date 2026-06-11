@@ -1,0 +1,34 @@
+[
+  {
+    "label": "标准语言",
+    "options": [
+      { "id": "common",   "label": "通用语"   },
+      { "id": "dwarvish", "label": "矮人语"   },
+      { "id": "elvish",   "label": "精灵语"   },
+      { "id": "giant",    "label": "巨人语"   },
+      { "id": "gnomish",  "label": "侏儒语"   },
+      { "id": "halfling", "label": "半身人语" },
+      { "id": "orc",      "label": "兽人语"   }
+    ]
+  },
+  {
+    "label": "特种语言",
+    "options": [
+      { "id": "abyssal",     "label": "深渊语"     },
+      { "id": "celestial",   "label": "天界语"     },
+      { "id": "draconic",    "label": "龙语"       },
+      { "id": "deep_speech", "label": "深潜语" },
+      { "id": "infernal",    "label": "炼狱语"     },
+      { "id": "primordial",  "label": "原初语"     },
+      { "id": "sylvan",      "label": "木族语"     },
+      { "id": "undercommon", "label": "地底通用语" }
+    ]
+  },
+  {
+    "label": "秘密语言",
+    "options": [
+      { "id": "druidic",      "label": "德鲁伊语" },
+      { "id": "thieves_cant", "label": "盗贼黑话"   }
+    ]
+  }
+]

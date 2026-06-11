@@ -1,0 +1,16 @@
+[
+  {
+    "label": "全部护甲",
+    "options": [
+      { "id": "light",  "label": "轻甲" },
+      { "id": "medium", "label": "中甲" },
+      { "id": "heavy",  "label": "重甲" }
+    ]
+  },
+  {
+    "label": "盾牌",
+    "options": [
+      { "id": "shield", "label": "盾牌" }
+    ]
+  }
+]

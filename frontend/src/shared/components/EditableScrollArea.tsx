@@ -30,7 +30,7 @@ export default function EditableScrollArea({
   };
 
   return (
-    <div className={`group bg-sheet-content-bg overflow-y-scroll ${className}`}>
+    <div className={`group bg-sheet-content-bg overflow-y-auto ${className}`}>
       <div
         ref={divRef}
         contentEditable
