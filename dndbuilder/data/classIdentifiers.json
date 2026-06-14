@@ -1,0 +1,16 @@
+[
+  { "id": "barbarian",   "labels": ["野蛮人", "barbarian", "蛮子", "蛮"] },
+  { "id": "bard",        "labels": ["吟游诗人", "bard", "诗人", "诗"] },
+  { "id": "cleric",      "labels": ["牧师", "cleric", "牧"] },
+  { "id": "druid",       "labels": ["德鲁伊", "druid", "德"] },
+  { "id": "fighter",     "labels": ["战士", "fighter", "战"] },
+  { "id": "monk",        "labels": ["武僧", "monk", "僧"] },
+  { "id": "paladin",     "labels": ["圣武士", "paladin", "帕拉丁", "帕"] },
+  { "id": "ranger",      "labels": ["游侠", "ranger", "软"] },
+  { "id": "rogue",       "labels": ["游荡者", "rogue", "贼"] },
+  { "id": "sorcerer",    "labels": ["术士", "sorcerer", "术"] },
+  { "id": "warlock",     "labels": ["邪术师", "warlock", "契术师", "锁"] },
+  { "id": "wizard",      "labels": ["法师", "wizard", "法"] },
+  { "id": "artificer",   "labels": ["奇械师", "artificer", "奇械"] },
+  { "id": "bloodhunter", "labels": ["血猎手", "血猎人","bloodhunter", "血猎"] }
+]
