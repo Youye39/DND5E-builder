@@ -19,7 +19,7 @@ import type {
   DeathSaves,
   SpellBoxData,
 } from "./types";
-import type { Item, AttackEntry, SpellData } from "../types/types";
+import type { Item, AttackEntry } from "../types/types";
 import {
   getCurrentCharacter,
   getSaveList,
@@ -157,7 +157,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     [updateCharacter]
   );
   const setWeapons = useCallback(
-    (weapons: any[]) => updateCharacter({ weapons }),
+    (weapons: any[]) => updateCharacter({ weapons: weapons as never[] }),
     [updateCharacter]
   );
   const setProficiencies = useCallback(

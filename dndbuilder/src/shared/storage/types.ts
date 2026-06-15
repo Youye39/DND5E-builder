@@ -2,8 +2,8 @@
 // 角色卡数据模型 —— 用于 localStorage 持久化
 // ============================================================================
 
-import type { CharacterInfoData } from "../../character-sheet-back/components/CharacterInfoSection";
-import type { Item, SpellData, AttackEntry, ExtraBonus, TraitItem } from "../types/types";
+import type { CharacterInfoData } from "../../features/back-info/CharacterInfoSection";
+import type { Item, SpellData, AttackEntry, TraitItem } from "../types/types";
 
 /** 六项属性 */
 export interface Attributes {

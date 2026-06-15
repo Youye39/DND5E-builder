@@ -1,11 +1,11 @@
 import { useState } from "react";
-import BottomToolbar from "./shared/components/BottomToolbar";
-import CharacterSheet from "./character-sheet/CharacterSheet";
-import CharacterBackSide from "./character-sheet-back/CharacterSheetBack";
-import SpellSheet from "./spell-sheet/SpellSheet";
-import ArchiveDialog from "./shared/components/ArchiveDialog";
-import ExportDialog from "./shared/components/ExportPdfDialog";
-import CustomItemDialog from "./shared/components/CustomItemDialog";
+import BottomToolbar from "./dialogs/BottomToolbar";
+import CharacterSheet from "./pages/PageFront";
+import CharacterBackSide from "./pages/PageBack";
+import SpellSheet from "./pages/PageSpell";
+import ArchiveDialog from "./dialogs/ArchiveDialog";
+import ExportDialog from "./dialogs/ExportPdfDialog";
+import CustomItemDialog from "./dialogs/CustomItemDialog";
 import { CharacterProvider } from "./shared/storage/CharacterContext";
 
 // ============================================================================
