@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../../shared/tokens/colors";
-import type { TraitItem } from "../../shared/types/types";
+import type { TraitItem, SubTrait } from "../../shared/types/types";
 import traitKeywords from "../../../data/traitKeywords.json";
 
 const KEYWORD_PATTERNS = traitKeywords as string[];
@@ -20,6 +20,7 @@ const tooltipBase: React.CSSProperties = {
 
 interface TraitTooltipProps {
   trait: TraitItem | null;
+  subTrait?: SubTrait | null;
   mouseY: number;
   cardLeft: number;
   onMouseEnter?: () => void;
@@ -27,7 +28,7 @@ interface TraitTooltipProps {
 }
 
 export const TraitTooltip = React.memo(function TraitTooltip({
-  trait, mouseY: initY, cardLeft: initLeft,
+  trait, subTrait, mouseY: initY, cardLeft: initLeft,
   onMouseEnter, onMouseLeave,
 }: TraitTooltipProps) {
   const tooltipRef = useRef<HTMLDivElement>(null);
@@ -41,7 +42,9 @@ export const TraitTooltip = React.memo(function TraitTooltip({
     });
   }, [initY, initLeft]);
 
-  const visible = trait && (!!trait.description || !!trait.name);
+  const showSub = subTrait && (!!subTrait.description || !!subTrait.name);
+  const showParent = trait && !showSub && (!!trait.description || !!trait.name);
+  const visible = showParent || showSub;
   if (!visible) return ReactDOM.createPortal(<div style={{ ...tooltipBase, left: pos.left, top: pos.top, display: "none" }} />, document.body);
 
   return ReactDOM.createPortal(
@@ -51,29 +54,50 @@ export const TraitTooltip = React.memo(function TraitTooltip({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      {/* 特质名称 */}
-      <div style={{ fontSize: "14px", fontFamily: "var(--font-serif-regular)", color: sheetColors.textDark, fontVariationSettings: FVAR, fontWeight: 600, marginBottom: 4 }}>
-        {trait!.name}
-      </div>
-      {/* 标签 */}
-      {trait!.tags && trait!.tags.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginBottom: 6 }}>
-          {trait!.tags.map((tag, idx) => (
-            <span key={idx} style={{ padding: "1px 6px", borderRadius: "2px", backgroundColor: sheetColors.hoverBg, fontSize: "11px", color: sheetColors.textDark, fontFamily: "var(--font-serif-regular)" }}>
-              {tag}
-            </span>
-          ))}
-        </div>
-      )}
-      {/* 描述 */}
-      {trait!.description && (
-        <div style={{ fontSize: "12px", lineHeight: 1.5, whiteSpace: "pre-wrap", color: sheetColors.textLighter, fontFamily: "var(--font-serif-regular)", fontVariationSettings: FVAR }}>
-          {trait!.description.split(HIGHLIGHT_RE).map((part, i) =>
-            i % 2 === 1
-              ? <span key={i} style={{ color: sheetColors.textDark, fontWeight: 600 }}>{part}</span>
-              : <span key={i}>{part}</span>
+      {showSub ? (
+        <>
+          {/* 特质选项名称 */}
+          <div style={{ fontSize: "14px", fontFamily: "var(--font-serif-regular)", color: sheetColors.textDark, fontVariationSettings: FVAR, fontWeight: 600, marginBottom: 4 }}>
+            {subTrait!.name}
+          </div>
+          {/* 特质选项描述 */}
+          {subTrait!.description && (
+            <div style={{ fontSize: "12px", lineHeight: 1.5, whiteSpace: "pre-wrap", color: sheetColors.textLighter, fontFamily: "var(--font-serif-regular)", fontVariationSettings: FVAR }}>
+              {subTrait!.description.split(HIGHLIGHT_RE).map((part, i) =>
+                i % 2 === 1
+                  ? <span key={i} style={{ color: sheetColors.textDark, fontWeight: 600 }}>{part}</span>
+                  : <span key={i}>{part}</span>
+              )}
+            </div>
           )}
-        </div>
+        </>
+      ) : (
+        <>
+          {/* 特质名称 */}
+          <div style={{ fontSize: "14px", fontFamily: "var(--font-serif-regular)", color: sheetColors.textDark, fontVariationSettings: FVAR, fontWeight: 600, marginBottom: 4 }}>
+            {trait!.name}
+          </div>
+          {/* 标签 */}
+          {trait!.tags && trait!.tags.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginBottom: 6 }}>
+              {trait!.tags.map((tag, idx) => (
+                <span key={idx} style={{ padding: "1px 6px", borderRadius: "2px", backgroundColor: sheetColors.hoverBg, fontSize: "11px", color: sheetColors.textDark, fontFamily: "var(--font-serif-regular)" }}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+          {/* 描述 */}
+          {trait!.description && (
+            <div style={{ fontSize: "12px", lineHeight: 1.5, whiteSpace: "pre-wrap", color: sheetColors.textLighter, fontFamily: "var(--font-serif-regular)", fontVariationSettings: FVAR }}>
+              {trait!.description.split(HIGHLIGHT_RE).map((part, i) =>
+                i % 2 === 1
+                  ? <span key={i} style={{ color: sheetColors.textDark, fontWeight: 600 }}>{part}</span>
+                  : <span key={i}>{part}</span>
+              )}
+            </div>
+          )}
+        </>
       )}
     </div>,
     document.body

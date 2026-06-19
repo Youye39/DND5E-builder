@@ -79,6 +79,14 @@ export interface AttackEntry {
   refId: string; // 指向 Item.id 或 SpellData.id
 }
 
+// ─── 特质选项条目 ────────────────────────────────────────────────────────
+export interface SubTrait {
+  id: string;
+  name: string;
+  usage?: string;        // 使用次数，如 "3/3"
+  description?: string;
+}
+
 // ─── 特质条目（特性与特质）────────────────────────────────────────────────
 export interface TraitItem {
   id: string;
@@ -86,6 +94,7 @@ export interface TraitItem {
   usage?: string;        // 使用次数，如 "3/3"
   description?: string;
   tags?: string[];       // 自定义标签
+  subTraits?: SubTrait[];
 }
 
 export function createDefaultTrait(name = ""): TraitItem {
@@ -93,6 +102,14 @@ export function createDefaultTrait(name = ""): TraitItem {
     id: `trait_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     name,
     tags: [],
+    subTraits: [],
+  };
+}
+
+export function createDefaultSubTrait(): SubTrait {
+  return {
+    id: `sub_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    name: "",
   };
 }
 

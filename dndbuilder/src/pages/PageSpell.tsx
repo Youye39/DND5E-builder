@@ -133,7 +133,12 @@ export default function SpellSheet() {
         ? { ...b, spells, spellCount: Math.max(b.spellCount, spells.length) }
         : b
     );
-    updateCharacter({ spellBoxes: nextBoxes });
+    // 清理已删除法术对应的攻击条目
+    const allSpellIds = new Set(nextBoxes.flatMap(b => (b.spells ?? []).map(s => s.id)));
+    const filteredEntries = character.attackEntries.filter(
+      e => e.type !== "spell" || allSpellIds.has(e.refId)
+    );
+    updateCharacter({ spellBoxes: nextBoxes, attackEntries: filteredEntries });
   };
 
   const handleAddSpell = (boxLevel: number, spell: SpellData) => {
