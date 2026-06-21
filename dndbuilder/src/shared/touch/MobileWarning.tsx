@@ -6,18 +6,18 @@ const FVAR = "'CTGR' 0, 'wdth' 100";
 
 export default function MobileWarning() {
   const [show, setShow] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    // 只显示一次
-    if (localStorage.getItem("mobile_warning_dismissed")) return;
+    if (dismissed) return;
     const check = () => setShow(window.innerWidth < 600);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
-  }, []);
+  }, [dismissed]);
 
   const handleDismiss = () => {
-    localStorage.setItem("mobile_warning_dismissed", "1");
+    setDismissed(true);
     setShow(false);
   };
 
