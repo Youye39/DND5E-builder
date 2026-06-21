@@ -6,6 +6,7 @@ import SpellSheet from "./pages/PageSpell";
 import ArchiveDialog from "./dialogs/ArchiveDialog";
 import ExportDialog from "./dialogs/ExportPdfDialog";
 import CustomItemDialog from "./dialogs/CustomItemDialog";
+import GuideDialog from "./dialogs/GuideDialog";
 import { CharacterProvider } from "./shared/storage/CharacterContext";
 import MobileWarning from "./shared/touch/MobileWarning";
 
@@ -267,6 +268,7 @@ function AppContent() {
       <ArchiveDialog open={activeDialog === "archive"} onOpenChange={(open) => { if (!open) closeDialog(); }} />
       <ExportDialog open={activeDialog === "export"} onOpenChange={(open) => { if (!open) closeDialog(); }} />
       <CustomItemDialog open={activeDialog === "custom"} onOpenChange={(open) => { if (!open) closeDialog(); }} />
+      <GuideDialog open={activeDialog === "guide"} onClose={closeDialog} />
     </div>
   );
 }

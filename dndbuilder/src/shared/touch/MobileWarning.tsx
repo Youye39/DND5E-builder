@@ -8,11 +8,18 @@ export default function MobileWarning() {
   const [show, setShow] = useState(false);
 
   useEffect(() => {
+    // 只显示一次
+    if (localStorage.getItem("mobile_warning_dismissed")) return;
     const check = () => setShow(window.innerWidth < 600);
     check();
     window.addEventListener("resize", check);
     return () => window.removeEventListener("resize", check);
   }, []);
+
+  const handleDismiss = () => {
+    localStorage.setItem("mobile_warning_dismissed", "1");
+    setShow(false);
+  };
 
   if (!show) return null;
 
@@ -20,7 +27,7 @@ export default function MobileWarning() {
     <div
       className="fixed inset-0 z-[99999] flex items-center justify-center"
       style={{ backgroundColor: "rgba(0,0,0,0.35)" }}
-      onClick={(e) => e.target === e.currentTarget && setShow(false)}
+      onClick={(e) => e.target === e.currentTarget && handleDismiss()}
     >
       <div
         style={{
@@ -46,7 +53,7 @@ export default function MobileWarning() {
           为了获得更好的体验，请使用电脑或平板打开。
         </p>
         <button
-          onClick={() => setShow(false)}
+          onClick={handleDismiss}
           className="font-serif-medium-cjk text-[14px]"
           style={{
             padding: "6px 24px",

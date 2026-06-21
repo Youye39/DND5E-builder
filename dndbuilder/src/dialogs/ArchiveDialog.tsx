@@ -121,7 +121,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
             className="text-base"
             style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}
           >
-            切换存档
+            存档管理
           </DialogTitle>
         </DialogHeader>
 
