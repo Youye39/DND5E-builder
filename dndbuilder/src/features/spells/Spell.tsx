@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import ButtonComponent from "../../shared/ui/ButtonComponent";
 import type { SpellData } from "../../shared/types/types";
 import { SpellDialog } from "./SpellDialog";
 import SpellTip from "./SpellTip";
 import { useInteractionHandler } from "../../shared/dialogs/useInteractionHandler";
-
 const ABILITY_LABELS: Record<string, string> = { int: "智力", wis: "感知", cha: "魅力" };
 
 interface SpellRowProps {
@@ -15,8 +14,6 @@ interface SpellRowProps {
   isDragging?: boolean;
   onHover?: (e: React.MouseEvent) => void;
   onHoverLeave?: () => void;
-  /** 所在列索引（0=左, 1=中, 2=右），用于 SpellTip 定位 */
-  columnIndex?: number;
 }
 
 export default function SpellRow({
@@ -27,26 +24,24 @@ export default function SpellRow({
   isDragging,
   onHover,
   onHoverLeave,
-  columnIndex,
 }: SpellRowProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUsage, setEditingUsage] = useState(false);
   const [concentrationFocused, setConcentrationFocused] = useState(false);
-  const [tipPos, setTipPos] = useState({ mouseY: 0, cardLeft: 0, cardWidth: 0, cardBottom: 0 });
+  const [tipPos, setTipPos] = useState({ mouseY: 0, cardLeft: 0 });
 
   const safe = spell ?? { id: "", name: "", description: "", isInnate: false };
   const enabled = !editingUsage && !isDragging;
+  const tapTimestamp = useRef(0);
 
   const {
     tipVisible,
     onMouseEnter: hookMouseEnter,
     onMouseLeave: hookMouseLeave,
-    onClick,
     onTipMouseEnter,
     onTipMouseLeave,
   } = useInteractionHandler({
-    onOpenDialog: () => setIsDialogOpen(true),
-    onShowTip: (pos) => setTipPos({ mouseY: pos.mouseY, cardLeft: pos.cardLeft, cardWidth: pos.cardWidth ?? 0, cardBottom: pos.cardBottom ?? 0 }),
+    onShowTip: (pos) => setTipPos({ mouseY: pos.mouseY, cardLeft: pos.cardLeft }),
     enabled: enabled && !!safe.name,
   });
 
@@ -79,7 +74,13 @@ export default function SpellRow({
 
   const openDialog = () => {
     if (editingUsage || isDragging) return;
-    onClick();
+    const now = Date.now();
+    if (now - tapTimestamp.current < 500) {
+      tapTimestamp.current = 0;
+      setIsDialogOpen(true);
+    } else {
+      tapTimestamp.current = now;
+    }
   };
 
   return (
@@ -180,9 +181,6 @@ export default function SpellRow({
             spell={safe}
             mouseY={tipPos.mouseY}
             cardLeft={tipPos.cardLeft}
-            cardWidth={tipPos.cardWidth}
-            cardBottom={tipPos.cardBottom}
-            columnIndex={columnIndex}
             onChange={onChange}
             onMouseEnter={onTipMouseEnter}
             onMouseLeave={onTipMouseLeave}

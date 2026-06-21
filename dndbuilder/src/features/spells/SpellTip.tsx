@@ -27,12 +27,6 @@ interface SpellTipProps {
   mouseY: number;
   /** 卡片左侧边缘的 X 坐标 */
   cardLeft: number;
-  /** 卡片宽度（用于列定位） */
-  cardWidth?: number;
-  /** 卡片底部边缘的 Y 坐标（用于下方定位） */
-  cardBottom?: number;
-  /** 所在列：0=左列, 1=中列, 2=右列；默认 2（左侧弹出） */
-  columnIndex?: number;
   /** 若传入则跳过内部定位计算，直接使用此 left 值 */
   overrideLeft?: number;
   /** 若传入则跳过内部定位计算，直接使用此 top 值 */
@@ -44,26 +38,18 @@ interface SpellTipProps {
   onMouseLeave?: () => void;
 }
 
-export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, cardWidth = 358, cardBottom, columnIndex = 2, overrideLeft, overrideTop, overrideWidth, onMouseEnter, onMouseLeave, onChange }: SpellTipProps) {
+export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, overrideLeft, overrideTop, overrideWidth, onMouseEnter, onMouseLeave, onChange }: SpellTipProps) {
   const hasOverride = overrideLeft !== undefined && overrideTop !== undefined;
   const w = overrideWidth ?? TOOLTIP_W;
   const [pos] = useState(() => {
     if (hasOverride) return { left: overrideLeft, top: overrideTop };
-    if (columnIndex === 0) {
-      // 第一列 → 右侧弹出
-      return {
-        left: initLeft + cardWidth + 8,
-        top: Math.max(4, Math.min(initY - 10, window.innerHeight - 200)),
-      };
-    }
-    if (columnIndex === 1) {
-      // 第二列 → 下方弹出
+    // 屏幕 < 600px → 下方弹出；否则左侧弹出
+    if (window.innerWidth < 600) {
       return {
         left: initLeft,
-        top: (cardBottom ?? initY) + 4,
+        top: initY + 4,
       };
     }
-    // 第三列（默认）→ 左侧弹出
     return {
       left: initLeft - TOOLTIP_W - 8,
       top: Math.max(4, Math.min(initY - 10, window.innerHeight - 200)),

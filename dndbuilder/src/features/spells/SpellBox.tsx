@@ -59,8 +59,6 @@ export default function SpellBox({
 }: SpellBoxProps) {
   // 内部 spells 状态（用于未受控模式）
   const safeSpells = externalSpells ?? [];
-  // 根据环位计算所在列：0-2→左列, 3-5→中列, 6-9→右列
-  const colIndex = level <= 2 ? 0 : level <= 5 ? 1 : 2;
   
   // 添加法术对话框
   const [addDialogOpen, setAddDialogOpen] = useState(false);
@@ -294,7 +292,6 @@ export default function SpellBox({
                     onChange={changeHandler}
                     onDelete={deleteHandler}
                     isDragging={dragIndex !== null}
-                    columnIndex={colIndex}
                   />
                 ) : (
                   <SpellRow
@@ -302,7 +299,6 @@ export default function SpellBox({
                     onChange={changeHandler}
                     onDelete={deleteHandler}
                     isDragging={dragIndex !== null}
-                    columnIndex={colIndex}
                   />
                 )}
               </div>
@@ -401,7 +397,7 @@ export default function SpellBox({
             }}
           >
             {spell ? (
-              isCantrip ? <Cantrip spell={spell} onChange={() => {}} columnIndex={colIndex} /> : <SpellRow spell={spell} onChange={() => {}} columnIndex={colIndex} />
+              isCantrip ? <Cantrip spell={spell} onChange={() => {}} /> : <SpellRow spell={spell} onChange={() => {}} />
             ) : (
               <div style={{ height: ITEM_H }} />
             )}

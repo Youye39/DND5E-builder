@@ -190,6 +190,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
     return () => window.removeEventListener('resize', handler);
   }, []);
   const pendingIndexRef = useRef<number | null>(null);
+  const clickTimestamps = useRef<Map<number, number>>(new Map());
 
   const {
     onClick,
@@ -447,8 +448,16 @@ export default function AttackPanel({ className }: AttackPanelProps) {
                       // 最后一行（空行 / + 按钮）始终打开选择攻击来源
                       setSelectMode(true);
                     } else {
-                      pendingIndexRef.current = i;
-                      onClick();
+                      // 每行独立的双击检测（键鼠和触摸屏均适用）
+                      const now = Date.now();
+                      const last = clickTimestamps.current.get(i) || 0;
+                      if (now - last < 500) {
+                        clickTimestamps.current.delete(i);
+                        pendingIndexRef.current = i;
+                        onClick();
+                      } else {
+                        clickTimestamps.current.set(i, now);
+                      }
                     }
                   }}
                   style={{
