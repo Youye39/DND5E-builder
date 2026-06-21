@@ -27,16 +27,34 @@ interface SpellTipProps {
   mouseY: number;
   /** 卡片左侧边缘的 X 坐标 */
   cardLeft: number;
+  /** 若传入则跳过内部定位计算，直接使用此 left 值 */
+  overrideLeft?: number;
+  /** 若传入则跳过内部定位计算，直接使用此 top 值 */
+  overrideTop?: number;
+  /** 覆盖宽度 */
+  overrideWidth?: number;
   onChange?: (spell: SpellData) => void;
   onMouseEnter?: () => void;
   onMouseLeave?: () => void;
 }
 
-export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, onMouseEnter, onMouseLeave, onChange }: SpellTipProps) {
-  const [pos] = useState(() => ({
-    left: initLeft - TOOLTIP_W - 8,
-    top: Math.max(4, Math.min(initY - 10, window.innerHeight - 200)),
-  }));
+export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, overrideLeft, overrideTop, overrideWidth, onMouseEnter, onMouseLeave, onChange }: SpellTipProps) {
+  const hasOverride = overrideLeft !== undefined && overrideTop !== undefined;
+  const w = overrideWidth ?? TOOLTIP_W;
+  const [pos] = useState(() => {
+    if (hasOverride) return { left: overrideLeft, top: overrideTop };
+    // 屏幕 < 600px → 下方弹出；否则左侧弹出
+    if (window.innerWidth < 600) {
+      return {
+        left: initLeft,
+        top: initY + 4,
+      };
+    }
+    return {
+      left: initLeft - TOOLTIP_W - 8,
+      top: Math.max(4, Math.min(initY - 10, window.innerHeight - 200)),
+    };
+  });
   const [localUsage, setLocalUsage] = useState<string | null>(null);
 
   if (!spell.name && !spell.description && !spell.school) return null;
@@ -53,12 +71,12 @@ export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, onM
   return ReactDOM.createPortal(
     <div
       style={{
-        position: "fixed", width: TOOLTIP_W,
+        position: "fixed", width: w,
         left: pos.left, top: pos.top,
         backgroundColor: sheetColors.cardBg, borderRadius: "8px",
         border: "1px solid var(--color-border)",
         boxShadow: "0 6px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)",
-        padding: "10px 12px", zIndex: 10000, fontVariationSettings: FVAR,
+        padding: "10px 12px", zIndex: 9998, fontVariationSettings: FVAR,
         pointerEvents: "auto",
       }}
       onMouseEnter={onMouseEnter}

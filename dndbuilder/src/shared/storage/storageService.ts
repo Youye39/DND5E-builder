@@ -3,7 +3,7 @@
 // ============================================================================
 
 import type { CharacterData, SaveArchive } from "./types";
-import { createDefaultCharacter } from "./types";
+import { createDefaultCharacter, generateId } from "./types";
 import { deleteImage } from "./imageStore";
 
 const STORAGE_KEY = "dndbuilder_archive";
@@ -139,4 +139,49 @@ export function duplicateCharacter(id: string): CharacterData | null {
   archive.saves.push(copy);
   writeArchive(archive);
   return copy;
+}
+
+// ============================================================================
+// JSON 文件导出 / 导入
+// ============================================================================
+
+/** 导出指定存档为 JSON 字符串（不含图片二进制数据） */
+export function exportCharacterToJSON(id: string): string | null {
+  const char = getCharacter(id);
+  if (!char) return null;
+  return JSON.stringify(char, null, 2);
+}
+
+/** 从 JSON 字符串导入角色存档（生成新 ID，不影响原有存档） */
+export function importCharacterFromJSON(jsonStr: string): CharacterData | null {
+  let data: unknown;
+  try {
+    data = JSON.parse(jsonStr);
+  } catch {
+    console.error("导入失败：JSON 格式错误");
+    return null;
+  }
+
+  // 基本校验
+  if (!data || typeof data !== "object") {
+    console.error("导入失败：无效的数据格式");
+    return null;
+  }
+  const candidate = data as Record<string, unknown>;
+  if (typeof candidate.id !== "string" || typeof candidate.name !== "string") {
+    console.error("导入失败：缺少必要字段（id, name）");
+    return null;
+  }
+
+  // 生成新 ID、重置时间戳
+  const imported = {
+    ...candidate,
+    id: generateId(),
+    name: candidate.name as string,
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  } as CharacterData;
+
+  saveCharacter(imported);
+  return imported;
 }

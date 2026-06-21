@@ -70,7 +70,7 @@ export default function CustomItemDialog({ open, onOpenChange }: CustomItemDialo
     if (!selected) return;
     removeCustom(selected);
     setContent(getDefaultRaw(selected));
-    setSaved(false);
+    setSaved(true);
   };
 
   return (

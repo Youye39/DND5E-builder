@@ -2,7 +2,7 @@
 // 存档管理对话框（优化版）
 // ============================================================================
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,8 @@ import {
   deleteCharacter as deleteStorageCharacter,
   renameCharacter,
   duplicateCharacter,
+  exportCharacterToJSON,
+  importCharacterFromJSON,
 } from "../shared/storage/storageService";
 import { sheetColors } from "../shared/tokens/colors";
 
@@ -34,6 +36,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // 每次打开时刷新列表
   useEffect(() => {
@@ -74,10 +77,43 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
     refreshSaveList();
   };
 
+  const handleExport = (id: string, name: string) => {
+    const json = exportCharacterToJSON(id);
+    if (!json) return;
+    const blob = new Blob([json], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${name}_dndbuilder.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const jsonStr = reader.result as string;
+      const char = importCharacterFromJSON(jsonStr);
+      if (char) {
+        refreshSaveList();
+        switchCharacter(char.id);
+      } else {
+        alert("导入失败：文件格式不正确，请选择有效的 D&D Builder 存档文件。");
+      }
+    };
+    reader.readAsText(file);
+    // 重置 input，允许重复选择同一个文件
+    e.target.value = "";
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-md !rounded-[10px] !p-5"
+        className="max-w-md !rounded-[10px] !pl-5 !pr-2 !py-5"
         style={{ borderColor: sheetColors.borderPlaceholder }}
       >
         <DialogHeader>
@@ -89,9 +125,9 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
           </DialogTitle>
         </DialogHeader>
 
-        {/* 滚动区域：右侧留出空间避免挤压 */}
+        {/* 滚动区域：flex 自适应宽度 */}
         <div
-          className="w-[485px] space-y-2 pr-1 max-h-[55vh] overflow-y-scroll group/scroll"
+          className="w-full space-y-2 pr-1 max-h-[55vh] overflow-y-scroll group/scroll"
         >
           {saveList.length === 0 && (
             <p
@@ -201,7 +237,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
                       <div className="flex gap-1">
                         <button
                           onClick={() => handleDelete(save.id)}
-                          className="px-2 py-1 rounded-[2px] text-white"
+                          className="px-2 py-1 rounded-[2px] text-white cursor-pointer"
                           style={{
                             fontSize: "12px",
                             fontFamily: "var(--font-serif-medium)",
@@ -212,7 +248,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
                         </button>
                         <button
                           onClick={() => setConfirmDelete(null)}
-                          className="px-2 py-1 rounded-[2px]"
+                          className="px-2 py-1 rounded-[2px] cursor-pointer"
                           style={{
                             fontSize: "12px",
                             fontFamily: "var(--font-serif-medium)",
@@ -227,7 +263,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
                       <div className="flex items-center gap-0.5">
                         <button
                           onClick={() => handleDuplicate(save.id)}
-                          className="px-2 py-1 rounded-[2px]"
+                          className="px-2 py-1 rounded-[2px] cursor-pointer"
                           style={{
                             fontSize: "12px",
                             fontFamily: "var(--font-serif-regular)",
@@ -237,8 +273,19 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
                           复制
                         </button>
                         <button
+                          onClick={() => handleExport(save.id, save.name)}
+                          className="px-2 py-1 rounded-[2px] cursor-pointer"
+                          style={{
+                            fontSize: "12px",
+                            fontFamily: "var(--font-serif-regular)",
+                            color: sheetColors.textPlaceholder,
+                          }}
+                        >
+                          导出
+                        </button>
+                        <button
                           onClick={() => setConfirmDelete(save.id)}
-                          className="px-2 py-1 rounded-[2px]"
+                          className="px-2 py-1 rounded-[2px] cursor-pointer"
                           style={{
                             fontSize: "12px",
                             fontFamily: "var(--font-serif-regular)",
@@ -255,35 +302,62 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
             );
           })}
 
-          {/* 新建按钮 */}
-          <button
-            onClick={handleNew}
-            className="w-full flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-[2px] border border-dashed transition-colors cursor-pointer"
-            style={{
-              borderColor: sheetColors.borderLight,
-              backgroundColor: sheetColors.cardBg,
-            }}
-          >
-            <span
-              className="leading-none"
+          {/* 底部操作区：新建 + 导入 */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleNew}
+              className="flex-1 flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-[2px] border border-dashed transition-colors cursor-pointer"
               style={{
-                fontSize: "14px",
-                fontFamily: "var(--font-serif-regular)",
-                color: sheetColors.textPlaceholder,
+                borderColor: sheetColors.borderLight,
+                backgroundColor: sheetColors.cardBg,
               }}
             >
-              +
-            </span>
-            <span
+              <span
+                className="leading-none"
+                style={{
+                  fontSize: "14px",
+                  fontFamily: "var(--font-serif-regular)",
+                  color: sheetColors.textPlaceholder,
+                }}
+              >
+                +
+              </span>
+              <span
+                style={{
+                  fontSize: "13px",
+                  fontFamily: "var(--font-serif-regular)",
+                  color: sheetColors.textLighter,
+                }}
+              >
+                新建角色存档
+              </span>
+            </button>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="flex-1 flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-[2px] border border-dashed transition-colors cursor-pointer"
               style={{
-                fontSize: "13px",
-                fontFamily: "var(--font-serif-regular)",
-                color: sheetColors.textLighter,
+                borderColor: sheetColors.borderLight,
+                backgroundColor: sheetColors.cardBg,
               }}
             >
-              新建角色存档
-            </span>
-          </button>
+              <span
+                style={{
+                  fontSize: "13px",
+                  fontFamily: "var(--font-serif-regular)",
+                  color: sheetColors.textLighter,
+                }}
+              >
+                从本地导入
+              </span>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json"
+              className="hidden"
+              onChange={handleImport}
+            />
+          </div>
         </div>
 
         {/* 细滑轨 — 匹配 ScrollArea 组件样式 */}

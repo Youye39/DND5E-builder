@@ -43,7 +43,7 @@ function AbilityField({ value, onChange }: { value: string; onChange: (v: string
         top: `${rect.bottom + 4}px`,
         left: `${rect.left}px`,
         width: `${rect.width}px`,
-        zIndex: 10000,
+        zIndex: 9998,
       });
     }
   }, [isOpen]);

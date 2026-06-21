@@ -348,9 +348,9 @@ export function SpellDialog({
             <div style={{ display: "flex", alignItems: "center", minHeight: 28 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 5, userSelect: "none" }}>
                 <ButtonComponent
-                  checked={!!data.saveType}
+                  checked={data.saveType !== undefined}
                   onChange={() => {
-                    if (data.saveType) {
+                    if (data.saveType !== undefined) {
                       set("saveType", undefined);
                       // 取消勾选时删除攻击栏对应条目
                       if (character) {
@@ -367,12 +367,12 @@ export function SpellDialog({
                 <span style={{ ...T, color: sheetColors.textMedium, fontSize: "13px" }}>保存为伤害法术</span>
               </div>
               <div style={{ flex: 1 }} />
-              {data.saveType && (
+              {data.saveType !== undefined && (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
                   <span style={{ ...T, color: sheetColors.textPlaceholder, fontSize: "13px" }}>显示</span>
                   <select
-                    value={data.saveType}
-                    onChange={(e) => set("saveType", e.target.value as "attack" | "save")}
+                    value={data.saveType || ""}
+                    onChange={(e) => set("saveType", e.target.value as "attack" | "save" | "")}
                     style={{
                       ...T, border: "none", borderBottom: "1px solid var(--color-border)", borderRadius: 0,
                     padding: "2px 20px 2px 0", outline: "none", backgroundColor: "transparent",
@@ -383,13 +383,14 @@ export function SpellDialog({
                 >
                   <option value="attack">攻击加值</option>
                   <option value="save">豁免DC</option>
+                  <option value="">空白</option>
                 </select>
                 </span>
               )}
             </div>
 
             {/* 第二行：伤害骰 + 伤害类型（勾选后才显示） ── */}
-            {data.saveType && (
+            {data.saveType !== undefined && (
               <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 6, marginTop: 4 }}>
                 <input
                   type="text"

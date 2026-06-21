@@ -1,11 +1,12 @@
 interface PassivePerceptionProps {
-  perceptionModifier?: number;
+  /** 察觉技能的总加值（含属性调整值 + 熟练/专精加值） */
+  perceptionTotal?: number;
 }
 
 export default function PassivePerception({
-  perceptionModifier = 0
+  perceptionTotal = 0
 }: PassivePerceptionProps) {
-  const passivePerceptionValue = 10 + perceptionModifier;
+  const passivePerceptionValue = 10 + perceptionTotal;
 
   return (
     <div className="h-[44px] relative w-[358px]" data-name="被动感知（察觉）" style={{ left: '-1px' }}>

@@ -3,7 +3,7 @@ import ButtonComponent from "../../shared/ui/ButtonComponent";
 import type { SpellData } from "../../shared/types/types";
 import { SpellDialog } from "./SpellDialog";
 import SpellTip from "./SpellTip";
-
+import { useInteractionHandler } from "../../shared/dialogs/useInteractionHandler";
 const ABILITY_LABELS: Record<string, string> = { int: "智力", wis: "感知", cha: "魅力" };
 
 interface SpellRowProps {
@@ -28,11 +28,22 @@ export default function SpellRow({
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUsage, setEditingUsage] = useState(false);
   const [concentrationFocused, setConcentrationFocused] = useState(false);
-  const [tipVisible, setTipVisible] = useState(false);
   const [tipPos, setTipPos] = useState({ mouseY: 0, cardLeft: 0 });
-  const tipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const safe = spell ?? { id: "", name: "", description: "", isInnate: false };
+  const enabled = !editingUsage && !isDragging;
+  const tapTimestamp = useRef(0);
+
+  const {
+    tipVisible,
+    onMouseEnter: hookMouseEnter,
+    onMouseLeave: hookMouseLeave,
+    onTipMouseEnter,
+    onTipMouseLeave,
+  } = useInteractionHandler({
+    onShowTip: (pos) => setTipPos({ mouseY: pos.mouseY, cardLeft: pos.cardLeft }),
+    enabled: enabled && !!safe.name,
+  });
 
   const textLeft = isCantrip ? "left-[22px]" : "left-[30px]";
   const textWidth = isCantrip ? "" : "w-[306px]";
@@ -51,33 +62,25 @@ export default function SpellRow({
     if (e.key === "Enter" || e.key === "Escape") setEditingUsage(false);
   };
 
-  const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const scheduleHide = () => {
-    if (hideTimerRef.current) clearTimeout(hideTimerRef.current);
-    hideTimerRef.current = setTimeout(() => setTipVisible(false), 200);
-  };
-
-  const cancelHide = () => {
-    if (hideTimerRef.current) { clearTimeout(hideTimerRef.current); hideTimerRef.current = null; }
-  };
-
   const handleMouseEnter = (e: React.MouseEvent) => {
     onHover?.(e);
-    cancelHide();
-    if (safe.name) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      tipTimerRef.current = setTimeout(() => {
-        setTipPos({ mouseY: e.clientY, cardLeft: rect.left });
-        setTipVisible(true);
-      }, 300);
-    }
+    hookMouseEnter(e);
   };
 
   const handleMouseLeave = () => {
     onHoverLeave?.();
-    if (tipTimerRef.current) clearTimeout(tipTimerRef.current);
-    scheduleHide();
+    hookMouseLeave();
+  };
+
+  const openDialog = () => {
+    if (editingUsage || isDragging) return;
+    const now = Date.now();
+    if (now - tapTimestamp.current < 500) {
+      tapTimestamp.current = 0;
+      setIsDialogOpen(true);
+    } else {
+      tapTimestamp.current = now;
+    }
   };
 
   return (
@@ -104,7 +107,7 @@ export default function SpellRow({
           {/* 法术名 — 可点击打开对话框 */}
           <div
             className="absolute inset-0 cursor-pointer hover:bg-sheet-hover-light/20"
-            onClick={() => !editingUsage && !isDragging && setIsDialogOpen(true)}
+            onClick={openDialog}
           >
             {safe.name ? (
               <div className="-translate-y-full absolute flex flex-col font-serif-regular-cjk h-[23px] justify-end left-[8px] text-[16px] text-black top-[22px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
@@ -179,8 +182,8 @@ export default function SpellRow({
             mouseY={tipPos.mouseY}
             cardLeft={tipPos.cardLeft}
             onChange={onChange}
-            onMouseEnter={cancelHide}
-            onMouseLeave={scheduleHide}
+            onMouseEnter={onTipMouseEnter}
+            onMouseLeave={onTipMouseLeave}
           />
         )}
 

@@ -67,7 +67,7 @@ export interface SpellData {
   damageDice?: string;
   damageType?: string;
   attackBonus?: number;       // 法术攻击加值
-  saveType?: "attack" | "save"; // 命中类/豁免类 伤害法术标记
+  saveType?: "attack" | "save" | ""; // 命中类/豁免类/空白 伤害法术标记
   /** 预计算后的攻击栏显示值，如 "+5" 或 "DC15" */
   attackDisplay?: string;
 }
@@ -79,6 +79,14 @@ export interface AttackEntry {
   refId: string; // 指向 Item.id 或 SpellData.id
 }
 
+// ─── 特质选项条目 ────────────────────────────────────────────────────────
+export interface SubTrait {
+  id: string;
+  name: string;
+  usage?: string;        // 使用次数，如 "3/3"
+  description?: string;
+}
+
 // ─── 特质条目（特性与特质）────────────────────────────────────────────────
 export interface TraitItem {
   id: string;
@@ -86,6 +94,7 @@ export interface TraitItem {
   usage?: string;        // 使用次数，如 "3/3"
   description?: string;
   tags?: string[];       // 自定义标签
+  subTraits?: SubTrait[];
 }
 
 export function createDefaultTrait(name = ""): TraitItem {
@@ -93,6 +102,14 @@ export function createDefaultTrait(name = ""): TraitItem {
     id: `trait_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     name,
     tags: [],
+    subTraits: [],
+  };
+}
+
+export function createDefaultSubTrait(): SubTrait {
+  return {
+    id: `sub_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+    name: "",
   };
 }
 

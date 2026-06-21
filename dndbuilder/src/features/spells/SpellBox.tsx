@@ -5,6 +5,7 @@ import Cantrip from "./Cantrip";
 import SpellRow from "./Spell";
 import SlotIndicator from "./SlotIndicator";
 import { SpellDialog } from "./SpellDialog";
+import { sheetColors } from "../../shared/tokens/colors";
 import type { SpellData } from "../../shared/types/types";
 import { createDefaultSpell } from "../../shared/types/types";
 
@@ -61,6 +62,14 @@ export default function SpellBox({
   
   // 添加法术对话框
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+
+  // 右键删除菜单
+  const [spellContextMenu, setSpellContextMenu] = useState<{ index: number; x: number; y: number } | null>(null);
+
+  const handleSpellContextMenu = (e: React.MouseEvent, index: number) => {
+    e.preventDefault();
+    setSpellContextMenu({ index, x: e.clientX, y: e.clientY });
+  };
 
   const handleOpenAddDialog = () => {
     setAddDialogOpen(true);
@@ -275,6 +284,7 @@ export default function SpellBox({
                   transition: dragIndex !== null && index !== dragIndex ? 'transform 0.15s ease' : 'none',
                 }}
                 onMouseDown={(e) => onMouseDown(e, index)}
+                onContextMenu={(e) => handleSpellContextMenu(e, index)}
               >
                 {isCantrip ? (
                   <Cantrip
@@ -299,6 +309,7 @@ export default function SpellBox({
           {onAddSpell && (
             <div className="shrink-0">
               <button
+                data-name="add-spell"
                 onClick={handleOpenAddDialog}
                 className="flex items-center gap-1 w-full h-[24px] px-[30px] text-[13px] text-sheet-text-spell-placeholder hover:text-sheet-text-secondary hover:bg-sheet-hover-light/20 transition-colors cursor-pointer font-serif-regular-cjk text-left"
                 style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
@@ -403,6 +414,50 @@ export default function SpellBox({
         onSave={handleAddSpell}
         onClose={handleCloseAddDialog}
       />
+
+      {/* 右键删除菜单 */}
+      {spellContextMenu && ReactDOM.createPortal(
+        <div
+          className="fixed inset-0 z-[9999]"
+          onClick={() => setSpellContextMenu(null)}
+          onContextMenu={(e) => { e.preventDefault(); setSpellContextMenu(null); }}
+        >
+          <div
+            style={{
+              position: "fixed",
+              left: spellContextMenu.x,
+              top: spellContextMenu.y,
+              backgroundColor: sheetColors.cardBg,
+              border: "1px solid var(--color-border)",
+              borderRadius: "4px",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
+              minWidth: "100px",
+              zIndex: 10000,
+              padding: 0,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              onClick={() => {
+                const next = safeSpells.filter((_, i) => i !== spellContextMenu.index);
+                onSpellsChange?.(next);
+                setSpellContextMenu(null);
+              }}
+              style={{
+                padding: "4px 10px",
+                fontSize: "12px",
+                color: sheetColors.textDark,
+                cursor: "pointer",
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.hoverBg; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
+            >
+              删除
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from "react";
+import { useIsTouchDevice } from "../../shared/touch/useDelayedTap";
 
 interface AttackComponentProps {
   name?: string;
@@ -59,16 +60,44 @@ export default function AttackComponent({
   const nameSize = useAutoFontSize(nameContainerRef, nameRef, 18, name);
   const bonusSize = useAutoFontSize(bonusContainerRef, bonusRef, 18, attackBonus);
   const damageSize = useAutoFontSize(damageContainerRef, damageRef, 18, damage);
+  const isTouch = useIsTouchDevice();
+  const tapTimestamp = useRef(0);
+
+  const handleClick = () => {
+    if (!onClick) return;
+    if (!isTouch) { onClick(); return; }
+    const now = Date.now();
+    if (now - tapTimestamp.current < 500) {
+      tapTimestamp.current = 0;
+      onClick();
+    } else {
+      tapTimestamp.current = now;
+    }
+  };
+
+  const handleNameClick = (e: React.MouseEvent) => {
+    onNameEnter?.(e);
+    handleClick();
+  };
+
+  const handleAttackClick = (e: React.MouseEvent) => {
+    onAttackEnter?.(e);
+    handleClick();
+  };
+
+  const handleDamageClick = (e: React.MouseEvent) => {
+    onDamageEnter?.(e);
+    handleClick();
+  };
 
   if (variant === 'toFill') {
     return (
       <div
         className={`h-[28px] ${className}`}
-        onMouseEnter={onNameEnter}
         onMouseLeave={onMouseLeave}
       >
         <div
-          onClick={onClick}
+          onClick={handleClick}
           className="w-[331px] h-full flex items-center justify-center bg-white border border-dashed border-sheet-border-placeholder rounded-[2px] hover:bg-sheet-bg cursor-pointer"
         >
           <span className="text-[18px] text-sheet-text-placeholder leading-none">+</span>
@@ -86,15 +115,15 @@ export default function AttackComponent({
       className={`flex h-[28px] gap-[5px] ${className}`}
       onMouseLeave={onMouseLeave}
     >
-      <div ref={nameContainerRef} className={nameClass} onClick={onClick} onMouseEnter={onNameEnter}>
+      <div ref={nameContainerRef} className={nameClass} onClick={handleNameClick}>
         <span ref={nameRef} className="pl-[5px] font-['Noto_Serif:Regular',sans-serif] text-black leading-none whitespace-nowrap" style={{ fontSize: nameSize }}>{name}</span>
       </div>
 
-      <div ref={bonusContainerRef} className={bonusClass} onClick={onClick} onMouseEnter={onAttackEnter}>
+      <div ref={bonusContainerRef} className={bonusClass} onClick={handleAttackClick}>
         <span ref={bonusRef} className="pl-[5px] font-['Noto_Serif:Regular',sans-serif] text-black leading-none whitespace-nowrap" style={{ fontSize: bonusSize }}>{attackBonus}</span>
       </div>
 
-      <div ref={damageContainerRef} className={damageClass} onClick={onClick} onMouseEnter={onDamageEnter}>
+      <div ref={damageContainerRef} className={damageClass} onClick={handleDamageClick}>
         <span ref={damageRef} className="pl-[5px] font-['Noto_Serif:Regular',sans-serif] text-black leading-none whitespace-nowrap" style={{ fontSize: damageSize }}>{damage}</span>
       </div>
     </div>

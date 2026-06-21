@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../shared/tokens/colors";
 import { useCharacter } from "../shared/storage/CharacterContext";
+import { exportCharacterToJSON } from "../shared/storage/storageService";
 import { toOwlbearJSON, toFVTTJSON } from "../shared/storage/exportService";
 import CharacterSheet from "../pages/PageFront";
 import CharacterBackSide from "../pages/PageBack";
@@ -134,6 +135,14 @@ export default function ExportDialog({ open, onOpenChange }: ExportDialogProps) 
     URL.revokeObjectURL(url);
   };
 
+  const exportLocalArchive = () => {
+    if (!character) return;
+    const json = exportCharacterToJSON(character.id);
+    if (!json) return;
+    downloadJSON(json, `${character.name}_dndbuilder.json`);
+    onOpenChange(false);
+  };
+
   const exportHTML = async () => {
     setExporting(true);
     try {
@@ -179,6 +188,25 @@ export default function ExportDialog({ open, onOpenChange }: ExportDialogProps) 
         pageContents.push(tempDiv.innerHTML);
       }
 
+      // ── 构建 tooltip 数据 ──
+      const tooltipData = {
+        spells: (character?.spellBoxes ?? []).flatMap(b => b.spells ?? []).filter(s => s.name).map(s => ({
+          name: s.name, school: s.school ?? "", description: s.description ?? "",
+          ritual: !!s.ritual, concentration: !!s.concentration,
+          isInnate: !!s.isInnate, usage: s.usage ?? "1/1",
+          innateAbility: s.innateAbility ?? "",
+        })),
+        items: (character?.items ?? []).filter(i => i.name).map(i => ({
+          name: i.name, description: i.description ?? "",
+          features: i.features?.map(f => ({ id: f.id, name: f.name, description: f.description, note: f.note ?? "" })) ?? [],
+        })),
+        traits: (character?.traitList ?? []).filter(t => t.name).map(t => ({
+          name: t.name, description: t.description ?? "",
+          subTraits: t.subTraits?.map(s => ({ name: s.name, description: s.description ?? "" })) ?? [],
+        })),
+      };
+      const tooltipJSON = JSON.stringify(tooltipData).replace(/<\//g, '<\\/');
+
         const pageNames = ["角色卡正面", "角色卡背面", "法术书"];
         const tabs = pageNames.map((n, i) =>
           `<label class="page-tab" data-i="${i}" onclick="switchPage(${i})">${n}</label>`
@@ -208,15 +236,172 @@ ${stylesHTML}
   .page-content [data-name="character-card"],
   .page-content [data-name="角色卡背面"],
   .page-content > .absolute:first-child { top: 0 !important; }
+  /* 隐藏添加输入框 */
+  .page-content textarea[placeholder*="特性"],
+  .page-content textarea[placeholder*="物品"] { display: none !important; }
+  /* 隐藏攻击栏的 + 按钮 */
+  .page-content .border-dashed { display: none !important; }
+  /* 隐藏添加法术按钮 */
+  .page-content [data-name="add-spell"] { display: none !important; }
+  /* 隐藏生命值和临时生命值输入框 */
+  .page-content [data-name="hp"] input:first-of-type,
+  .page-content [data-name="temp-hp"] input { display: none !important; }
+  /* 隐藏钱币输入框 */
+  .page-content [data-name="钱币"] input { display: none !important; }
+  /* 法术准备按钮始终未选中 */
+  .page-content [data-name="法术"] [data-name="按钮"] svg circle:nth-child(3),
+  .page-content [data-name="戏法"] [data-name="按钮"] svg circle:nth-child(3) { display: none !important; }
+  /* 隐藏已知信息行 */
+  .page-content .pointer-events-none.flex.justify-between { display: none !important; }
+  .tooltip-popup {
+    position: fixed; width: 240px; z-index: 99999; pointer-events: auto;
+    background: #fff; border-radius: 8px; border: 1px solid #e0e0e0;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06);
+    padding: 10px 12px; font-size: 12px; line-height: 1.5; display: none;
+    font-family: "Noto Serif", "Noto Sans SC", serif;
+    font-variation-settings: 'CTGR' 0, 'wdth' 100;
+  }
+  .tooltip-popup .tip-name {
+    font-size: 14px; font-weight: 600; color: #2b2b2b; margin-bottom: 4px;
+  }
+  .tooltip-popup .tip-tag {
+    display: inline-flex; align-items: center; gap: 2px;
+    padding: 1px 6px; border-radius: 2px;
+    background: #f0ecdd; font-size: 11px; line-height: 1.4; margin-right: 4px; margin-bottom: 4px;
+  }
+  .tooltip-popup .tip-desc { color: #666; white-space: pre-wrap; }
+  .tooltip-overlay { position: fixed; inset: 0; z-index: 99998; display: none; }
 </style>
 </head>
 <body>
+  <div class="tooltip-overlay" id="tipOverlay" onclick="hideTooltip()"></div>
+  <div class="tooltip-popup" id="tipPopup"></div>
   <div class="page-wrapper">
     <div class="page-nav">${tabs}</div>
     <div class="page-container">
       ${pageContents.map((c, i) => `<div class="page-content ${i === 0 ? "" : "hidden"}" data-page="${i}">${c}</div>`).join("")}
     </div>
   </div>
+  <script>
+    var _td = ${tooltipJSON};
+    var _popup = document.getElementById('tipPopup');
+    var _overlay = document.getElementById('tipOverlay');
+    var _schoolMap = { abjuration:'防护', conjuration:'咒法', divination:'预言', enchantment:'附魔', evocation:'塑能', illusion:'幻术', necromancy:'死灵', transmutation:'变化' };
+
+    function showTooltip(html, x, y) {
+      _popup.innerHTML = html;
+      _popup.style.left = Math.max(4, Math.min(x, window.innerWidth - 248)) + 'px';
+      _popup.style.top = Math.max(4, y - 10) + 'px';
+      _popup.style.display = 'block';
+      _overlay.style.display = 'block';
+    }
+
+    function hideTooltip() { _popup.style.display = 'none'; _overlay.style.display = 'none'; }
+
+    function esc(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+    function buildSpellTip(s) {
+      var h = '<div class="tip-name">' + esc(s.name) + '</div>';
+      if (s.school || s.ritual || s.concentration) {
+        h += '<div style="margin-bottom:6px">';
+        if (s.school) h += '<span class="tip-tag">' + esc(_schoolMap[s.school] || s.school) + '</span>';
+        if (s.ritual) h += '<span class="tip-tag">仪式</span>';
+        if (s.concentration) h += '<span class="tip-tag">专注</span>';
+        h += '</div>';
+      }
+      if (s.description) h += '<div class="tip-desc">' + esc(s.description) + '</div>';
+      return h;
+    }
+
+    function buildItemTip(it) {
+      var h = '<div class="tip-name">' + esc(it.name) + '</div>';
+      if (it.description) h += '<div class="tip-desc" style="margin-top:2px">' + esc(it.description) + '</div>';
+      if (it.features && it.features.length > 0) {
+        it.features.forEach(function(f) {
+          h += '<div style="margin-top:6px"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:13px;font-weight:600;color:#2b2b2b">' + esc(f.name) + '</span>';
+          if (f.note) h += '<span style="font-size:11px;color:#999;flex-shrink:0;margin-left:8px">' + esc(f.note) + '</span>';
+          h += '</div>';
+          if (f.description) h += '<div class="tip-desc" style="margin-top:2px">' + esc(f.description) + '</div></div>';
+        });
+      }
+      return h;
+    }
+
+    function buildTraitTip(t) {
+      var h = '<div class="tip-name">' + esc(t.name) + '</div>';
+      if (t.description) h += '<div class="tip-desc" style="margin-top:2px">' + esc(t.description) + '</div>';
+      if (t.subTraits && t.subTraits.length > 0) {
+        t.subTraits.forEach(function(st) {
+          if (st.name || st.description) {
+            h += '<div style="margin-top:6px">';
+            if (st.name) h += '<div style="font-size:13px;font-weight:600;color:#2b2b2b">' + esc(st.name) + '</div>';
+            if (st.description) h += '<div class="tip-desc" style="margin-top:2px">' + esc(st.description) + '</div>';
+            h += '</div>';
+          }
+        });
+      }
+      return h;
+    }
+
+    document.addEventListener('click', function(e) {
+      // 点击 tooltip 自身或遮罩不处理
+      if (e.target.closest('#tipPopup') || e.target.closest('#tipOverlay')) return;
+      // 从点击目标向上查找可触发 tip 的元素
+      var el = e.target;
+      var found = null;
+      while (el && el !== document.body && el !== document.documentElement) {
+        var dn = el.getAttribute && el.getAttribute('data-name');
+        if (dn === '法术' || dn === '戏法' || dn === '技能') { found = el; break; }
+        if (el.className && typeof el.className === 'string' && el.className.indexOf('cursor-pointer') >= 0) { found = el; break; }
+        el = el.parentElement;
+      }
+      if (!found) { hideTooltip(); return; }
+      // 取文本作为名称
+      var name = (found.textContent || '').trim();
+      if (!name) { hideTooltip(); return; }
+      // 精确匹配法术
+      for (var i = 0; i < _td.spells.length; i++) {
+        if (_td.spells[i].name === name) {
+          var r = found.getBoundingClientRect();
+          showTooltip(buildSpellTip(_td.spells[i]), r.left - 248, r.top); return;
+        }
+      }
+      // 尝试前半部分匹配（有描述的法术文本包含额外内容）
+      var parts = name.split(/[（(（【]/);
+      var firstName = parts[0].trim();
+      if (firstName !== name) {
+        for (var j = 0; j < _td.spells.length; j++) {
+          if (_td.spells[j].name === firstName) {
+            var r2 = found.getBoundingClientRect();
+            showTooltip(buildSpellTip(_td.spells[j]), r2.left - 248, r2.top); return;
+          }
+        }
+      }
+      // 查找物品
+      for (var i2 = 0; i2 < _td.items.length; i2++) {
+        if (_td.items[i2].name === name) {
+          var r3 = found.getBoundingClientRect();
+          showTooltip(buildItemTip(_td.items[i2]), r3.left - 248, r3.top); return;
+        }
+        if (_td.items[i2].name === firstName) {
+          var r4 = found.getBoundingClientRect();
+          showTooltip(buildItemTip(_td.items[i2]), r4.left - 248, r4.top); return;
+        }
+      }
+      // 查找特质
+      for (var i3 = 0; i3 < _td.traits.length; i3++) {
+        if (_td.traits[i3].name === name) {
+          var r5 = found.getBoundingClientRect();
+          showTooltip(buildTraitTip(_td.traits[i3]), r5.left - 248, r5.top); return;
+        }
+        if (_td.traits[i3].name === firstName) {
+          var r6 = found.getBoundingClientRect();
+          showTooltip(buildTraitTip(_td.traits[i3]), r6.left - 248, r6.top); return;
+        }
+      }
+      hideTooltip();
+    });
+  <\/script>
   <script>
     function switchPage(i) {
       document.querySelectorAll(".page-content").forEach(el => el.classList.add("hidden"));
@@ -264,6 +449,17 @@ ${stylesHTML}
               导出文件
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <button disabled={exporting} onClick={exportLocalArchive} style={{
+                display: "flex", flexDirection: "column", gap: 2, padding: "10px 14px", borderRadius: "2px",
+                border: `1px solid ${sheetColors.borderLight}`, backgroundColor: sheetColors.cardBg,
+                cursor: "pointer", textAlign: "left", width: "100%", transition: "background 0.1s",
+                opacity: exporting ? 0.5 : 1,
+              }}
+                onMouseEnter={(e) => { if (!exporting) e.currentTarget.style.backgroundColor = sheetColors.contentBg; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
+              >
+                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>导出当前存档于本地</span>
+              </button>
               <button disabled={exporting} onClick={exportOwlbear} style={{
                 display: "flex", flexDirection: "column", gap: 2, padding: "10px 14px", borderRadius: "2px",
                 border: `1px solid ${sheetColors.borderLight}`, backgroundColor: sheetColors.cardBg,

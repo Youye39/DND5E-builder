@@ -5,6 +5,7 @@
 import type { CharacterData } from "./types";
 import { ARMOR_OPTIONS } from "../../../data/armorOptions";
 import type { ArmorOption } from "../../../data/armorOptions";
+import classData from "../../../data/classData.json";
 
 // ─── 技能中文名 → 英文 key 映射 ──────────────────────────────────────────────
 const SKILL_MAP: Record<string, string> = {
@@ -17,6 +18,23 @@ const SKILL_NAMES_CN = ["运动","特技","巧手","隐匿","调查","奥秘","�
 
 function attrMod(value: number): number {
   return Math.floor((value - 10) / 2);
+}
+
+/** 从 classData 读取预设法术位 */
+function getDefaultSpellSlots(character: CharacterData): Record<number, number> {
+  const classId = character.basicInfo?.["职业_id"];
+  const charLevel = typeof character.level === "number" ? character.level : 1;
+  if (!classId) return {};
+  const classSpellData = (classData as Record<string, any>)[classId];
+  const spellSlotsData = classSpellData?.spellSlots;
+  if (!spellSlotsData || !Array.isArray(spellSlotsData)) return {};
+  const levelEntry = spellSlotsData.find((entry: any) => entry.level === charLevel);
+  if (!levelEntry) return {};
+  const result: Record<number, number> = {};
+  for (let i = 0; i < levelEntry.slots.length; i++) {
+    if (levelEntry.slots[i] > 0) result[i + 1] = levelEntry.slots[i];
+  }
+  return result;
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -173,26 +191,13 @@ export function toOwlbearJSON(character: CharacterData): string {
   // ── 年龄转数字 ──────────────────────────────────────────────────
   const ageNum = character.characterInfo?.age ? parseInt(character.characterInfo.age, 10) || null : null;
 
-  // ── 法术位（来自 customSpellSlots / spellBoxes） ───────────────
+  // ── 法术位（优先 customSpellSlots → classData 默认 → 空） ─────
   const spellSlots: Record<string, any> = {};
   const customSlots = character.customSpellSlots ?? {};
-  // 用 customSpellSlots 确定 max，否则用 spellBoxes 的 spellCount 汇总
-  const maxMap: Record<number, number> = {};
-  for (const box of character.spellBoxes ?? []) {
-    if (!box.isCantrip) {
-      const prev = maxMap[box.level] ?? 0;
-      maxMap[box.level] = prev + box.spellCount;
-    }
-  }
-  const allLevels = new Set([
-    ...Object.keys(customSlots).map(Number),
-    ...Object.keys(maxMap).map(Number),
-  ]);
-  for (const lvl of allLevels) {
-    const max = customSlots[lvl] ?? maxMap[lvl] ?? 0;
-    if (max > 0) {
-      spellSlots[String(lvl)] = { current: max, max };
-    }
+  const customKeys = Object.keys(customSlots);
+  const sourceSlots = customKeys.length > 0 ? customSlots : getDefaultSpellSlots(character);
+  for (const [lvl, max] of Object.entries(sourceSlots)) {
+    if (max > 0) spellSlots[lvl] = { current: max, max };
   }
 
   // ── 法术攻击加值 ────────────────────────────────────────────────
@@ -488,10 +493,11 @@ export function toFVTTJSON(character: CharacterData): string {
       })(),
       spells: (() => {
         const slots: Record<string, any> = {};
-        for (const box of character.spellBoxes ?? []) {
-          if (!box.isCantrip) {
-            slots[`spell${box.level}`] = { value: box.spellCount, override: null };
-          }
+        const customSlots = character.customSpellSlots ?? {};
+        const customKeys = Object.keys(customSlots);
+        const sourceSlots = customKeys.length > 0 ? customSlots : getDefaultSpellSlots(character);
+        for (const [lvl, max] of Object.entries(sourceSlots)) {
+          if (max > 0) slots[`spell${lvl}`] = { value: max, override: null };
         }
         return slots;
       })(),

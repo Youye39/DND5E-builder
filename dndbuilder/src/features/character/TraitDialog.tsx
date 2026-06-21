@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../../shared/tokens/colors";
-import type { TraitItem } from "../../shared/types/types";
+import type { TraitItem, SubTrait } from "../../shared/types/types";
+import { createDefaultSubTrait } from "../../shared/types/types";
 import traitTagPresets from "../../../data/traitTagPresets.json";
 import ScrollArea from "../../shared/ui/ScrollArea";
 
@@ -34,6 +35,20 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
   }, [initialTrait, open]);
 
   const set = (field: keyof TraitItem, val: string) => setData(prev => ({ ...prev, [field]: val }));
+
+  // ── 特质选项 ──
+  const addSubTrait = () =>
+    setData(prev => ({ ...prev, subTraits: [...(prev.subTraits ?? []), createDefaultSubTrait()] }));
+  const updateSubTrait = (id: string, field: keyof Omit<SubTrait, "id">, val: string) =>
+    setData(prev => ({
+      ...prev,
+      subTraits: (prev.subTraits ?? []).map(s => s.id === id ? { ...s, [field]: val } : s),
+    }));
+  const removeSubTrait = (id: string) =>
+    setData(prev => ({
+      ...prev,
+      subTraits: (prev.subTraits ?? []).filter(s => s.id !== id),
+    }));
 
   const handleSave = () => {
     const name = data.name.trim() || "新特质";
@@ -157,10 +172,101 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
             onFocus={(e) => { e.currentTarget.style.borderColor = sheetColors.borderInput; }}
             onBlur={(e) => { e.currentTarget.style.borderColor = sheetColors.hoverBg; }}
           />
+
+          {/* ── 特质选项 ── */}
+          <div style={{ ...LABEL, marginTop: 16 }}>特质选项</div>
+          {(data.subTraits ?? []).map((sub) => (
+            <SubTraitRow
+              key={sub.id}
+              subTrait={sub}
+              onUpdate={updateSubTrait}
+              onRemove={removeSubTrait}
+            />
+          ))}
+          <button
+            onClick={addSubTrait}
+            style={{
+              ...T, fontSize: "13px", color: sheetColors.textLighter,
+              border: `1px dashed ${sheetColors.iconDisabled}`, borderRadius: "2px",
+              padding: "3px 10px", background: "transparent", cursor: "pointer", marginTop: 6,
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.borderColor = sheetColors.textSecondary; e.currentTarget.style.color = sheetColors.textSecondary; }}
+            onMouseLeave={(e) => { e.currentTarget.style.borderColor = sheetColors.iconDisabled; e.currentTarget.style.color = sheetColors.textLighter; }}
+          >
+            + 添加特质选项
+          </button>
         </ScrollArea>
       </div>
     </div>,
     document.body
+  );
+}
+
+// ═══ 特质选项行 ═══════════════════════════════════════════════════════════
+
+function SubTraitRow({
+  subTrait, onUpdate, onRemove,
+}: {
+  subTrait: SubTrait;
+  onUpdate: (id: string, field: keyof Omit<SubTrait, "id">, val: string) => void;
+  onRemove: (id: string) => void;
+}) {
+  return (
+    <div style={{ marginBottom: 8 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+        <input
+          type="text"
+          value={subTrait.name}
+          onChange={(e) => onUpdate(subTrait.id, "name", e.target.value)}
+          placeholder="选项名称"
+          style={{
+            ...T, border: "1px solid transparent", borderRadius: "2px",
+            padding: "2px 4px", outline: "none", backgroundColor: "transparent",
+            fontWeight: 600, flex: 1, minWidth: 40,
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.borderColor = sheetColors.borderLight; e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
+          onMouseLeave={(e) => { if (document.activeElement !== e.currentTarget) { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.backgroundColor = "transparent"; } }}
+          onFocus={(e) => { e.currentTarget.style.borderColor = sheetColors.borderInput; e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
+          onBlur={(e) => { e.currentTarget.style.borderColor = "transparent"; e.currentTarget.style.backgroundColor = "transparent"; }}
+        />
+        <input
+          type="text"
+          value={subTrait.usage ?? ""}
+          onChange={(e) => onUpdate(subTrait.id, "usage", e.target.value)}
+          placeholder="次数"
+          style={{
+            ...T, fontSize: 12, width: 44, textAlign: "center",
+            border: "none", borderBottom: "1px solid var(--color-border)", borderRadius: 0,
+            padding: "1px 0", outline: "none", backgroundColor: "transparent",
+            color: sheetColors.textPlaceholder,
+          }}
+        />
+        <button
+          onClick={() => onRemove(subTrait.id)}
+          style={{
+            ...T, border: "none", background: "transparent", cursor: "pointer",
+            padding: "0 4px", lineHeight: 1, color: sheetColors.textLighter,
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = sheetColors.textMedium; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = sheetColors.textLighter; }}
+        >
+          ×
+        </button>
+      </div>
+      <textarea
+        value={subTrait.description ?? ""}
+        onChange={(e) => onUpdate(subTrait.id, "description", e.target.value)}
+        placeholder="选项描述"
+        rows={2}
+        style={{
+          ...T, width: "100%", resize: "vertical", boxSizing: "border-box",
+          border: `1px solid ${sheetColors.hoverBg}`, borderRadius: "2px", padding: "4px 8px",
+          marginTop: 4, outline: "none", backgroundColor: sheetColors.cardBg,
+        }}
+        onFocus={(e) => { e.currentTarget.style.borderColor = sheetColors.borderInput; }}
+        onBlur={(e) => { e.currentTarget.style.borderColor = sheetColors.hoverBg; }}
+      />
+    </div>
   );
 }
 

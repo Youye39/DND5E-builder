@@ -13,7 +13,7 @@ const tooltipBase: React.CSSProperties = {
   backgroundColor: sheetColors.cardBg, borderRadius: "8px",
   border: "1px solid var(--color-border)",
   boxShadow: "0 6px 24px rgba(0,0,0,0.10), 0 2px 6px rgba(0,0,0,0.06)",
-  padding: "10px 12px", zIndex: 10000, fontVariationSettings: FVAR,
+  padding: "10px 12px", zIndex: 9998, fontVariationSettings: FVAR,
   pointerEvents: "auto",
 };
 
