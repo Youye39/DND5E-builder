@@ -39,7 +39,6 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
     onClick,
     onTipMouseEnter,
     cancelHide,
-    scheduleHide,
   } = useInteractionHandler({
     onOpenDialog: () => setDialogOpen(true),
     onHideTip: () => setHoveredIndex(null),
@@ -233,16 +232,16 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
   }, [hookMouseEnter]);
 
   const handleSubItemEnter = useCallback((parentIndex: number, subIndex: number, e: React.MouseEvent) => {
-    cancelHide();
     const rect = e.currentTarget.getBoundingClientRect();
     setHoveredSubPos({ left: rect.left, top: rect.top });
     setHoveredSubKey({ parentIndex, subIndex });
-  }, [cancelHide]);
+    hookMouseEnter(e);
+  }, [hookMouseEnter]);
 
   const handleSubItemLeave = useCallback(() => {
-    scheduleHide();
+    hookMouseLeave();
     setHoveredSubKey(null);
-  }, [scheduleHide]);
+  }, [hookMouseLeave]);
 
   const hoveredTrait = hoveredIndex !== null ? traitList[hoveredIndex] ?? null : null;
   const hoveredSubTrait = hoveredSubKey !== null
@@ -314,9 +313,10 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
                       onContextMenu={(e) => handleSubContextMenu(e, i, si)}
                     >
                       <span
+                        onClick={() => { setEditingIndex(i); onClick(); }}
                         onMouseEnter={(e) => handleSubItemEnter(i, si, e)}
                         onMouseLeave={handleSubItemLeave}
-                        className="min-w-0 flex-1 font-serif-regular-cjk text-[18px] text-black leading-normal cursor-default rounded-[1px] px-[2px] truncate"
+                        className="min-w-0 flex-1 font-serif-regular-cjk text-[18px] text-black leading-normal cursor-pointer hover:bg-sheet-hover-bg rounded-[1px] px-[2px] truncate"
                       >
                         {sub.name}
                       </span>

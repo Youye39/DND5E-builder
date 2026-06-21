@@ -75,11 +75,25 @@ export default function AttackComponent({
     }
   };
 
+  const handleNameClick = (e: React.MouseEvent) => {
+    onNameEnter?.(e);
+    handleClick();
+  };
+
+  const handleAttackClick = (e: React.MouseEvent) => {
+    onAttackEnter?.(e);
+    handleClick();
+  };
+
+  const handleDamageClick = (e: React.MouseEvent) => {
+    onDamageEnter?.(e);
+    handleClick();
+  };
+
   if (variant === 'toFill') {
     return (
       <div
         className={`h-[28px] ${className}`}
-        onMouseEnter={onNameEnter}
         onMouseLeave={onMouseLeave}
       >
         <div
@@ -101,15 +115,15 @@ export default function AttackComponent({
       className={`flex h-[28px] gap-[5px] ${className}`}
       onMouseLeave={onMouseLeave}
     >
-      <div ref={nameContainerRef} className={nameClass} onClick={handleClick} onMouseEnter={onNameEnter}>
+      <div ref={nameContainerRef} className={nameClass} onClick={handleNameClick}>
         <span ref={nameRef} className="pl-[5px] font-['Noto_Serif:Regular',sans-serif] text-black leading-none whitespace-nowrap" style={{ fontSize: nameSize }}>{name}</span>
       </div>
 
-      <div ref={bonusContainerRef} className={bonusClass} onClick={handleClick} onMouseEnter={onAttackEnter}>
+      <div ref={bonusContainerRef} className={bonusClass} onClick={handleAttackClick}>
         <span ref={bonusRef} className="pl-[5px] font-['Noto_Serif:Regular',sans-serif] text-black leading-none whitespace-nowrap" style={{ fontSize: bonusSize }}>{attackBonus}</span>
       </div>
 
-      <div ref={damageContainerRef} className={damageClass} onClick={handleClick} onMouseEnter={onDamageEnter}>
+      <div ref={damageContainerRef} className={damageClass} onClick={handleDamageClick}>
         <span ref={damageRef} className="pl-[5px] font-['Noto_Serif:Regular',sans-serif] text-black leading-none whitespace-nowrap" style={{ fontSize: damageSize }}>{damage}</span>
       </div>
     </div>

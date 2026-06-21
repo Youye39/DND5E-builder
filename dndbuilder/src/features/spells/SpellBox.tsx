@@ -309,6 +309,7 @@ export default function SpellBox({
           {onAddSpell && (
             <div className="shrink-0">
               <button
+                data-name="add-spell"
                 onClick={handleOpenAddDialog}
                 className="flex items-center gap-1 w-full h-[24px] px-[30px] text-[13px] text-sheet-text-spell-placeholder hover:text-sheet-text-secondary hover:bg-sheet-hover-light/20 transition-colors cursor-pointer font-serif-regular-cjk text-left"
                 style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
