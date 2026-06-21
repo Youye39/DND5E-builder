@@ -122,7 +122,7 @@ function AppContent() {
           <div
             ref={canvasRef}
             className="canvas-scale-wrapper"
-            style={{ transform: `scale(${scale})`, transformOrigin: 'center top', touchAction: 'none' }}
+            style={{ transform: `scale(${scale})`, transformOrigin: 'center top', touchAction: 'pan-x pan-y' }}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
             onTouchEnd={handleTouchEnd}
