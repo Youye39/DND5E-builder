@@ -8,9 +8,11 @@ interface CantripProps {
   isDragging?: boolean;
   onHover?: (e: React.MouseEvent) => void;
   onHoverLeave?: () => void;
+  /** 所在列索引，用于 SpellTip 定位 */
+  columnIndex?: number;
 }
 
-export default function Cantrip({ spell, onChange, onDelete, isDragging, onHover, onHoverLeave }: CantripProps) {
+export default function Cantrip({ spell, onChange, onDelete, isDragging, onHover, onHoverLeave, columnIndex }: CantripProps) {
   return (
     <SpellRow
       spell={spell}
@@ -20,6 +22,7 @@ export default function Cantrip({ spell, onChange, onDelete, isDragging, onHover
       isDragging={isDragging}
       onHover={onHover}
       onHoverLeave={onHoverLeave}
+      columnIndex={columnIndex}
     />
   );
 }

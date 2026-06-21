@@ -8,6 +8,7 @@ import { createDefaultItem } from "../../shared/types/types";
 import { ItemDialog } from "./ItemDialog";
 import { ItemTooltip } from "./ItemTooltip";
 import { sheetColors } from "../../shared/tokens/colors";
+import { useInteractionHandler } from "../../shared/dialogs/useInteractionHandler";
 
 interface EquipmentPanelProps {
   className?: string;
@@ -28,8 +29,20 @@ export default function EquipmentPanel({ className }: EquipmentPanelProps) {
   const [contextMenu, setContextMenu] = useState<{ index: number; x: number; y: number } | null>(null);
   const quantityInputRef = useRef<HTMLInputElement>(null);
   const addInputRef = useRef<HTMLTextAreaElement>(null);
-  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hideLocked = useRef(false);
+
+  const {
+    onMouseEnter: hookMouseEnter,
+    onMouseLeave: hookMouseLeave,
+    onClick,
+    onTipMouseEnter,
+    lockHide,
+    unlockHide,
+  } = useInteractionHandler({
+    onOpenDialog: () => setDialogOpen(true),
+    onHideTip: () => setHoveredIndex(null),
+    tipDelay: 0,
+    hideDelay: 150,
+  });
 
   // 自动聚焦数量输入框
   useEffect(() => {
@@ -61,28 +74,12 @@ export default function EquipmentPanel({ className }: EquipmentPanelProps) {
     }
   }, [commitInput]);
 
-  const scheduleHide = useCallback(() => {
-    if (hideLocked.current) return;
-    if (hideTimer.current) clearTimeout(hideTimer.current);
-    hideTimer.current = setTimeout(() => setHoveredIndex(null), 350);
-  }, []);
-
-  const cancelHide = useCallback(() => {
-    if (hideTimer.current) { clearTimeout(hideTimer.current); hideTimer.current = null; }
-  }, []);
-
   const handleItemEnter = useCallback((i: number, e: React.MouseEvent) => {
-    cancelHide();
+    setHoveredIndex(i);
     const rect = e.currentTarget.getBoundingClientRect();
     setHoverPos({ left: rect.left, top: rect.top });
-    setHoveredIndex(i);
-  }, [cancelHide]);
-
-  const openEditDialog = (index: number) => {
-    setEditingIndex(index);
-    setDialogOpen(true);
-    setHoveredIndex(null);
-  };
+    hookMouseEnter(e);
+  }, [hookMouseEnter]);
 
   const handleSave = (item: Item) => {
     const newItems = [...items];
@@ -105,8 +102,8 @@ export default function EquipmentPanel({ className }: EquipmentPanelProps) {
     setItems(newItems);
   }, [hoveredIndex, items, setItems]);
 
-  const handleFocusLock = useCallback(() => { hideLocked.current = true; }, []);
-  const handleFocusUnlock = useCallback(() => { hideLocked.current = false; }, []);
+  const handleFocusLock = useCallback(() => { lockHide(); }, [lockHide]);
+  const handleFocusUnlock = useCallback(() => { unlockHide(); }, [unlockHide]);
 
   const startQuantityEdit = (i: number, currentQty: number) => {
     setQuantityEditIndex(i);
@@ -167,10 +164,10 @@ export default function EquipmentPanel({ className }: EquipmentPanelProps) {
               <span key={item.id} className="inline">
                 {i > 0 && <span className="text-sheet-text-secondary">、</span>}
                 <span
-                  onClick={() => openEditDialog(i)}
+                  onClick={() => { setEditingIndex(i); onClick(); }}
                   onContextMenu={(e) => handleContextMenu(e, i)}
                   onMouseEnter={(e) => handleItemEnter(i, e)}
-                  onMouseLeave={scheduleHide}
+                  onMouseLeave={hookMouseLeave}
                   className="font-serif-regular-cjk text-[18px] text-black leading-normal cursor-pointer hover:bg-sheet-hover-bg rounded-[1px] px-[2px]"
                 >
                   {item.name}
@@ -236,8 +233,8 @@ export default function EquipmentPanel({ className }: EquipmentPanelProps) {
           item={items[hoveredIndex!]}
           mouseY={hoverPos.top}
           cardLeft={hoverPos.left}
-          onMouseEnter={cancelHide}
-          onMouseLeave={scheduleHide}
+          onMouseEnter={onTipMouseEnter}
+          onMouseLeave={hookMouseLeave}
           onChargeChange={handleChargeChange}
           onFocusLock={handleFocusLock}
           onFocusUnlock={handleFocusUnlock}

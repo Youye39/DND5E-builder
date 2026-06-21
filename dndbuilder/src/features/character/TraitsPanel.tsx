@@ -8,6 +8,7 @@ import type { TraitItem } from "../../shared/types/types";
 import { sheetColors } from "../../shared/tokens/colors";
 import TraitDialog from "./TraitDialog";
 import { TraitTooltip } from "./TraitTooltip";
+import { useInteractionHandler } from "../../shared/dialogs/useInteractionHandler";
 
 interface TraitsPanelProps {
   className?: string;
@@ -30,8 +31,21 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
   const [hoveredSubKey, setHoveredSubKey] = useState<{ parentIndex: number; subIndex: number } | null>(null);
   const [hoveredSubPos, setHoveredSubPos] = useState({ left: 0, top: 0 });
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const measureRef = useRef<HTMLCanvasElement | null>(null);
+
+  const {
+    onMouseEnter: hookMouseEnter,
+    onMouseLeave: hookMouseLeave,
+    onClick,
+    onTipMouseEnter,
+    cancelHide,
+    scheduleHide,
+  } = useInteractionHandler({
+    onOpenDialog: () => setDialogOpen(true),
+    onHideTip: () => setHoveredIndex(null),
+    tipDelay: 0,
+    hideDelay: 150,
+  });
 
   // ── 长按拖拽排序 ──
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -175,11 +189,6 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
     }
   }, [commitInput]);
 
-  const openEditDialog = (index: number) => {
-    setEditingIndex(index);
-    setDialogOpen(true);
-  };
-
   const handleSave = (trait: TraitItem) => {
     const newList = [...traitList];
     if (editingIndex !== null) {
@@ -216,21 +225,12 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
   }, [traitList, setTraitList]);
 
   // ── Tooltip ──
-  const scheduleHide = useCallback(() => {
-    if (hideTimer.current) clearTimeout(hideTimer.current);
-    hideTimer.current = setTimeout(() => setHoveredIndex(null), 300);
-  }, []);
-
-  const cancelHide = useCallback(() => {
-    if (hideTimer.current) { clearTimeout(hideTimer.current); hideTimer.current = null; }
-  }, []);
-
   const handleItemEnter = useCallback((i: number, e: React.MouseEvent) => {
-    cancelHide();
+    setHoveredIndex(i);
     const rect = e.currentTarget.getBoundingClientRect();
     setHoverPos({ left: rect.left, top: rect.top });
-    setHoveredIndex(i);
-  }, [cancelHide]);
+    hookMouseEnter(e);
+  }, [hookMouseEnter]);
 
   const handleSubItemEnter = useCallback((parentIndex: number, subIndex: number, e: React.MouseEvent) => {
     cancelHide();
@@ -244,15 +244,6 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
     setHoveredSubKey(null);
   }, [scheduleHide]);
 
-  const cancelSubHide = useCallback(() => {
-    cancelHide();
-  }, [cancelHide]);
-
-  // 清理定时器
-  useEffect(() => {
-    return () => { if (hideTimer.current) clearTimeout(hideTimer.current); };
-  }, []);
-
   const hoveredTrait = hoveredIndex !== null ? traitList[hoveredIndex] ?? null : null;
   const hoveredSubTrait = hoveredSubKey !== null
     ? traitList[hoveredSubKey.parentIndex]?.subTraits?.[hoveredSubKey.subIndex] ?? null
@@ -262,7 +253,7 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
     <>
       <SectionContainer title="特性和特质" className={`${className || ""} w-[358px] h-[770px]`}>
         <ScrollArea className="absolute top-[9px] left-[9px] right-[9px] bottom-[33px] bg-sheet-content-bg rounded-[2px] overflow-x-hidden">
-          <div ref={traitsContainerRef} className="pl-[8px] pt-[5px] pb-[5px] min-h-full">
+          <div ref={traitsContainerRef} className="pl-[8px] pt-[5px] pb-[5px] min-h-full select-none">
             {traitList.map((trait, i) => (
               <div
                 key={trait.id}
@@ -278,11 +269,11 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
                   className="flex items-baseline max-w-full leading-normal"
                 >
                   <span
-                    onClick={() => openEditDialog(i)}
-                    onContextMenu={(e) => handleContextMenu(e, i)}
-                    onMouseEnter={(e) => handleItemEnter(i, e)}
-                    onMouseLeave={scheduleHide}
-                    className="min-w-0 flex-1 font-serif-regular-cjk text-[18px] text-black leading-normal cursor-pointer hover:bg-sheet-hover-bg rounded-[1px] px-[2px] truncate"
+                  onClick={() => { setEditingIndex(i); onClick(); }}
+                  onContextMenu={(e) => handleContextMenu(e, i)}
+                  onMouseEnter={(e) => handleItemEnter(i, e)}
+                  onMouseLeave={hookMouseLeave}
+                  className="min-w-0 flex-1 font-serif-regular-cjk text-[18px] text-black leading-normal cursor-pointer hover:bg-sheet-hover-bg rounded-[1px] px-[2px] truncate"
                   >
                     {trait.name}
                   </span>
@@ -401,8 +392,8 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
         subTrait={hoveredSubTrait}
         mouseY={hoveredSubTrait ? hoveredSubPos.top : hoverPos.top}
         cardLeft={hoveredSubTrait ? hoveredSubPos.left : hoverPos.left}
-        onMouseEnter={hoveredSubTrait ? cancelSubHide : cancelHide}
-        onMouseLeave={hoveredSubTrait ? handleSubItemLeave : scheduleHide}
+        onMouseEnter={hoveredSubTrait ? cancelHide : onTipMouseEnter}
+        onMouseLeave={hoveredSubTrait ? handleSubItemLeave : hookMouseLeave}
       />
 
       {/* 拖拽浮动层 */}

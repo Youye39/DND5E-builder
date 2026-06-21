@@ -32,7 +32,7 @@ export default function HeaderBrand({ className = "" }: { className?: string }) 
         </p>
       </div>
       <p className="font-serif-regular-logo font-normal text-[10px] text-[#595959] h-[10px] -mt-[10px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
-        Builder Version 1.0
+        Builder Version 1.1
       </p>
     </div>
   );

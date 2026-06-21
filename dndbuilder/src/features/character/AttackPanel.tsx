@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { useState, useCallback, useRef, useMemo } from 'react';
+import { useState, useCallback, useRef, useMemo, useEffect } from 'react';
+import { useInteractionHandler } from "../../shared/dialogs/useInteractionHandler";
 import { sheetColors } from "../../shared/tokens/colors";
 import AttackComponent from './WeaponComponent';
 import SectionContainer from "../../shared/ui/SectionContainer";
@@ -175,7 +176,6 @@ export default function AttackPanel({ className }: AttackPanelProps) {
   const setItems = (newItems: Item[]) => updateCharacter({ items: newItems });
 
   const [itemDialogOpen, setItemDialogOpen] = useState(false);
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingItem, setEditingItem] = useState<Item | null>(null);
   const [spellDialogOpen, setSpellDialogOpen] = useState(false);
   const [editingSpell, setEditingSpell] = useState<SpellData | null>(null);
@@ -183,8 +183,40 @@ export default function AttackPanel({ className }: AttackPanelProps) {
   const [spellPickerOpen, setSpellPickerOpen] = useState(false);
   const [equipmentPickerOpen, setEquipmentPickerOpen] = useState(false);
   const [hover, setHover] = useState<HoverState | null>(null);
-  const hideTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const hideLocked = useRef(false);
+  const [isNarrow, setIsNarrow] = useState(() => window.innerWidth < 600);
+  useEffect(() => {
+    const handler = () => setIsNarrow(window.innerWidth < 600);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+  const pendingIndexRef = useRef<number | null>(null);
+
+  const {
+    onClick,
+    cancelHide,
+    scheduleHide,
+    lockHide,
+    unlockHide,
+  } = useInteractionHandler({
+    onOpenDialog: () => {
+      const i = pendingIndexRef.current;
+      if (i === null || i >= safeEntries.length) return;
+      const entry = attackEntries[i];
+      if (entry?.type === "spell") {
+        const spell = allSpells.find(s => s.id === entry.refId);
+        if (spell) { setEditingSpell(spell); setSpellDialogOpen(true); }
+      } else if (entry?.type === "weapon") {
+        const item = items.find(it => it.id === entry.refId);
+        setEditingItem(item ?? null);
+        setItemDialogOpen(true);
+      } else {
+        setSelectMode(true);
+      }
+    },
+    onHideTip: () => setHover(null),
+    tipDelay: 0,
+    hideDelay: 100,
+  });
 
   // ── 拖拽排序（参考 SpellBox） ──
   const [dragIndex, setDragIndex] = useState<number | null>(null);
@@ -258,10 +290,11 @@ export default function AttackPanel({ className }: AttackPanelProps) {
     }
 
     if (item.isWeapon) {
-      // 创建或更新 attack entry
+      // 创建或更新 attack entry（用 pendingIndexRef 而非 editingIndex，避免闭包过期）
       const newEntry: AttackEntry = { id: `attack_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`, type: "weapon", refId: item.id };
-      if (editingIndex !== null && editingIndex < currentEntries.length) {
-        currentEntries[editingIndex] = newEntry;
+      const idx = pendingIndexRef.current;
+      if (idx !== null && idx < currentEntries.length) {
+        currentEntries[idx] = newEntry;
       } else {
         currentEntries.push(newEntry);
       }
@@ -271,58 +304,23 @@ export default function AttackPanel({ className }: AttackPanelProps) {
       setAttackEntries(filtered);
       setItems(currentItems);
       setItemDialogOpen(false);
-      setEditingIndex(null);
       return;
     }
 
     setItems(currentItems);
     setAttackEntries(currentEntries);
     setItemDialogOpen(false);
-    setEditingIndex(null);
-  }, [safeEntries, items, editingIndex, setItems, setAttackEntries]);
-
-  // ── 点击行 ↦ 打开对话框 ──
-  const handleClick = useCallback((i: number) => {
-    const entry = attackEntries[i];
-    if (entry?.type === "spell") {
-      const spell = allSpells.find(s => s.id === entry.refId);
-      if (spell) {
-        setEditingSpell(spell);
-        setSpellDialogOpen(true);
-      }
-      return;
-    }
-    setEditingIndex(i);
-    if (entry?.type === "weapon") {
-      // 编辑已有武器 → 打开物品编辑
-      const item = items.find(it => it.id === entry.refId);
-      setEditingItem(item ?? null);
-      setItemDialogOpen(true);
-    } else {
-      // 空行 → 显示选择模式
-      setSelectMode(true);
-    }
-  }, [attackEntries, allSpells, items]);
+  }, [safeEntries, items, setItems, setAttackEntries]);
 
   // ── Tooltip 管理 ──
-  const scheduleHide = useCallback(() => {
-    if (hideLocked.current) return;
-    if (hideTimer.current) clearTimeout(hideTimer.current);
-    hideTimer.current = setTimeout(() => setHover(null), 200);
-  }, []);
-
-  const cancelHide = useCallback(() => {
-    if (hideTimer.current) { clearTimeout(hideTimer.current); hideTimer.current = null; }
-  }, []);
-
   const handleColumnEnter = useCallback((i: number, column: HoverColumn, e: React.MouseEvent) => {
     cancelHide();
     const rect = e.currentTarget.getBoundingClientRect();
     setHover({ index: i, column, left: rect.left, top: rect.top + rect.height / 2 });
   }, [cancelHide]);
 
-  const handleFocusLock = useCallback(() => { hideLocked.current = true; }, []);
-  const handleFocusUnlock = useCallback(() => { hideLocked.current = false; }, []);
+  const handleFocusLock = useCallback(() => { lockHide(); }, [lockHide]);
+  const handleFocusUnlock = useCallback(() => { unlockHide(); }, [unlockHide]);
 
   // ── 特性修改（装备同步） ──
   const handleChargeChange = useCallback((featureId: string, note: string) => {
@@ -431,7 +429,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
         </div>
 
         <ScrollArea className="absolute top-[23px] left-[13px] right-[3px] bottom-[33px]">
-          <div ref={containerRef} className="flex flex-col gap-[8px]">
+          <div ref={containerRef} className="flex flex-col gap-[8px] select-none">
             {displayList.map((d, i) => {
               const isLast = i === displayList.length - 1;
               const isDraggable = !isLast && d.name;
@@ -445,7 +443,13 @@ export default function AttackPanel({ className }: AttackPanelProps) {
                       _dragHappened.current = false;
                       return;
                     }
-                    handleClick(i);
+                    if (isLast) {
+                      // 最后一行（空行 / + 按钮）始终打开选择攻击来源
+                      setSelectMode(true);
+                    } else {
+                      pendingIndexRef.current = i;
+                      onClick();
+                    }
                   }}
                   style={{
                     transform: isLast ? 'none' : getTransform(i),
@@ -473,29 +477,47 @@ export default function AttackPanel({ className }: AttackPanelProps) {
       </SectionContainer>
 
       {/* Tooltips */}
-      {currentDisplay?.spell && hover && currentDisplay.name && hover.column === "name" && (
+      {currentDisplay?.spell && hover && currentDisplay.name && hover.column === "name" && (() => {
+        const spellLeft = isNarrow
+          ? Math.max(8, Math.min(hover.left, window.innerWidth - 240 - 8))
+          : hover.left - 248;
+        const spellTop = isNarrow
+          ? hover.top + 12
+          : Math.max(4, Math.min(hover.top - 10, window.innerHeight - 200));
+        return (
         <SpellTip
           spell={currentDisplay.spell}
           mouseY={hover.top}
           cardLeft={hover.left}
+          overrideLeft={spellLeft}
+          overrideTop={spellTop}
           onMouseEnter={cancelHide}
           onMouseLeave={scheduleHide}
         />
-      )}
-      {currentDisplay?.item && hover && currentDisplay.name && hover.column === "name" && currentDisplay.item.features.length > 0 && (
+        );
+      })()}
+      {currentDisplay?.item && hover && currentDisplay.name && hover.column === "name" && (() => {
+        const itemLeft = isNarrow
+          ? Math.max(8, Math.min(hover.left, window.innerWidth - 220 - 8))
+          : hover.left - 228;
+        const itemTop = isNarrow
+          ? hover.top + 12
+          : Math.max(4, Math.min(hover.top - 10, window.innerHeight - 200));
+        return (
         <ItemTooltip
           item={currentDisplay.item}
           mouseY={hover.top}
           cardLeft={hover.left}
-          overrideLeft={hover.left - 228}
-          overrideTop={Math.max(4, Math.min(hover.top - 10, window.innerHeight - 200))}
+          overrideLeft={itemLeft}
+          overrideTop={itemTop}
           onMouseEnter={cancelHide}
           onMouseLeave={scheduleHide}
           onChargeChange={handleChargeChange}
           onFocusLock={handleFocusLock}
           onFocusUnlock={handleFocusUnlock}
         />
-      )}
+        );
+      })()}
       {currentDisplay?.item && hover && currentDisplay.name && hover.column === "attack" && (
         <HitTooltip
           weapon={currentDisplay.item}
@@ -599,11 +621,11 @@ export default function AttackPanel({ className }: AttackPanelProps) {
               <button onClick={() => setSpellPickerOpen(false)} style={{ ...T, border: "none", background: "transparent", cursor: "pointer", color: sheetColors.textPlaceholder }}>取消</button>
             </div>
             <ScrollArea style={{ flex: 1, padding: "12px 16px" }}>
-              {allSpells.filter(s => s.name && s.saveType && !safeEntries.some(e => e.type === "spell" && e.refId === s.id)).length === 0 ? (
+              {allSpells.filter(s => s.name && s.saveType !== undefined && !safeEntries.some(e => e.type === "spell" && e.refId === s.id)).length === 0 ? (
                 <div style={{ ...T, color: sheetColors.textPlaceholder, textAlign: "center", padding: 24 }}>暂无</div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-                  {allSpells.filter(s => s.name && s.saveType && !safeEntries.some(e => e.type === "spell" && e.refId === s.id)).map((spell) => (
+                  {allSpells.filter(s => s.name && s.saveType !== undefined && !safeEntries.some(e => e.type === "spell" && e.refId === s.id)).map((spell) => (
                     <button
                       key={spell.id}
                       onClick={() => {
@@ -732,7 +754,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
           initialItem={editingItem ?? undefined}
           onSave={handleSaveItem}
           onDelete={editingItem ? () => setItemDialogOpen(false) : undefined}
-          onClose={() => { setItemDialogOpen(false); setEditingIndex(null); setEditingItem(null); }}
+          onClose={() => { setItemDialogOpen(false); setEditingItem(null); }}
         />
       )}
 

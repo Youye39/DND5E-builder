@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import BottomToolbar from "./dialogs/BottomToolbar";
 import CharacterSheet from "./pages/PageFront";
 import CharacterBackSide from "./pages/PageBack";
@@ -7,6 +7,21 @@ import ArchiveDialog from "./dialogs/ArchiveDialog";
 import ExportDialog from "./dialogs/ExportPdfDialog";
 import CustomItemDialog from "./dialogs/CustomItemDialog";
 import { CharacterProvider } from "./shared/storage/CharacterContext";
+import MobileWarning from "./shared/touch/MobileWarning";
+
+// 用户交互时重试持久存储请求（user gesture 下授予概率更高）
+let persistRetried = false;
+function retryPersistOnUserGesture() {
+  if (persistRetried) return;
+  persistRetried = true;
+  document.removeEventListener("click", retryPersistOnUserGesture);
+  if (navigator.storage?.persist) {
+    navigator.storage.persist().then((granted) => {
+      if (granted) console.log("✅ 持久存储权限已授予（用户交互后）");
+    });
+  }
+}
+document.addEventListener("click", retryPersistOnUserGesture, { once: true });
 
 // ============================================================================
 // 页面导航栏
@@ -40,6 +55,49 @@ function PageNavigationBar() {
 function AppContent() {
   const [activeDialog, setActiveDialog] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const [scale, setScale] = useState(0.8);
+  const pinchRef = useRef<number | null>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const handleWheel = useCallback((e: WheelEvent) => {
+    if (!e.ctrlKey && !e.metaKey) return;
+    e.preventDefault();
+    setScale(s => {
+      const delta = e.deltaY > 0 ? -0.05 : 0.05;
+      return Math.max(0.5, Math.min(1.1, +(s + delta).toFixed(2)));
+    });
+  }, []);
+
+  // 用原生事件监听避免被动模式导致 preventDefault 失效
+  useEffect(() => {
+    const el = canvasRef.current;
+    if (!el) return;
+    el.addEventListener('wheel', handleWheel, { passive: false });
+    return () => el.removeEventListener('wheel', handleWheel);
+  }, [handleWheel]);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length === 2) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchRef.current = Math.sqrt(dx * dx + dy * dy);
+    }
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (e.touches.length !== 2 || pinchRef.current === null) return;
+    e.preventDefault();
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const ratio = dist / pinchRef.current;
+    pinchRef.current = dist;
+    setScale(s => Math.max(0.5, Math.min(1.1, +(s * ratio).toFixed(2))));
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    pinchRef.current = null;
+  }, []);
 
   const closeDialog = () => setActiveDialog(null);
 
@@ -60,8 +118,15 @@ function AppContent() {
       {/* 主内容区域 */}
       <div className="flex-1 overflow-x-auto overflow-y-auto p-4">
         <div className="flex items-start justify-center min-w-max">
-          {/* 画布缩放容器 - 只缩放角色卡内容 */}
-          <div className="canvas-scale-wrapper" style={{ transform: 'scale(0.8)', transformOrigin: 'center top' }}>
+          {/* 画布缩放容器 - 支持 Ctrl+滚轮 / 双指缩放 */}
+          <div
+            ref={canvasRef}
+            className="canvas-scale-wrapper"
+            style={{ transform: `scale(${scale})`, transformOrigin: 'center top', touchAction: 'none' }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             <div className="canvas-content" style={{ width: '1414px', height: '1410px' }}>
                 {/* 角色卡内容（包含页码标签） */}
                 <div className="relative mx-auto" style={{ width: "1224px", height: "1659px", filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))' }}>
@@ -209,6 +274,7 @@ function AppContent() {
 export default function App() {
   return (
     <CharacterProvider>
+      <MobileWarning />
       <AppContent />
     </CharacterProvider>
   );

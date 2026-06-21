@@ -682,7 +682,7 @@ function RestIcon({ type, onShortRest, onLongRest, onPopupClose, shortRollLog, s
             left: popupPos.left,
             top: popupPos.top,
             transform: "translateY(-100%)",
-            zIndex: 10000,
+            zIndex: 9998,
             backgroundColor: "#fff",
             border: "1px solid var(--color-border)",
             borderRadius: "6px",
@@ -1052,6 +1052,14 @@ function CharacterCardContent() {
 
   const { attributes, level, proficiencyBonus } = character;
   const wisdomMod = Math.floor(((attributes?.wis_value ?? 10) - 10) / 2);
+  // 察觉技能总加值 = 属性调整值 + (熟练/专精加值)
+  const perceptionSkillState = character.skills?.察觉 ?? 0;
+  const perceptionTotal =
+    perceptionSkillState === 0
+      ? wisdomMod
+      : perceptionSkillState === 1
+        ? wisdomMod + (proficiencyBonus ?? 2)
+        : wisdomMod + 2 * (proficiencyBonus ?? 2);
 
   const handleAttributeChange = (field: string, value: number) => {
     const updated = { ...attributes, [field]: value };
@@ -1083,7 +1091,7 @@ function CharacterCardContent() {
       <SavingThrowPanel className="absolute left-[190px] top-[383px]" attributes={attributes} proficiencyBonus={proficiencyBonus} />
       <AttributesPanel key={character.id} attributes={attributes} onAttributeChange={handleAttributeChange} />
       <div className="absolute h-[44px] left-[56px] rounded-[2px] top-[1178px] w-[358px]" data-name="passive-perception">
-        <PassivePerception perceptionModifier={wisdomMod} />
+        <PassivePerception perceptionTotal={perceptionTotal} />
       </div>
       <ProficiencyBonusComponent
         className="absolute h-[44px] left-[190px] rounded-[2px] top-[318px] w-[223px]"

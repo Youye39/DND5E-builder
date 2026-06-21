@@ -67,7 +67,7 @@ export interface SpellData {
   damageDice?: string;
   damageType?: string;
   attackBonus?: number;       // 法术攻击加值
-  saveType?: "attack" | "save"; // 命中类/豁免类 伤害法术标记
+  saveType?: "attack" | "save" | ""; // 命中类/豁免类/空白 伤害法术标记
   /** 预计算后的攻击栏显示值，如 "+5" 或 "DC15" */
   attackDisplay?: string;
 }
