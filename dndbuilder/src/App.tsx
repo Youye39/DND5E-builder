@@ -10,7 +10,6 @@ import GuideDialog from "./dialogs/GuideDialog";
 import { CharacterProvider } from "./shared/storage/CharacterContext";
 import MobileWarning from "./shared/touch/MobileWarning";
 
-// 用户交互时重试持久存储请求（user gesture 下授予概率更高）
 let persistRetried = false;
 function retryPersistOnUserGesture() {
   if (persistRetried) return;
@@ -191,7 +190,6 @@ function AppContent() {
                     />
                   </div>
 
-                  {/* 左翻页按钮 - 绝对定位叠在左侧 */}
                   <div className="absolute" style={{ top: "8px", left: "-95px" }}>
                     <button
                       onClick={handlePrevPage}
@@ -221,7 +219,6 @@ function AppContent() {
                     </button>
                   </div>
 
-                  {/* 右翻页按钮 - 绝对定位叠在右侧 */}
                   <div className="absolute" style={{ top: "8px", right: "-95px" }}>
                     <button
                       onClick={handleNextPage}
