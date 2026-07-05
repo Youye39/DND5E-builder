@@ -816,11 +816,11 @@ function RestsAndDeathSection() {
   }, []);
 
   const handleLongRest = useCallback(() => {
-    setUsedHitDice(0);
+    setUsedHitDice(prev => Math.max(0, prev - Math.floor(level / 2)));
     setRollLog([]);
     setShortHealInfo(undefined);
     setSessionStartHP(undefined);
-  }, []);
+  }, [level]);
 
   return (
     <div className="absolute contents">
@@ -1052,14 +1052,16 @@ function CharacterCardContent() {
 
   const { attributes, level, proficiencyBonus } = character;
   const wisdomMod = Math.floor(((attributes?.wis_value ?? 10) - 10) / 2);
-  // 察觉技能总加值 = 属性调整值 + (熟练/专精加值)
+  // 察觉技能总加值 = 属性调整值 + (半熟练/熟练/专精加值)
   const perceptionSkillState = character.skills?.察觉 ?? 0;
-  const perceptionTotal =
-    perceptionSkillState === 0
-      ? wisdomMod
-      : perceptionSkillState === 1
-        ? wisdomMod + (proficiencyBonus ?? 2)
-        : wisdomMod + 2 * (proficiencyBonus ?? 2);
+  const pb = proficiencyBonus ?? 2;
+  const halfProf = Math.floor(pb / 2);
+  const perceptionTotal = wisdomMod + (
+    perceptionSkillState === 3 ? pb * 2 :
+    perceptionSkillState === 2 ? pb :
+    perceptionSkillState === 1 ? halfProf :
+    0
+  );
 
   const handleAttributeChange = (field: string, value: number) => {
     const updated = { ...attributes, [field]: value };

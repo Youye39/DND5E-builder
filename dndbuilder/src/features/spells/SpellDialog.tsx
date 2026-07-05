@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../../shared/tokens/colors";
 import { createDefaultSpell } from "../../shared/types/types";
@@ -54,6 +54,7 @@ export function SpellDialog({
   const { character, updateCharacter } = useCharacter();
   const [data, setData] = useState<SpellData>(initialSpell ?? createDefaultSpell());
   const [showAbilityPicker, setShowAbilityPicker] = useState(false);
+  const mouseDownOnOverlay = useRef(false);
   const [showSchoolPicker, setShowSchoolPicker] = useState(false);
 
   useEffect(() => {
@@ -93,7 +94,8 @@ export function SpellDialog({
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center"
       style={{ backgroundColor: "rgba(0,0,0,0.18)" }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onMouseDown={(e) => { mouseDownOnOverlay.current = e.target === e.currentTarget; }}
+      onClick={(e) => { if (e.target === e.currentTarget && mouseDownOnOverlay.current) onClose(); }}
     >
       <div
         style={{

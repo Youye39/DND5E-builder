@@ -3,7 +3,7 @@
 // ============================================================================
 
 import type { CharacterInfoData } from "../../features/back-info/CharacterInfoSection";
-import type { Item, SpellData, AttackEntry, TraitItem } from "../types/types";
+import type { Item, SpellData, AttackEntry, TraitItem, ExtraBonus } from "../types/types";
 
 /** 六项属性 */
 export interface Attributes {
@@ -61,9 +61,15 @@ export interface DeathSaves {
 export type SavingThrowKey = "strength" | "dexterity" | "constitution" | "intelligence" | "wisdom" | "charisma";
 export type SavingThrows = Record<SavingThrowKey, boolean>;
 
-/** 技能熟练状态：0=无, 1=熟练, 2=专精（技能按照 D&D 5e 标准18项） */
-export type SkillState = 0 | 1 | 2;
+/** 技能熟练状态：0=无, 1=半熟练, 2=熟练, 3=专精（技能按照 D&D 5e 标准18项） */
+export type SkillState = 0 | 1 | 2 | 3;
 export type Skills = Record<string, SkillState>;
+
+/** 技能自定义加值：用户自定义的修饰符值（格式："+n" 或 "-n"，null 表示使用计算值） */
+export type SkillCustomModifiers = Record<string, string | null>;
+
+/** 豁免自定义加值：用户自定义的修饰符值（格式："+n" 或 "-n"，null 表示使用计算值） */
+export type SavingThrowCustomModifiers = Record<SavingThrowKey, string | null>;
 
 /** 全部角色卡数据 */
 export interface CharacterData {
@@ -101,7 +107,9 @@ export interface CharacterData {
   proficiencies: Proficiencies;
   deathSaves: DeathSaves;
   savingThrows: SavingThrows;
+  savingThrowCustomModifiers: SavingThrowCustomModifiers;
   skills: Skills;
+  skillCustomModifiers: SkillCustomModifiers;
 
   // ---- 角色卡背面 ----
   characterInfo: CharacterInfoData;
@@ -117,12 +125,6 @@ export interface CharacterData {
   spellcastingAbility: "int" | "wis" | "cha"; // 施法关键属性（SpellSheet 抬头设定）
   spellSaveDCExtras: ExtraBonus[];   // 法术豁免DC 额外加值
   spellAttackExtras: ExtraBonus[];   // 法术攻击加值 额外加值
-}
-
-/** 额外加值项 */
-export interface ExtraBonus {
-  id: string;
-  value: string; // 如 "+1", "-2", "3"
 }
 
 /** 存档管理器 */
@@ -220,7 +222,16 @@ export function createDefaultCharacter(name = "新角色"): CharacterData {
       wisdom: false,
       charisma: false,
     },
+    savingThrowCustomModifiers: {
+      strength: null,
+      dexterity: null,
+      constitution: null,
+      intelligence: null,
+      wisdom: null,
+      charisma: null,
+    },
     skills: {},
+    skillCustomModifiers: {},
     characterInfo: createDefaultCharacterInfo(name),
     backstory: "",
     inventory: "",

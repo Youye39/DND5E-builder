@@ -53,15 +53,15 @@ export default function SkillPanel({ className: propClassName, attributes: propA
   };
   const proficiencyBonus = propBonus ?? char?.proficiencyBonus ?? 2;
 
-  const skillStates: Record<string, 0 | 1 | 2> = char?.skills ?? {};
+  const skillStates: Record<string, 0 | 1 | 2 | 3 | 3> = char?.skills ?? {};
+  const skillCustomModifiers = char?.skillCustomModifiers ?? {};
 
-  // 吟游诗人万事通：等级 >= 2 时，未熟练技能也加一半熟练加值
-  const classId = char?.basicInfo?.["职业_id"];
-  const level = typeof char?.level === "number" ? char.level : 1;
-  const isBardJackOfAllTrades = classId === "bard" && level >= 2;
-
-  const handleSkillStateChange = (skillName: string, newState: 0 | 1 | 2) => {
+  const handleSkillStateChange = (skillName: string, newState: 0 | 1 | 2 | 3) => {
     ctx.updateCharacter({ skills: { ...skillStates, [skillName]: newState } });
+  };
+
+  const handleSkillCustomModifierChange = (skillName: string, newValue: string | null) => {
+    ctx.updateCharacter({ skillCustomModifiers: { ...skillCustomModifiers, [skillName]: newValue } });
   };
 
   return (
@@ -76,7 +76,8 @@ export default function SkillPanel({ className: propClassName, attributes: propA
             proficiencyBonus={proficiencyBonus}
             state={skillStates[skill.name] ?? 0}
             onStateChange={(s) => handleSkillStateChange(skill.name, s)}
-            jackOfAllTrades={isBardJackOfAllTrades}
+            customModifier={skillCustomModifiers[skill.name] ?? null}
+            onCustomModifierChange={(val) => handleSkillCustomModifierChange(skill.name, val)}
           />
         ))}
       </div>

@@ -34,6 +34,8 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
     }
   }, [initialTrait, open]);
 
+  const mouseDownOnOverlay = useRef(false);
+
   const set = (field: keyof TraitItem, val: string) => setData(prev => ({ ...prev, [field]: val }));
 
   // ── 特质选项 ──
@@ -63,7 +65,8 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center"
       style={{ backgroundColor: "rgba(0,0,0,0.18)" }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onMouseDown={(e) => { mouseDownOnOverlay.current = e.target === e.currentTarget; }}
+      onClick={(e) => { if (e.target === e.currentTarget && mouseDownOnOverlay.current) onClose(); }}
     >
       <div
         style={{

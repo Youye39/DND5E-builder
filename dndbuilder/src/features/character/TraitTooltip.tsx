@@ -36,9 +36,13 @@ export const TraitTooltip = React.memo(function TraitTooltip({
 
   useLayoutEffect(() => {
     if (!tooltipRef.current) return;
+    const cardEl = document.querySelector('[data-name="character-card"]');
+    const cardBottom = cardEl?.getBoundingClientRect().bottom ?? window.innerHeight;
+    const tipHeight = tooltipRef.current.offsetHeight;
+    const clampedTop = Math.min(initY, cardBottom - tipHeight);
     setPos({
       left: Math.max(4, initLeft - TOOLTIP_W - 8),
-      top: Math.max(4, Math.min(initY, window.innerHeight - 200)),
+      top: Math.max(4, clampedTop),
     });
   }, [initY, initLeft]);
 

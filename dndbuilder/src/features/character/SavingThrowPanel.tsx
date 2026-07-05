@@ -42,8 +42,17 @@ export default function SavingThrowPanel({ className, attributes: propAttributes
     intelligence: false, wisdom: false, charisma: false,
   };
 
+  const savingThrowCustomModifiers: Record<SavingThrowKey, string | null> = char?.savingThrowCustomModifiers ?? {
+    strength: null, dexterity: null, constitution: null,
+    intelligence: null, wisdom: null, charisma: null,
+  };
+
   const handleCheckedChange = (key: SavingThrowKey, checked: boolean) => {
     ctx.updateCharacter({ savingThrows: { ...savingThrows, [key]: checked } });
+  };
+
+  const handleCustomModifierChange = (key: SavingThrowKey, value: string | null) => {
+    ctx.updateCharacter({ savingThrowCustomModifiers: { ...savingThrowCustomModifiers, [key]: value } });
   };
 
   return (
@@ -60,6 +69,8 @@ export default function SavingThrowPanel({ className, attributes: propAttributes
               proficiencyBonus={bonus}
               checked={savingThrows[key]}
               onCheckedChange={(v) => handleCheckedChange(key, v)}
+              customModifier={savingThrowCustomModifiers[key]}
+              onCustomModifierChange={(v) => handleCustomModifierChange(key, v)}
             />
           );
         })}

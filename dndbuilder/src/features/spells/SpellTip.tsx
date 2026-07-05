@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useLayoutEffect } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../../shared/tokens/colors";
 import type { SpellData } from "../../shared/types/types";
@@ -41,20 +41,27 @@ interface SpellTipProps {
 export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, overrideLeft, overrideTop, overrideWidth, onMouseEnter, onMouseLeave, onChange }: SpellTipProps) {
   const hasOverride = overrideLeft !== undefined && overrideTop !== undefined;
   const w = overrideWidth ?? TOOLTIP_W;
-  const [pos] = useState(() => {
+  const tipRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState(() => {
     if (hasOverride) return { left: overrideLeft, top: overrideTop };
-    // 屏幕 < 600px → 下方弹出；否则左侧弹出
+    // 初始粗略定位
     if (window.innerWidth < 600) {
-      return {
-        left: initLeft,
-        top: initY + 4,
-      };
+      return { left: initLeft, top: initY + 4 };
     }
-    return {
-      left: initLeft - TOOLTIP_W - 8,
-      top: Math.max(4, Math.min(initY - 10, window.innerHeight - 200)),
-    };
+    return { left: initLeft - TOOLTIP_W - 8, top: Math.max(4, initY - 10) };
   });
+
+  useLayoutEffect(() => {
+    if (hasOverride || !tipRef.current) return;
+    const cardEl = document.querySelector('[data-name="character-card"]');
+    const cardBottom = cardEl?.getBoundingClientRect().bottom ?? window.innerHeight;
+    const tipHeight = tipRef.current.offsetHeight;
+    if (window.innerWidth < 600) {
+      setPos(prev => ({ ...prev, top: Math.min(initY + 4, cardBottom - tipHeight) }));
+    } else {
+      setPos(prev => ({ ...prev, top: Math.max(4, Math.min(initY - 10, cardBottom - tipHeight)) }));
+    }
+  }, [initY, hasOverride]);
   const [localUsage, setLocalUsage] = useState<string | null>(null);
 
   if (!spell.name && !spell.description && !spell.school) return null;
@@ -70,6 +77,7 @@ export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, ove
 
   return ReactDOM.createPortal(
     <div
+      ref={tipRef}
       style={{
         position: "fixed", width: w,
         left: pos.left, top: pos.top,

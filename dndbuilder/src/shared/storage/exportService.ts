@@ -116,10 +116,20 @@ export function toOwlbearJSON(character: CharacterData): string {
     const mod = attrMod(val);
     const saveKey = k === "str" ? "strength" : k === "dex" ? "dexterity" : k === "con" ? "constitution" : k === "int" ? "intelligence" : k === "wis" ? "wisdom" : "charisma";
     const saveProf = character.savingThrows?.[saveKey];
+    const customSaveModStr = character.savingThrowCustomModifiers?.[saveKey] ?? null;
+    let saveProficient = !!saveProf;
+    let saveBonus = saveProf ? mod + pb : mod;
+    let saveMisc = 0;
+    if (customSaveModStr) {
+      const parsed = parseInt(customSaveModStr, 10);
+      saveProficient = false;
+      saveBonus = parsed;
+      saveMisc = parsed;
+    }
     abilities[k] = {
       total: val, initial: val, background: 0, growth: 0, misc: 0,
       modifier: mod,
-      save: { proficient: !!saveProf, bonus: saveProf ? mod + pb : mod, misc: 0 },
+      save: { proficient: saveProficient, bonus: saveBonus, misc: saveMisc },
     };
   }
 
@@ -135,12 +145,20 @@ export function toOwlbearJSON(character: CharacterData): string {
     const state = character.skills?.[name] ?? 0;
     const abil = skillAbilityMap[name] ?? "dex";
     const abilMod = attrMod((attrs as any)[`${abil}_value`] ?? 10);
-    let total = abilMod;
-    let prof: string;
-    if (state === 2) { total += pb * 2; prof = "expertise"; }
-    else if (state === 1) { total += pb; prof = "proficient"; }
-    else { prof = "none"; }
-    skills.push({ name, ability: abil, proficiency: prof, total, misc_bonus: 0 });
+    const customSkillMod = character.skillCustomModifiers?.[name] ?? null;
+    if (customSkillMod) {
+      const parsed = parseInt(customSkillMod, 10);
+      skills.push({ name, ability: abil, proficiency: "none", total: parsed, misc_bonus: parsed });
+    } else {
+      const halfProf = Math.floor(pb / 2);
+      let total = abilMod;
+      let prof: string;
+      if (state === 3) { total += pb * 2; prof = "expertise"; }
+      else if (state === 2) { total += pb; prof = "proficient"; }
+      else if (state === 1) { total += halfProf; prof = "half_proficient"; }
+      else { prof = "none"; }
+      skills.push({ name, ability: abil, proficiency: prof, total, misc_bonus: 0 });
+    }
   }
 
   // ── 武备 ────────────────────────────────────────────────────────
@@ -240,7 +258,11 @@ export function toOwlbearJSON(character: CharacterData): string {
       ac: finalAC,
       dc: 8 + pb + attrMod(attrs[`${character.spellcastingAbility ?? "int"}_value`] ?? 10),
       dc_ability: cnAbilities[character.spellcastingAbility ?? "int"] ?? "智力",
-      passive_perception: 10 + wisMod + ((character.skills?.察觉 ?? 0) >= 1 ? pb : 0),
+      passive_perception: (() => {
+        const percState = character.skills?.察觉 ?? 0;
+        const percBonus = percState === 3 ? pb * 2 : percState === 2 ? pb : percState === 1 ? Math.floor(pb / 2) : 0;
+        return 10 + wisMod + percBonus;
+      })(),
       speed: character.customSpeed ?? 30,
       size: "中型",
       hp: { current: character.currentHP ?? 0, max: character.currentHP ?? 0, temp: character.tempHP ?? 0 },
@@ -321,9 +343,17 @@ export function toOwlbearJSON(character: CharacterData): string {
         const state = character.skills?.[name] ?? 0;
         const abil = skillAbilityMap2[name] ?? "dex";
         const mod = attrMod((attrs as any)[`${abil}_value`] ?? 10);
-        let total = mod;
-        if (state === 2) total += pb * 2;
-        else if (state === 1) total += pb;
+        const customSkillMod = character.skillCustomModifiers?.[name] ?? null;
+        let total: number;
+        if (customSkillMod) {
+          total = parseInt(customSkillMod, 10);
+        } else {
+          const halfProf = Math.floor(pb / 2);
+          total = mod;
+          if (state === 3) total += pb * 2;
+          else if (state === 2) total += pb;
+          else if (state === 1) total += halfProf;
+        }
         const suffix = state >= 1 ? "*" : "";
         sb.push(`${name}${suffix}:${total}`);
       }
@@ -415,7 +445,8 @@ export function toFVTTJSON(character: CharacterData): string {
     const val = attrs[`${k}_value`] ?? 10;
     const saveKey = k === "str" ? "strength" : k === "dex" ? "dexterity" : k === "con" ? "constitution" : k === "int" ? "intelligence" : k === "wis" ? "wisdom" : "charisma";
     const saveProf = character.savingThrows?.[saveKey] ? 1 : 0;
-    abilities[k] = { value: val, proficient: saveProf, max: null, bonuses: { check: "", save: "", skill: "" } };
+    const customSaveMod = character.savingThrowCustomModifiers?.[saveKey] ?? null;
+    abilities[k] = { value: val, proficient: customSaveMod ? 0 : saveProf, max: null, bonuses: { check: "", save: customSaveMod ?? "", skill: "" } };
   }
 
   // 技能
@@ -429,7 +460,13 @@ export function toFVTTJSON(character: CharacterData): string {
   for (const cn of SKILL_NAMES_CN) {
     const abil = skillAbilityMap[cn] ?? "dex";
     const state = character.skills?.[cn] ?? 0;
-    skills[SKILL_MAP[cn]] = { value: state, ability: abil, bonuses: { check: "", pass: "", save: "" } };
+    const customSkillMod = character.skillCustomModifiers?.[cn] ?? null;
+    if (customSkillMod) {
+      skills[SKILL_MAP[cn]] = { value: 0, ability: abil, bonuses: { check: customSkillMod, pass: "", save: "" } };
+    } else {
+      const fvttValue = state === 0 ? 0 : state === 1 ? 0.5 : state === 2 ? 1 : 2;
+      skills[SKILL_MAP[cn]] = { value: fvttValue, ability: abil, bonuses: { check: "", pass: "", save: "" } };
+    }
   }
 
   const output: any = {

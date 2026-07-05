@@ -9,6 +9,7 @@ import CustomItemDialog from "./dialogs/CustomItemDialog";
 import GuideDialog from "./dialogs/GuideDialog";
 import { CharacterProvider } from "./shared/storage/CharacterContext";
 import MobileWarning from "./shared/touch/MobileWarning";
+import AnnouncementDialog from "./shared/ui/AnnouncementDialog";
 
 let persistRetried = false;
 function retryPersistOnUserGesture() {
@@ -274,6 +275,7 @@ export default function App() {
   return (
     <CharacterProvider>
       <MobileWarning />
+      <AnnouncementDialog />
       <AppContent />
     </CharacterProvider>
   );
