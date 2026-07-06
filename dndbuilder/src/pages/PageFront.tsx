@@ -403,7 +403,7 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
                           </div>
                         ) : (
                           <span style={{ ...T, fontSize: "12px", color: sheetColors.textPlaceholder }}>
-                            {armorDisplayFormula(armor.formula)} = {armor.calcAC(dexMod, conMod, wisMod)}
+                            {armorDisplayFormula(armor.formula, lang)} = {armor.calcAC(dexMod, conMod, wisMod)}
                           </span>
                         )}
                       </div>

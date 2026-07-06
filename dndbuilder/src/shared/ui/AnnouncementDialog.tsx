@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../tokens/colors";
 import announcementsData from "../../../data/announcements.json";

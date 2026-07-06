@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { sheetColors } from "../../shared/tokens/colors";
 import type { Item } from "../../shared/types/types";
 import { useLanguage } from "../../shared/i18n/LanguageContext";
-import { toDamageId, displayDamageType } from "../../shared/i18n/displayUtils";
+import { displayDamageType } from "../../shared/i18n/displayUtils";
 
 const FVAR = "'CTGR' 0, 'wdth' 100";
 const T: React.CSSProperties = {
@@ -41,7 +41,7 @@ interface DamageTooltipProps extends TooltipProps {
 const ATTRIBUTE_LABELS: Record<string, string> = { str: "attr.strFull", dex: "attr.dexFull", custom: "attr.custom" };
 
 export function HitTooltip({ weapon, mouseY: initY, cardLeft: initLeft, onMouseEnter, onMouseLeave }: TooltipProps) {
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const [pos] = useState(() => ({ left: initLeft - 20, top: initY + 12 }));
   return ReactDOM.createPortal(
     <div
@@ -52,7 +52,7 @@ export function HitTooltip({ weapon, mouseY: initY, cardLeft: initLeft, onMouseE
       <div style={{ ...T, fontWeight: 600, fontSize: "14px", marginBottom: 6 }}>{t('weaponTip.attack')}</div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
         <span style={LABEL}>{t('weaponTip.attribute')}</span>
-        <span style={T}>{t(ATTRIBUTE_LABELS[weapon.attackAttr ?? "str"] || weapon.attackAttr)}</span>
+        <span style={T}>{t(ATTRIBUTE_LABELS[weapon.attackAttr ?? "str"] ?? weapon.attackAttr ?? "")}</span>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
         <span style={LABEL}>{t('weaponTip.proficient')}</span>
