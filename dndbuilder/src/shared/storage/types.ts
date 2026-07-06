@@ -170,7 +170,7 @@ export function generateId(): string {
   return `char_${++_idCounter}`;
 }
 
-export function createDefaultCharacter(name = "新角色"): CharacterData {
+export function createDefaultCharacter(name = "Character"): CharacterData {
   return {
     id: generateId(),
     name,

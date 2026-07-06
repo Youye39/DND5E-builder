@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom";
 import { sheetColors } from "../shared/tokens/colors";
+import { useLanguage } from "../shared/i18n/LanguageContext";
 
 const FVAR = "'CTGR' 0, 'wdth' 100";
 
@@ -9,6 +10,7 @@ interface GuideDialogProps {
 }
 
 export default function GuideDialog({ open, onClose }: GuideDialogProps) {
+  const { t } = useLanguage();
   if (!open) return null;
 
   return ReactDOM.createPortal(
@@ -59,7 +61,7 @@ export default function GuideDialog({ open, onClose }: GuideDialogProps) {
             marginBottom: 16,
           }}
         >
-          车卡指引
+          {t('guide.title')}
         </div>
 
         <div
@@ -72,7 +74,7 @@ export default function GuideDialog({ open, onClose }: GuideDialogProps) {
             textAlign: "center",
           }}
         >
-          功能开发中，敬请期待
+          {t('guide.comingSoon')}
         </div>
         <div
           style={{
@@ -84,7 +86,7 @@ export default function GuideDialog({ open, onClose }: GuideDialogProps) {
             textAlign: "center",
           }}
         >
-          反馈bug/修改建议 → QQ:1226247814
+          {t('guide.feedback')}
         </div>
 
         <div
@@ -116,7 +118,7 @@ export default function GuideDialog({ open, onClose }: GuideDialogProps) {
               e.currentTarget.style.borderColor = "var(--color-border)";
             }}
           >
-            上一页
+            {t('guide.prev')}
           </button>
           <button
             style={{
@@ -138,7 +140,7 @@ export default function GuideDialog({ open, onClose }: GuideDialogProps) {
               (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkBg)
             }
           >
-            下一页
+            {t('guide.next')}
           </button>
         </div>
       </div>

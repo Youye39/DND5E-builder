@@ -1,6 +1,7 @@
 import SavingThrowComponent from "./SavingThrowComponent";
 import SectionContainer from "../../shared/ui/SectionContainer";
 import { useCharacter } from "../../shared/storage/CharacterContext";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 import type { Attributes, SavingThrowKey, SavingThrows } from "../../shared/storage/types";
 
 interface SavingThrowPanelProps {
@@ -14,12 +15,12 @@ function getModifier(attrValue: number): number {
 }
 
 const SAVE_LABEL_MAP: Record<SavingThrowKey, string> = {
-  strength: "力量",
-  dexterity: "敏捷",
-  constitution: "体质",
-  intelligence: "智力",
-  wisdom: "感知",
-  charisma: "魅力",
+  strength: "attr.strFull",
+  dexterity: "attr.dexFull",
+  constitution: "attr.conFull",
+  intelligence: "attr.intFull",
+  wisdom: "attr.wisFull",
+  charisma: "attr.chaFull",
 };
 
 const SAVE_ATTR_MAP: Record<SavingThrowKey, string> = {
@@ -32,6 +33,7 @@ const SAVE_ATTR_MAP: Record<SavingThrowKey, string> = {
 };
 
 export default function SavingThrowPanel({ className, attributes: propAttributes, proficiencyBonus: propBonus }: SavingThrowPanelProps) {
+  const { t } = useLanguage();
   const ctx = useCharacter();
   const char = ctx.character;
 
@@ -56,7 +58,7 @@ export default function SavingThrowPanel({ className, attributes: propAttributes
   };
 
   return (
-    <SectionContainer title="豁免" className={`${className || ""} w-[223px] h-[208px]`}>
+    <SectionContainer title={t('savingThrow.title')} className={`${className || ""} w-[223px] h-[208px]`}>
       <div className="absolute top-[14px] left-[16px] right-[16px] flex flex-col gap-[12px]">
         {(Object.keys(SAVE_LABEL_MAP) as SavingThrowKey[]).map((key) => {
           const attrKey = SAVE_ATTR_MAP[key] as keyof typeof attrs;
@@ -64,7 +66,7 @@ export default function SavingThrowPanel({ className, attributes: propAttributes
           return (
             <SavingThrowComponent
               key={key}
-              label={SAVE_LABEL_MAP[key]}
+              label={t(SAVE_LABEL_MAP[key])}
               modifier={mod}
               proficiencyBonus={bonus}
               checked={savingThrows[key]}

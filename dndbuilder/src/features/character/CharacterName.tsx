@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface CharacterNameProps {
   value?: string;
@@ -6,6 +7,7 @@ interface CharacterNameProps {
 }
 
 export default function CharacterName({ value = "", onChange }: CharacterNameProps) {
+  const { t } = useLanguage();
   const [editing, setEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -59,7 +61,7 @@ export default function CharacterName({ value = "", onChange }: CharacterNamePro
         <div aria-hidden="true" className="absolute border-2 border-sheet-border-secondary border-solid inset-[-1px] pointer-events-none rounded-[3px]" />
       </div>
       <div className="[word-break:break-word] absolute flex flex-col font-serif-medium-cjk font-medium inset-[16.2%_81.51%_75.42%_2.87%] justify-center leading-[0] text-sheet-text-placeholder text-[14px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
-        <p className="leading-[normal]">角色名</p>
+        <p className="leading-[normal]">{t('info.characterName')}</p>
       </div>
     </div>
   );

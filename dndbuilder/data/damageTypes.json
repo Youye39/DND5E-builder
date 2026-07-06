@@ -1,15 +1,41 @@
 [
-  "挥砍",
-  "穿刺",
-  "钝击",
-  "火焰",
-  "寒冷",
-  "闪电",
-  "雷鸣",
-  "强酸",
-  "毒素",
-  "心灵",
-  "光耀",
-  "黯蚀",
-  "力场"
+  {
+    "id": "Bludgeoning", "label": "钝击"
+  },
+  {
+    "id": "Piercing", "label": "穿刺"
+  },
+  {
+    "id": "Slashing", "label": "挥砍"
+  },
+  {
+    "id": "Fire", "label": "火焰"
+  },
+  {
+    "id": "Cold", "label": "寒冷"
+  },
+  {
+    "id": "Lightning", "label": "闪电"
+  },
+  {
+    "id": "Thunder", "label": "雷鸣"
+  },
+  {
+    "id": "Acid", "label": "强酸"
+  },
+  {
+    "id": "Poison", "label": "毒素"
+  },
+  {
+    "id": "Psychic", "label": "心灵"
+  },
+  {
+    "id": "Radiant", "label": "光耀"
+  },
+  {
+    "id": "Necrotic", "label": "黯蚀"
+  },
+  {
+    "id": "Force", "label": "力场"
+  }
 ]

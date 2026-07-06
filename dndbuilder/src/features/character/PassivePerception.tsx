@@ -1,3 +1,5 @@
+import { useLanguage } from "../../shared/i18n/LanguageContext";
+
 interface PassivePerceptionProps {
   /** 察觉技能的总加值（含属性调整值 + 熟练/专精加值） */
   perceptionTotal?: number;
@@ -6,6 +8,7 @@ interface PassivePerceptionProps {
 export default function PassivePerception({
   perceptionTotal = 0
 }: PassivePerceptionProps) {
+  const { t } = useLanguage();
   const passivePerceptionValue = 10 + perceptionTotal;
 
   return (
@@ -13,7 +16,7 @@ export default function PassivePerception({
       <div className="absolute bg-white inset-[2.27%_0] rounded-[2px]">
         <div className="overflow-clip relative rounded-[inherit] size-full">
           <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-medium-cjk font-medium justify-center leading-[0] left-[207px] text-[12px] text-black text-center top-[21px] w-[316px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
-            <p className="leading-[normal]">被动感知（察觉）</p>
+            <p className="leading-[normal]">{t('passivePerception')}</p>
           </div>
         </div>
         <div aria-hidden="true" className="absolute border-2 border-black border-solid inset-[-1px] pointer-events-none rounded-[3px] shadow-[0px_-1px_0px_0px_black,0px_1px_0px_0px_black]" />

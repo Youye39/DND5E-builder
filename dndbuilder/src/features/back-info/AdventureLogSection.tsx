@@ -1,5 +1,6 @@
 import SectionContainer from "../../shared/ui/SectionContainer";
 import EditableScrollArea from "../../shared/ui/EditableScrollArea";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface AdventureLogSectionProps {
   value: string;
@@ -7,8 +8,9 @@ interface AdventureLogSectionProps {
 }
 
 export default function AdventureLogSection({ value, onChange }: AdventureLogSectionProps) {
+  const { t } = useLanguage();
   return (
-    <SectionContainer title="冒险日志" className="h-[463px] left-[491px] top-[587px] w-[679px]">
+    <SectionContainer title={t('adventureLog.title')} className="h-[463px] left-[491px] top-[587px] w-[679px]">
       <EditableScrollArea
         value={value}
         onChange={onChange}

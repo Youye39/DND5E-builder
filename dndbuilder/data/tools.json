@@ -1,6 +1,7 @@
 [
   
   {
+    "id": "special",
     "label": "特殊工具",
     "options": [
       { "id": "disguise",  "label": "易容工具" },
@@ -12,6 +13,7 @@
     ]
   },
   {
+    "id": "artisan",
     "label": "工匠工具",
     "options": [
       { "id": "alchemist",     "label": "炼金工具" },
@@ -34,6 +36,7 @@
     ]
   },
   {
+    "id": "musical",
     "label": "乐器",
     "options": [
       { "id": "bagpipes", "label": "风笛"   },
@@ -49,6 +52,7 @@
     ]
   },
   {
+    "id": "gaming",
     "label": "赌具",
     "options": [
       { "id": "dice",        "label": "骰子" },
@@ -58,6 +62,7 @@
     ]
   },
   {
+    "id": "vehicle",
     "label": "载具",
     "options": [
       { "id": "land_vehicle",  "label": "陆地载具" },

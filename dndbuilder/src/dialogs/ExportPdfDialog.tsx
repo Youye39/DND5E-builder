@@ -11,6 +11,7 @@ import { toOwlbearJSON, toFVTTJSON } from "../shared/storage/exportService";
 import CharacterSheet from "../pages/PageFront";
 import CharacterBackSide from "../pages/PageBack";
 import SpellSheet from "../pages/PageSpell";
+import { useLanguage } from "../shared/i18n/LanguageContext";
 
 interface ExportDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ const PAGE_W = 1224;
 const PAGE_H = 1659;
 
 export default function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
+  const { t } = useLanguage();
   const { character } = useCharacter();
   const [exporting, setExporting] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
@@ -114,14 +116,14 @@ export default function ExportDialog({ open, onOpenChange }: ExportDialogProps) 
   const exportOwlbear = () => {
     if (!character) return;
     const json = toOwlbearJSON(character);
-    downloadJSON(json, `枭熊_${character.name ?? "角色"}.json`);
+    downloadJSON(json, `owlbear_${character.name ?? "character"}.json`);
     onOpenChange(false);
   };
 
   const exportFVTT = () => {
     if (!character) return;
     const json = toFVTTJSON(character);
-    downloadJSON(json, `fvtt_${character.name ?? "角色"}.json`);
+    downloadJSON(json, `fvtt_${character.name ?? "character"}.json`);
     onOpenChange(false);
   };
 
@@ -148,7 +150,7 @@ export default function ExportDialog({ open, onOpenChange }: ExportDialogProps) 
     try {
       await new Promise((r) => setTimeout(r, 400));
       const pages = printRef.current;
-      if (!pages) throw new Error("容器未就绪");
+      if (!pages) throw new Error(t('export.containerNotReady'));
       const pageEls = pages.querySelectorAll(".pdf-page");
 
       // 提取所有样式
@@ -553,11 +555,11 @@ ${stylesHTML}
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `角色卡_${character?.name ?? "角色"}.html`;
+        a.download = `character-sheet_${character?.name ?? "character"}.html`;
         a.click();
         URL.revokeObjectURL(url);
       } catch (e) {
-        alert("HTML 导出失败: " + (e instanceof Error ? e.message : "未知错误"));
+        alert(t('export.htmlFailed') + (e instanceof Error ? e.message : t('export.unknownError')));
       } finally {
         setExporting(false);
         onOpenChange(false);
@@ -581,7 +583,7 @@ ${stylesHTML}
               className="text-base"
               style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary, fontWeight: 600, marginBottom: 16 }}
             >
-              导出文件
+              {t('export.title')}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <button disabled={exporting} onClick={exportLocalArchive} style={{
@@ -593,7 +595,7 @@ ${stylesHTML}
                 onMouseEnter={(e) => { if (!exporting) e.currentTarget.style.backgroundColor = sheetColors.contentBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
-                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>导出当前存档于本地</span>
+                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>{t('export.saveLocally')}</span>
               </button>
               <button disabled={exporting} onClick={exportOwlbear} style={{
                 display: "flex", flexDirection: "column", gap: 2, padding: "10px 14px", borderRadius: "2px",
@@ -604,7 +606,7 @@ ${stylesHTML}
                 onMouseEnter={(e) => { if (!exporting) e.currentTarget.style.backgroundColor = sheetColors.contentBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
-                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>导出为枭熊 json</span>
+                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>{t('export.owlbear')}</span>
               </button>
               <button disabled={exporting} onClick={exportFVTT} style={{
                 display: "flex", flexDirection: "column", gap: 2, padding: "10px 14px", borderRadius: "2px",
@@ -615,7 +617,7 @@ ${stylesHTML}
                 onMouseEnter={(e) => { if (!exporting) e.currentTarget.style.backgroundColor = sheetColors.contentBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
-                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>导出为 fvtt json</span>
+                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>{t('export.fvtt')}</span>
               </button>
               <button disabled={exporting} onClick={exportHTML} style={{
                 display: "flex", flexDirection: "column", gap: 2, padding: "10px 14px", borderRadius: "2px",
@@ -627,7 +629,7 @@ ${stylesHTML}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
                 <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>
-                  {exporting ? "导出中" : "导出为 html"}
+                  {exporting ? t('export.exporting') : t('export.html')}
                 </span>
               </button>
               <button disabled={exporting} onClick={exportPDF} style={{
@@ -640,7 +642,7 @@ ${stylesHTML}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
                 <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>
-                  {exporting ? "导出中" : "导出为 pdf"}
+                  {exporting ? t('export.exporting') : t('export.pdf')}
                 </span>
               </button>
             </div>

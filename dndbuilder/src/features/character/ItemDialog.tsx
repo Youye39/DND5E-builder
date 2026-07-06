@@ -7,44 +7,60 @@ import ScrollArea from "../../shared/ui/ScrollArea";
 import ButtonComponent from "../../shared/ui/ButtonComponent";
 import { useCharacter } from "../../shared/storage/CharacterContext";
 import weaponPresets from "../../../data/weaponPresets.json";
+import weaponsJson from "../../../data/weapons.json";
 import weaponTags from "../../../data/weaponTags.json";
 import damageTypes from "../../../data/damageTypes.json";
 import type { WeaponPreset } from "./weapons/types";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
+import {
+  displayLabel, toDamageId, displayDamageType, tagDisplayName, idToDisplay,
+} from "../../shared/i18n/displayUtils";
 
 const PRESETS = weaponPresets as WeaponPreset[];
 const TAGS = weaponTags as { id: string; label: string }[];
-const DAMAGE_TYPES = damageTypes as string[];
+const DAMAGE_TYPES = damageTypes as { id: string; label: string }[];
+const WEAPON_GROUPS = weaponsJson as { id: string; label: string; options: { id: string; label: string }[] }[];
 
-const ATTACK_ATTRS: { id: "str" | "dex" | "con" | "int" | "wis" | "cha"; label: string }[] = [
-  { id: "str", label: "力量" },
-  { id: "dex", label: "敏捷" },
-  { id: "con", label: "体质" },
-  { id: "int", label: "智力" },
-  { id: "wis", label: "感知" },
-  { id: "cha", label: "魅力" },
-];
+/** 武器分组中文标签查找 */
+function weaponGroupLabel(groupId: string): string {
+  const g = WEAPON_GROUPS.find(wg => wg.id === groupId);
+  return g ? g.label : groupId;
+}
 
-const presetGroups: { label: string; options: WeaponPreset[] }[] = [
+const presetGroups: { label: string; labelKey: string; options: WeaponPreset[] }[] = [
   {
-    label: "简易近战武器",
+    label: "Simple Melee",
+    labelKey: "simple melee",
     options: PRESETS.filter((p) =>
       ["club", "dagger", "greatclub", "handaxe", "javelin", "lighthammer", "mace", "quarterstaff", "sickle", "spear"].includes(p.id)
     ),
   },
   {
-    label: "简易远程武器",
+    label: "Simple Ranged",
+    labelKey: "simple ranged",
     options: PRESETS.filter((p) => ["lightcrossbow", "dart", "shortbow", "sling"].includes(p.id)),
   },
   {
-    label: "军用近战武器",
+    label: "Martial Melee",
+    labelKey: "martial melee",
     options: PRESETS.filter((p) =>
       ["battleaxe", "flail", "glaive", "greataxe", "greatsword", "halberd", "lance", "longsword", "maul", "morningstar", "pike", "rapier", "scimitar", "shortsword", "trident", "warpick", "warhammer", "whip"].includes(p.id)
     ),
   },
   {
-    label: "军用远程武器",
+    label: "Martial Ranged",
+    labelKey: "martial ranged",
     options: PRESETS.filter((p) => ["blowgun", "handcrossbow", "heavycrossbow", "longbow", "net"].includes(p.id)),
   },
+];
+
+const ATTACK_ATTRS: { id: "str" | "dex" | "con" | "int" | "wis" | "cha"; labelKey: string }[] = [
+  { id: "str", labelKey: "attr.str" },
+  { id: "dex", labelKey: "attr.dex" },
+  { id: "con", labelKey: "attr.con" },
+  { id: "int", labelKey: "attr.int" },
+  { id: "wis", labelKey: "attr.wis" },
+  { id: "cha", labelKey: "attr.cha" },
 ];
 
 const FVAR = "'CTGR' 0, 'wdth' 100";
@@ -105,6 +121,7 @@ interface FeatureRowProps {
 }
 
 function FeatureRow({ feature, onUpdate, onRemove }: FeatureRowProps) {
+  const { t } = useLanguage();
   return (
     <div style={{ marginBottom: 10 }}>
       <div
@@ -120,7 +137,7 @@ function FeatureRow({ feature, onUpdate, onRemove }: FeatureRowProps) {
       <GhostInput
         type="text"
         value={feature.name}
-        placeholder="特性名称"
+        placeholder={t('item.featureName')}
         onChange={(e) => onUpdate(feature.id, "name", e.target.value)}
         style={{
           fontWeight: 600,
@@ -135,7 +152,7 @@ function FeatureRow({ feature, onUpdate, onRemove }: FeatureRowProps) {
         type="text"
         value={feature.note ?? ""}
         onChange={(e) => onUpdate(feature.id, "note", e.target.value)}
-        placeholder="次数"
+        placeholder={t('item.usage')}
         style={{
           ...T,
           fontSize: 12,
@@ -171,7 +188,7 @@ function FeatureRow({ feature, onUpdate, onRemove }: FeatureRowProps) {
   </div>
       <textarea
         value={feature.description ?? ""}
-        placeholder="特性描述"
+        placeholder={t('item.featureDescription')}
         onChange={(e) => onUpdate(feature.id, "description", e.target.value)}
         rows={2}
         style={{
@@ -189,6 +206,7 @@ function FeatureRow({ feature, onUpdate, onRemove }: FeatureRowProps) {
 // ═══ 标签选择器 ═════════════════════════════════════════════════════════
 
 function TagPicker({ selectedTags, onToggle }: { selectedTags: string[]; onToggle: (tagId: string) => void }) {
+  const { t, lang } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -209,7 +227,7 @@ function TagPicker({ selectedTags, onToggle }: { selectedTags: string[]; onToggl
         style={{ ...T, fontSize: "11px", color: sheetColors.textPlaceholder, cursor: "pointer" }}
         onClick={() => setIsOpen(!isOpen)}
       >
-        + 标签
+        {t('item.addTag')}
       </span>
       {isOpen && (
         <div
@@ -222,7 +240,7 @@ function TagPicker({ selectedTags, onToggle }: { selectedTags: string[]; onToggl
           }}
         >
           {available.length === 0 ? (
-            <div style={{ padding: "6px 10px", ...T, color: sheetColors.textPlaceholder, fontSize: "11px" }}>无更多标签</div>
+            <div style={{ padding: "6px 10px", ...T, color: sheetColors.textPlaceholder, fontSize: "11px" }}>{t('item.noMoreTags')}</div>
           ) : (
             available.map((tag) => (
               <div
@@ -235,7 +253,7 @@ function TagPicker({ selectedTags, onToggle }: { selectedTags: string[]; onToggl
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.hoverBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
               >
-                {tag.label}
+                {lang === 'en' ? tagDisplayName(tag.id, lang) : tag.label}
               </div>
             ))
           )}
@@ -335,6 +353,7 @@ interface ItemDialogProps {
 }
 
 export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: ItemDialogProps) {
+  const { t, lang } = useLanguage();
   const { character, updateCharacter } = useCharacter();
   const [data, setData] = useState<Item>(initialItem ?? createDefaultItem());
 
@@ -362,11 +381,12 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
   }, [showPresets]);
 
   const handlePresetSelect = (preset: WeaponPreset) => {
+    const presetName = displayLabel(preset.id, preset.label, lang);
     setData((d) => ({
       ...d,
-      name: d.name && d.name !== "新物品" && !PRESETS.some(p => p.label === d.name) ? d.name : preset.label,
+      name: d.name && d.name !== t('item.newItemDefault') && !PRESETS.some(p => p.label === d.name) ? d.name : presetName,
       damageDice: preset.damageDice,
-      damageType: preset.damageType,
+      damageType: toDamageId(preset.damageType),
       tags: [...preset.tags],
       attackAttr: preset.attackAttr,
       isWeapon: true,
@@ -382,7 +402,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
 
   const addExtraDamage = () => {
     const ed = data.extraDamages ?? [];
-    set("extraDamages", [...ed, { id: uid(), dice: "1d4", type: "挥砍" }]);
+    set("extraDamages", [...ed, { id: uid(), dice: "1d4", type: "Slashing" }]);
   };
   const updateExtraDamage = (id: string, field: "dice" | "type", val: string) => {
     const ed = data.extraDamages ?? [];
@@ -419,7 +439,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
     set("features", data.features.filter((f) => f.id !== id));
 
   const handleSave = () => {
-    const name = data.name.trim() || "新物品";
+    const name = data.name.trim() || t('item.newItem');
     onSave({ ...data, name });
     onClose();
   };
@@ -448,7 +468,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
         {/* ════ Header ════ */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: `1px solid ${sheetColors.hoverBg}`, flexShrink: 0 }}>
           <span className="text-base font-semibold" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}>
-            编辑物品
+            {t('item.edit')}
           </span>
           <div style={{ display: "flex", gap: "8px" }}>
             <button
@@ -458,7 +478,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.pageBg; e.currentTarget.style.borderColor = sheetColors.borderLight; e.currentTarget.style.color = "#000"; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; e.currentTarget.style.borderColor = "var(--color-border)"; e.currentTarget.style.color = sheetColors.textDark; }}
             >
-              删除
+              {t('item.delete')}
             </button>
             <button
               onClick={handleSave}
@@ -467,7 +487,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkHover)}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkBg)}
             >
-              保存
+              {t('item.save')}
             </button>
           </div>
         </div>
@@ -475,13 +495,13 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
         {/* ════ Body ════ */}
         <ScrollArea style={{ flex: 1, padding: "6px 16px 16px", minHeight: 0 }}>
           {/* ── 名称 + 数量 ── */}
-          <SectionLabel>名称</SectionLabel>
+          <SectionLabel>{t('item.name')}</SectionLabel>
           <div style={{ display: "flex", gap: 12 }}>
             <div ref={presetRef} style={{ position: "relative", flex: 1 }}>
               <input
                 value={data.name}
                 onChange={(e) => set("name", e.target.value)}
-                placeholder="物品名称"
+                placeholder={t('item.itemName')}
                 style={{
                   ...T, width: "100%", boxSizing: "border-box",
                   border: "1px solid var(--color-border)", borderRadius: "2px",
@@ -503,7 +523,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
                       backgroundSize: "8px 5px",
                     }}
                   >
-                    预设
+                    {t('item.presets')}
                   </button>
                   {showPresets && (
                     <div style={{
@@ -513,9 +533,9 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
                     }}>
                       <ScrollArea style={{ maxHeight: "260px" }}>
                         {presetGroups.map((group) => (
-                          <div key={group.label}>
+                          <div key={group.labelKey}>
                             <div style={{ padding: "6px 10px 2px", fontSize: "13px", color: sheetColors.textPlaceholder, fontFamily: "var(--font-serif-medium)" }}>
-                              {group.label}
+                              {lang === 'en' ? idToDisplay(group.labelKey) : weaponGroupLabel(group.labelKey)}
                             </div>
                             {group.options.map((preset) => (
                               <div
@@ -525,7 +545,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
                                 onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = sheetColors.hoverBg)}
                                 onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
                               >
-                                {preset.label}
+                                {displayLabel(preset.id, preset.label, lang)}
                               </div>
                             ))}
                           </div>
@@ -559,7 +579,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
                 const tag = TAGS.find((t) => t.id === tagId);
                 return (
                   <span key={tagId} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "1px 6px", borderRadius: "2px", backgroundColor: sheetColors.hoverBg, fontSize: "11px", color: sheetColors.textDark, fontFamily: "var(--font-serif-regular)" }}>
-                    {tag?.label ?? tagId}
+                    {lang === 'en' ? tagDisplayName(tagId, lang) : (tag?.label ?? tagId)}
                     <span onClick={() => toggleTag(tagId)} style={{ cursor: "pointer", marginLeft: 2, color: sheetColors.textLighter }}>×</span>
                   </span>
                 );
@@ -575,7 +595,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
           <textarea
             value={data.description ?? ""}
             onChange={(e) => set("description", e.target.value)}
-            placeholder="物品描述（可选）"
+            placeholder={t('item.itemDescription')}
             rows={2}
             style={{
               ...T, width: "100%", resize: "vertical", boxSizing: "border-box",
@@ -592,24 +612,24 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
               {divider}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
                 <div>
-                  <div style={{ ...LABEL, marginTop: 0 }}>攻击</div>
+                  <div style={{ ...LABEL, marginTop: 0 }}>{t('item.attack')}</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                     {/* 属性 + 熟练 同一行 */}
                     <div style={{ display: "flex", alignItems: "center", gap: 6, paddingLeft: 12 }}>
-                      <span style={{ ...LABEL, margin: 0, whiteSpace: "nowrap", width: 56, textAlign: "left", paddingRight: 8 }}>属性</span>
+                      <span style={{ ...LABEL, margin: 0, whiteSpace: "nowrap", width: 56, textAlign: "left", paddingRight: 8 }}>{t('item.attribute')}</span>
                       <CustomSelect
                         value={data.attackAttr ?? "str"}
-                        options={ATTACK_ATTRS.map(a => ({ value: a.id, label: a.label }))}
+                        options={ATTACK_ATTRS.map(a => ({ value: a.id, label: t(a.labelKey) }))}
                         onChange={(v) => set("attackAttr", v as any)}
                         style={{ width: 56 }}
                       />
                       <div style={{ flex: 0.5 }} />
-                      <span style={{ ...LABEL, margin: 0, whiteSpace: "nowrap" }}>熟练</span>
+                      <span style={{ ...LABEL, margin: 0, whiteSpace: "nowrap" }}>{t('item.proficient')}</span>
                       <ButtonComponent checked={data.proficient ?? true} onChange={() => set("proficient", !(data.proficient ?? true))} />
                     </div>
                     {/* 额外加值 缩进 */}
                     <div style={{ display: "flex", alignItems: "center", gap: 6, paddingLeft: 12 }}>
-                      <span style={{ ...LABEL, margin: 0, whiteSpace: "nowrap", width: 56, textAlign: "right", paddingRight: 8 }}>额外加值</span>
+                      <span style={{ ...LABEL, margin: 0, whiteSpace: "nowrap", width: 56, textAlign: "right", paddingRight: 8 }}>{t('item.extraBonus')}</span>
                       <input
                         type="text"
                         value={data.extraAttackBonus ?? ""}
@@ -623,7 +643,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
                   </div>
                 </div>
                 <div>
-                  <div style={{ ...LABEL, marginTop: 0 }}>伤害</div>
+                  <div style={{ ...LABEL, marginTop: 0 }}>{t('item.damage')}</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 6, paddingLeft: 8 }}>
                     {/* 基础伤害 */}
                     <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -636,8 +656,8 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
                         )}
                       </div>
                       <CustomSelect
-                        value={data.damageType ?? "挥砍"}
-                        options={DAMAGE_TYPES.map(t => ({ value: t, label: t }))}
+                        value={toDamageId(data.damageType ?? "Slashing")}
+                        options={DAMAGE_TYPES.map(dt => ({ value: dt.id, label: displayDamageType(dt.id, lang) }))}
                         onChange={(v) => set("damageType", v)}
                         style={{ width: 72 }}
                       />
@@ -652,14 +672,14 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
                         </div>
                         <CustomSelect
                           value={ed.type}
-                          options={DAMAGE_TYPES.map(t => ({ value: t, label: t }))}
+                          options={DAMAGE_TYPES.map(dt => ({ value: dt.id, label: displayDamageType(dt.id, lang) }))}
                           onChange={(v) => updateExtraDamage(ed.id, "type", v)}
                           style={{ width: 72 }}
                         />
                         <button onClick={() => removeExtraDamage(ed.id)} style={{ ...T, border: "none", background: "transparent", cursor: "pointer", color: sheetColors.textLighter }}>×</button>
                       </div>
                     ))}
-                    <AddButton onClick={addExtraDamage}>+ 额外伤害</AddButton>
+                    <AddButton onClick={addExtraDamage}>{t('item.addExtraDamage')}</AddButton>
                   </div>
                 </div>
               </div>
@@ -669,7 +689,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
           {divider}
 
           {/* ── 特性 ── */}
-          <SectionLabel>特性</SectionLabel>
+          <SectionLabel>{t('item.features')}</SectionLabel>
           {data.features.map((f) => (
             <FeatureRow
               key={f.id}
@@ -678,7 +698,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
               onRemove={removeFeature}
             />
           ))}
-          <AddButton onClick={addFeature}>+ 添加特性</AddButton>
+          <AddButton onClick={addFeature}>{t('item.addFeature')}</AddButton>
 
           {divider}
 
@@ -696,7 +716,7 @@ export function ItemDialog({ open, initialItem, onSave, onDelete, onClose }: Ite
                 if (next) set("proficient", true);
               }}
             />
-            <span style={{ ...T, color: sheetColors.textMedium, fontSize: "13px" }}>保存为攻击武器</span>
+            <span style={{ ...T, color: sheetColors.textMedium, fontSize: "13px" }}>{t('item.saveAsWeapon')}</span>
           </div>
         </ScrollArea>
       </div>

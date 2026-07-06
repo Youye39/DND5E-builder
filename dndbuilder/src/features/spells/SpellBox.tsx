@@ -8,6 +8,7 @@ import { SpellDialog } from "./SpellDialog";
 import { sheetColors } from "../../shared/tokens/colors";
 import type { SpellData } from "../../shared/types/types";
 import { createDefaultSpell } from "../../shared/types/types";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface SpellBoxProps {
   level: number;
@@ -57,6 +58,7 @@ export default function SpellBox({
   onSpellsChange,
   onAddSpell,
 }: SpellBoxProps) {
+  const { t } = useLanguage();
   // 内部 spells 状态（用于未受控模式）
   const safeSpells = externalSpells ?? [];
   
@@ -315,7 +317,7 @@ export default function SpellBox({
                 style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
               >
                 <span className="text-[16px] leading-none">+</span>
-                <span className="leading-none">添加法术</span>
+                <span className="leading-none">{t('spell.addSpell')}</span>
               </button>
             </div>
           )}
@@ -361,10 +363,10 @@ export default function SpellBox({
       {/* Cantrip label */}
       {isCantrip && (
         <div
-          className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-bold-cjk font-bold h-[24px] justify-center leading-[0] left-[70px] right-[258px] text-[12px] text-center text-white top-[13px]"
+          className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-bold-cjk font-bold h-[24px] justify-center leading-[0] left-[70px] right-0 text-[12px] text-left text-white top-[13px]"
           style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
         >
-          <p className="leading-[normal]">戏法</p>
+          <p className="leading-[normal]">{t('spell.cantrip')}</p>
         </div>
       )}
 

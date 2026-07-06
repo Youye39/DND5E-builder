@@ -2,6 +2,7 @@ import SectionContainer from "../../shared/ui/SectionContainer";
 import EditableInfoField from "./CharacterInfoField";
 import EditableScrollArea from "../../shared/ui/EditableScrollArea";
 import EmblemSection from "./EmblemSection";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface CharacterInfoData {
   name: string;
@@ -24,6 +25,7 @@ interface CharacterInfoSectionProps {
 }
 
 function NameField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { t } = useLanguage();
   return (
     <div className="absolute contents left-[14px] top-[calc(50%-160px)]" data-name="姓名">
       <div className="-translate-y-1/2 absolute bg-sheet-content-bg h-[55px] left-[14px] overflow-clip top-[calc(50%-150.5px)] w-[344px]">
@@ -39,20 +41,21 @@ function NameField({ value, onChange }: { value: string; onChange: (v: string) =
         className="-translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular font-normal h-[16px] justify-center leading-[0] left-[17px] text-sheet-text-secondary text-[14px] top-[calc(50%-189px)] w-[341px]"
         style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
       >
-        <p className="leading-[normal]">姓名</p>
+        <p className="leading-[normal]">{t('charInfo.name')}</p>
       </div>
     </div>
   );
 }
 
 function AppearanceDescField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const { t } = useLanguage();
   return (
     <div className="absolute h-[128px] left-[14px] top-[252px] w-[651px]" data-name="形象">
       <p
         className="[word-break:break-word] absolute font-serif-regular font-normal h-[17px] leading-[normal] left-[3px] text-sheet-text-secondary text-[12px] top-0 w-[648px]"
         style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
       >
-        形象
+        {t('charInfo.appearance')}
       </p>
       <EditableScrollArea
         value={value}
@@ -67,48 +70,49 @@ function AppearanceDescField({ value, onChange }: { value: string; onChange: (v:
 export type { CharacterInfoData };
 
 export default function CharacterInfoSection({ data, onChange }: CharacterInfoSectionProps) {
+  const { t } = useLanguage();
   return (
-    <SectionContainer title="角色信息" className="h-[418px] left-[491px] top-[151px] w-[679px]">
+    <SectionContainer title={t('charInfo.title')} className="h-[418px] left-[491px] top-[151px] w-[679px]">
       <NameField value={data.name} onChange={(v) => onChange("name", v)} />
       <div className="absolute contents left-[14px] top-[90px]" data-name="基本信息">
         <EditableInfoField
-          label="性别"
+          label={t('charInfo.gender')}
           value={data.gender}
           onChange={(v) => onChange("gender", v)}
           className="left-[14px] top-[90px]"
         />
         <EditableInfoField
-          label="年龄"
+          label={t('charInfo.age')}
           value={data.age}
           onChange={(v) => onChange("age", v)}
           className="left-[14px] top-[144px]"
         />
         <EditableInfoField
-          label="瞳色"
+          label={t('charInfo.eyeColor')}
           value={data.eyeColor}
           onChange={(v) => onChange("eyeColor", v)}
           className="left-[14px] top-[198px]"
         />
         <EditableInfoField
-          label="身高"
+          label={t('charInfo.height')}
           value={data.height}
           onChange={(v) => onChange("height", v)}
           className="left-[235px] top-[144px]"
         />
         <EditableInfoField
-          label="肤色"
+          label={t('charInfo.skinColor')}
           value={data.skinColor}
           onChange={(v) => onChange("skinColor", v)}
           className="left-[235px] top-[198px]"
         />
         <EditableInfoField
-          label="体重"
+          label={t('charInfo.weight')}
           value={data.weight}
           onChange={(v) => onChange("weight", v)}
           className="left-[456px] top-[144px]"
         />
         <EditableInfoField
-          label="发色"
+          label={t('charInfo.hairColor')}
           value={data.hairColor}
           onChange={(v) => onChange("hairColor", v)}
           className="left-[456px] top-[198px]"

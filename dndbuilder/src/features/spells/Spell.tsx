@@ -4,7 +4,7 @@ import type { SpellData } from "../../shared/types/types";
 import { SpellDialog } from "./SpellDialog";
 import SpellTip from "./SpellTip";
 import { useInteractionHandler } from "../../shared/dialogs/useInteractionHandler";
-const ABILITY_LABELS: Record<string, string> = { int: "智力", wis: "感知", cha: "魅力" };
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface SpellRowProps {
   spell?: SpellData;
@@ -25,6 +25,7 @@ export default function SpellRow({
   onHover,
   onHoverLeave,
 }: SpellRowProps) {
+  const { t } = useLanguage();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUsage, setEditingUsage] = useState(false);
   const [concentrationFocused, setConcentrationFocused] = useState(false);
@@ -113,7 +114,7 @@ export default function SpellRow({
               <div className="-translate-y-full absolute flex flex-col font-serif-regular-cjk h-[23px] justify-end left-[8px] text-[16px] text-black top-[22px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
                 <p className="leading-[normal]">
                   {safe.name}
-                  {safe.ritual && <i>（仪式）</i>}
+                  {safe.ritual && <i> ({t('spell.ritual')})</i>}
                 </p>
               </div>
             ) : (
@@ -129,7 +130,7 @@ export default function SpellRow({
                 className="-translate-y-1/2 absolute flex items-center text-[#595959] text-[12px] font-serif-regular leading-none top-[12px]"
                 style={{ right: "36px", fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
               >
-                {ABILITY_LABELS[safe.innateAbility ?? "int"]}
+                {t('ability.' + (safe.innateAbility ?? 'int'))}
               </div>
               <div
                 className="-translate-y-1/2 absolute flex items-center top-[12px]"
@@ -170,7 +171,7 @@ export default function SpellRow({
               }}
               onClick={(e) => { e.stopPropagation(); setConcentrationFocused(!concentrationFocused); }}
             >
-              {concentrationFocused ? "专注中" : "专注"}
+              {concentrationFocused ? t('spell.concentrating') : t('spell.concentration')}
             </div>
           )}
         </div>

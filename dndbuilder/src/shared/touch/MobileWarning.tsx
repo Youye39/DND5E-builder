@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../tokens/colors";
+import { useLanguage } from "../i18n/LanguageContext";
 
 const FVAR = "'CTGR' 0, 'wdth' 100";
 
 export default function MobileWarning() {
+  const { t } = useLanguage();
   const [show, setShow] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
@@ -44,13 +46,13 @@ export default function MobileWarning() {
           className="font-serif-bold-cjk font-bold text-[16px]"
           style={{ color: sheetColors.textDark, marginBottom: 12 }}
         >
-          提示
+          {t('mobile.title')}
         </div>
         <p
           className="font-serif-medium-cjk text-[14px]"
           style={{ lineHeight: 1.6, color: sheetColors.textMedium, marginBottom: 20 }}
         >
-          为了获得更好的体验，请使用电脑或平板打开。
+          {t('mobile.message')}
         </p>
         <button
           onClick={handleDismiss}
@@ -66,7 +68,7 @@ export default function MobileWarning() {
           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkHover)}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkBg)}
         >
-          我知道了
+          {t('mobile.dismiss')}
         </button>
       </div>
     </div>,

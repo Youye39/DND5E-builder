@@ -8,6 +8,7 @@ import ExportDialog from "./dialogs/ExportPdfDialog";
 import CustomItemDialog from "./dialogs/CustomItemDialog";
 import GuideDialog from "./dialogs/GuideDialog";
 import { CharacterProvider } from "./shared/storage/CharacterContext";
+import { LanguageProvider, useLanguage } from "./shared/i18n/LanguageContext";
 import MobileWarning from "./shared/touch/MobileWarning";
 import AnnouncementDialog from "./shared/ui/AnnouncementDialog";
 
@@ -59,6 +60,7 @@ function AppContent() {
   const [scale, setScale] = useState(0.8);
   const pinchRef = useRef<number | null>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const { t, toggleLang, lang } = useLanguage();
 
   const handleWheel = useCallback((e: WheelEvent) => {
     if (!e.ctrlKey && !e.metaKey) return;
@@ -152,7 +154,7 @@ function AppContent() {
                             className="font-sans-medium-cjk font-medium text-[20px] text-sheet-text-page-active"
                             style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
                           >
-                            {page === 0 ? '第一页' : page === 1 ? '第二页' : '第三页'}
+                            {page === 0 ? t('page.first') : page === 1 ? t('page.second') : t('page.third')}
                           </span>
                         </div>
                       </div>
@@ -169,7 +171,7 @@ function AppContent() {
                           className="font-sans-medium-cjk font-medium text-[20px] text-sheet-text-secondary"
                           style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
                         >
-                          {page === 0 ? '第一页' : page === 1 ? '第二页' : '第三页'}
+                          {page === 0 ? t('page.first') : page === 1 ? t('page.second') : t('page.third')}
                         </span>
                       </div>
                     ))}
@@ -217,6 +219,18 @@ function AppContent() {
                           </svg>
                         </div>
                       </div>
+                    </button>
+
+                    {/* 中英文切换按钮 */}
+                    <button
+                      onClick={toggleLang}
+                      className="mt-2 w-[75px] h-[36px] rounded-[34px] bg-white shadow-md hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95 cursor-pointer flex items-center justify-center"
+                      style={{ filter: 'drop-shadow(0 3px 6px rgba(0, 0, 0, 0.15))' }}
+                      title={lang === 'zh' ? 'Switch to English' : '切换到中文'}
+                    >
+                      <span className="font-sans-medium-cjk text-[13px] font-semibold text-sheet-text-secondary">
+                        {lang === 'zh' ? 'EN' : '中文'}
+                      </span>
                     </button>
                   </div>
 
@@ -274,9 +288,11 @@ function AppContent() {
 export default function App() {
   return (
     <CharacterProvider>
-      <MobileWarning />
-      <AnnouncementDialog />
-      <AppContent />
+      <LanguageProvider>
+        <MobileWarning />
+        <AnnouncementDialog />
+        <AppContent />
+      </LanguageProvider>
     </CharacterProvider>
   );
 }

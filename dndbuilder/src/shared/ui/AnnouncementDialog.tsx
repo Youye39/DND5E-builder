@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../tokens/colors";
 import announcementsData from "../../../data/announcements.json";
+import { useLanguage } from "../i18n/LanguageContext";
 
 const FVAR = "'CTGR' 0, 'wdth' 100";
 
@@ -140,6 +141,7 @@ const ANNOUNCEMENTS = announcementsData as Announcement[];
 const STORAGE_KEY = "dndbuilder_last_dismissed_announcement";
 
 export default function AnnouncementDialog() {
+  const { t } = useLanguage();
   const [dismissed, setDismissed] = useState(() => {
     try {
       return localStorage.getItem(STORAGE_KEY) === ANNOUNCEMENTS[0]?.id;
@@ -231,7 +233,7 @@ export default function AnnouncementDialog() {
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkHover)}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkBg)}
           >
-            知道了
+            {t('mobile.dismiss')}
           </button>
         </div>
       </div>

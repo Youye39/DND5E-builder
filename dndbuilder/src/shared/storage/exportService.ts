@@ -7,14 +7,27 @@ import { ARMOR_OPTIONS } from "../../../data/armorOptions";
 import type { ArmorOption } from "../../../data/armorOptions";
 import classData from "../../../data/classData.json";
 
-// ─── 技能中文名 → 英文 key 映射 ──────────────────────────────────────────────
-const SKILL_MAP: Record<string, string> = {
-  "运动": "ath", "特技": "acr", "巧手": "slt", "隐匿": "ste",
-  "调查": "inv", "奥秘": "arc", "历史": "his", "自然": "nat", "宗教": "rel",
-  "察觉": "prc", "洞悉": "ins", "驯兽": "ani", "医药": "med", "求生": "sur",
-  "游说": "per", "欺瞒": "dec", "威吓": "itm", "表演": "prf",
+// ─── 枭熊技能（直接硬编码中文名） ────────────────────────────────
+const CN_SKILL_NAMES    = ["运动","特技","巧手","隐匿","调查","奥秘","历史","自然","宗教","察觉","洞悉","驯兽","医药","求生","游说","欺瞒","威吓","表演"];
+const CN_SKILL_ABIL: Record<string,string> = {"运动":"str","特技":"dex","巧手":"dex","隐匿":"dex","调查":"int","奥秘":"int","历史":"int","自然":"int","宗教":"int","察觉":"wis","洞悉":"wis","驯兽":"wis","医药":"wis","求生":"wis","游说":"cha","欺瞒":"cha","威吓":"cha","表演":"cha"};
+/** FVTT 英文 key → 缩写 */
+const EN_SKILL_ABBR: Record<string,string> = { athletics:"ath",acrobatics:"acr",sleightOfHand:"slt",stealth:"ste",investigation:"inv",arcana:"arc",history:"his",nature:"nat",religion:"rel",perception:"prc",insight:"ins",animalHandling:"ani",medicine:"med",survival:"sur",persuasion:"per",deception:"dec",intimidation:"itm",performance:"prf" };
+const EN_SKILL_KEYS     = Object.keys(EN_SKILL_ABBR);
+/** 中文名 → 英文 key 映射（查 skills/customModifiers 用，兼容已迁移存档） */
+const CN_TO_EN: Record<string,string> = {运动:"athletics",特技:"acrobatics",巧手:"sleightOfHand",隐匿:"stealth",调查:"investigation",奥秘:"arcana",历史:"history",自然:"nature",宗教:"religion",察觉:"perception",洞悉:"insight",驯兽:"animalHandling",医药:"medicine",求生:"survival",游说:"persuasion",欺瞒:"deception",威吓:"intimidation",表演:"performance"};
+function skState(skills: any, cn: string): number { return skills?.[cn] ?? skills?.[CN_TO_EN[cn]!] ?? 0; }
+function skCustom(customs: any, cn: string): string | null { return customs?.[cn] ?? customs?.[CN_TO_EN[cn]!] ?? null; }
+/** 伤害类型 中文标签 ↔ 英文ID 双向映射（枭熊导出用中文） */
+const DAMAGE_CN_TO_ID: Record<string, string> = {
+  "挥砍": "Slashing", "穿刺": "Piercing", "钝击": "Bludgeoning",
+  "火焰": "Fire", "寒冷": "Cold", "闪电": "Lightning",
+  "雷鸣": "Thunder", "强酸": "Acid", "毒素": "Poison",
+  "心灵": "Psychic", "黯蚀": "Necrotic", "光耀": "Radiant", "力场": "Force",
 };
-const SKILL_NAMES_CN = ["运动","特技","巧手","隐匿","调查","奥秘","历史","自然","宗教","察觉","洞悉","驯兽","医药","求生","游说","欺瞒","威吓","表演"];
+const DAMAGE_ID_TO_CN: Record<string, string> = {};
+for (const [cn, id] of Object.entries(DAMAGE_CN_TO_ID)) {
+  DAMAGE_ID_TO_CN[id] = cn;
+}
 
 function attrMod(value: number): number {
   return Math.floor((value - 10) / 2);
@@ -133,22 +146,16 @@ export function toOwlbearJSON(character: CharacterData): string {
     };
   }
 
-  // ── 技能 ────────────────────────────────────────────────────────
+  // ── 技能（枭熊：直接用中文名硬编码） ──────────────────────────
   const skills: any[] = [];
-  const skillAbilityMap: Record<string, string> = {
-    "运动":"str","特技":"dex","巧手":"dex","隐匿":"dex",
-    "调查":"int","奥秘":"int","历史":"int","自然":"int","宗教":"int",
-    "察觉":"wis","洞悉":"wis","驯兽":"wis","医药":"wis","求生":"wis",
-    "游说":"cha","欺瞒":"cha","威吓":"cha","表演":"cha",
-  };
-  for (const name of SKILL_NAMES_CN) {
-    const state = character.skills?.[name] ?? 0;
-    const abil = skillAbilityMap[name] ?? "dex";
+  for (const cnName of CN_SKILL_NAMES) {
+    const abil = CN_SKILL_ABIL[cnName] ?? "dex";
+    const state = skState(character.skills, cnName);
     const abilMod = attrMod((attrs as any)[`${abil}_value`] ?? 10);
-    const customSkillMod = character.skillCustomModifiers?.[name] ?? null;
+    const customSkillMod = skCustom(character.skillCustomModifiers, cnName);
     if (customSkillMod) {
       const parsed = parseInt(customSkillMod, 10);
-      skills.push({ name, ability: abil, proficiency: "none", total: parsed, misc_bonus: parsed });
+      skills.push({ name: cnName, ability: abil, proficiency: "none", total: parsed, misc_bonus: parsed });
     } else {
       const halfProf = Math.floor(pb / 2);
       let total = abilMod;
@@ -157,7 +164,7 @@ export function toOwlbearJSON(character: CharacterData): string {
       else if (state === 2) { total += pb; prof = "proficient"; }
       else if (state === 1) { total += halfProf; prof = "half_proficient"; }
       else { prof = "none"; }
-      skills.push({ name, ability: abil, proficiency: prof, total, misc_bonus: 0 });
+      skills.push({ name: cnName, ability: abil, proficiency: prof, total, misc_bonus: 0 });
     }
   }
 
@@ -173,7 +180,7 @@ export function toOwlbearJSON(character: CharacterData): string {
       const dmgStr = dmgBonus >= 0 ? `${item.damageDice ?? "1d4"}+${dmgBonus}` : `${item.damageDice ?? "1d4"}${dmgBonus}`;
       weapons.push({
         name: item.name, proficient: item.proficient !== false,
-        attack_bonus: atkStr, damage: dmgStr, damage_type: item.damageType ?? "",
+        attack_bonus: atkStr, damage: dmgStr, damage_type: DAMAGE_ID_TO_CN[item.damageType ?? ""] ?? item.damageType ?? "",
         extra_damage: null, extra_damage_type: null,
         mastery: null, mastery_effect: null,
         weight: null, ammo_type: null, properties: null,
@@ -227,6 +234,7 @@ export function toOwlbearJSON(character: CharacterData): string {
       template_name: character.name || "角色",
       template_version: "ver.",
       layout_version: "v1.0.12-2014mode",
+      ruleset: null,
       source_file: "",
       parsed_at: new Date().toISOString(),
     },
@@ -235,7 +243,7 @@ export function toOwlbearJSON(character: CharacterData): string {
       display_name: character.name || "",
       player: character.basicInfo?.玩家名 ?? "",
       race: { name: character.basicInfo?.种族 ?? "", subrace: null },
-      alignment: character.basicInfo?.阵营 ?? null,
+      alignment: character.basicInfo?.阵营 ?? "",
       faith: null,
       age: ageNum,
       gender: character.characterInfo?.gender ?? "",
@@ -259,19 +267,30 @@ export function toOwlbearJSON(character: CharacterData): string {
       dc: 8 + pb + attrMod(attrs[`${character.spellcastingAbility ?? "int"}_value`] ?? 10),
       dc_ability: cnAbilities[character.spellcastingAbility ?? "int"] ?? "智力",
       passive_perception: (() => {
-        const percState = character.skills?.察觉 ?? 0;
+        const percKey = typeof character.skills?.perception !== 'undefined' ? 'perception' : '察觉';
+        const percState = character.skills?.[percKey] ?? 0;
         const percBonus = percState === 3 ? pb * 2 : percState === 2 ? pb : percState === 1 ? Math.floor(pb / 2) : 0;
         return 10 + wisMod + percBonus;
       })(),
       speed: character.customSpeed ?? 30,
       size: "中型",
-      hp: { current: character.currentHP ?? 0, max: character.currentHP ?? 0, temp: character.tempHP ?? 0 },
+      hp: { current: character.currentHP ?? 0, max: character.customMaxHP ?? (() => {
+        const classId = character.basicInfo?.["职业_id"];
+        const classEntry = classId ? (classData as any)[classId] : null;
+        if (!classEntry) return character.currentHP ?? 0;
+        const lvl = typeof character.level === "number" ? character.level : 1;
+        const cMod = attrMod(character.attributes?.con_value ?? 10);
+        return Math.max(1, (classEntry.hitpoints[1] + cMod) * lvl + classEntry.hitpoints[0] - classEntry.hitpoints[1]);
+      })(), temp: character.tempHP ?? 0 },
       hit_dice: { current: typeof character.level === "number" ? character.level : 1, max: typeof character.level === "number" ? character.level : 1, die_size: null },
     },
     defenses: { resistances: [], immunities: [], advantages: [], disadvantages: [] },
     skills,
     combat: {
-      armor: { name: armorName, ac_base: finalAC, dex_bonus_cap: dexCap, attuned: false, weight: null, equipped: true },
+      armor: { name: armorName, ac_base: (() => {
+        if (isCustom && character.customACFormula) return finalAC - shieldBonus - armorExtra - shieldExtra - acExtrasBonus;
+        return selectedArmor_ ? selectedArmor_.calcAC(dexMod, conMod, wisMod) : 10 + dexMod;
+      })(), dex_bonus_cap: dexCap, attuned: false, weight: null, equipped: true },
       shield: { ac_bonus: shieldBonus, attuned: false, equipped: !!character.hasShield },
       weapons,
       other_equipment: character.items?.filter(i => !i.isWeapon).map(i => ({ name: i.name, quantity: i.quantity })) ?? [],
@@ -330,20 +349,15 @@ export function toOwlbearJSON(character: CharacterData): string {
       sb.push(`hp:${character.currentHP ?? 0} hpmax:${character.currentHP ?? 0}`);
       // 先攻 / AC / DC / PP / 熟练
       const dcVal = 8 + pb + attrMod(attrs[`${character.spellcastingAbility ?? "int"}_value`] ?? 10);
-      const ppVal = 10 + wisMod + ((character.skills?.察觉 ?? 0) >= 1 ? pb : 0);
+      const percKey = typeof character.skills?.perception !== 'undefined' ? 'perception' : '察觉';
+      const ppVal = 10 + wisMod + ((character.skills?.[percKey] ?? 0) >= 1 ? pb : 0);
       sb.push(`先攻:${dexMod} ac:${finalAC} dc:${dcVal} pp:${ppVal} 熟练:${pb}`);
-      // 技能
-      const skillAbilityMap2: Record<string, string> = {
-        "运动":"str","特技":"dex","巧手":"dex","隐匿":"dex",
-        "调查":"int","奥秘":"int","历史":"int","自然":"int","宗教":"int",
-        "察觉":"wis","洞悉":"wis","驯兽":"wis","医药":"wis","求生":"wis",
-        "游说":"cha","欺瞒":"cha","威吓":"cha","表演":"cha",
-      };
-      for (const name of SKILL_NAMES_CN) {
-        const state = character.skills?.[name] ?? 0;
-        const abil = skillAbilityMap2[name] ?? "dex";
+      // 技能（dice_bot 使用中文名，正数不加 +）
+      for (const cnName of CN_SKILL_NAMES) {
+        const abil = CN_SKILL_ABIL[cnName] ?? "dex";
+        const state = skState(character.skills, cnName);
         const mod = attrMod((attrs as any)[`${abil}_value`] ?? 10);
-        const customSkillMod = character.skillCustomModifiers?.[name] ?? null;
+        const customSkillMod = skCustom(character.skillCustomModifiers, cnName);
         let total: number;
         if (customSkillMod) {
           total = parseInt(customSkillMod, 10);
@@ -355,7 +369,7 @@ export function toOwlbearJSON(character: CharacterData): string {
           else if (state === 1) total += halfProf;
         }
         const suffix = state >= 1 ? "*" : "";
-        sb.push(`${name}${suffix}:${total}`);
+        sb.push(`${cnName}${suffix}:${total}`);
       }
       return `.st ${sb.join(" ")}`;
     })(), embedded_json: null },
@@ -451,21 +465,21 @@ export function toFVTTJSON(character: CharacterData): string {
 
   // 技能
   const skillAbilityMap: Record<string, string> = {
-    "运动":"str","特技":"dex","巧手":"dex","隐匿":"dex",
-    "调查":"int","奥秘":"int","历史":"int","自然":"int","宗教":"int",
-    "察觉":"wis","洞悉":"wis","驯兽":"wis","医药":"wis","求生":"wis",
-    "游说":"cha","欺瞒":"cha","威吓":"cha","表演":"cha",
+    athletics:"str", acrobatics:"dex", sleightOfHand:"dex", stealth:"dex",
+    investigation:"int", arcana:"int", history:"int", nature:"int", religion:"int",
+    perception:"wis", insight:"wis", animalHandling:"wis", medicine:"wis", survival:"wis",
+    persuasion:"cha", deception:"cha", intimidation:"cha", performance:"cha",
   };
   const skills: Record<string, any> = {};
-  for (const cn of SKILL_NAMES_CN) {
-    const abil = skillAbilityMap[cn] ?? "dex";
-    const state = character.skills?.[cn] ?? 0;
-    const customSkillMod = character.skillCustomModifiers?.[cn] ?? null;
+  for (const key of EN_SKILL_KEYS) {
+    const abil = skillAbilityMap[key] ?? "dex";
+    const state = character.skills?.[key] ?? 0;
+    const customSkillMod = character.skillCustomModifiers?.[key] ?? null;
     if (customSkillMod) {
-      skills[SKILL_MAP[cn]] = { value: 0, ability: abil, bonuses: { check: customSkillMod, pass: "", save: "" } };
+      skills[EN_SKILL_ABBR[key]] = { value: 0, ability: abil, bonuses: { check: customSkillMod, pass: "", save: "" } };
     } else {
       const fvttValue = state === 0 ? 0 : state === 1 ? 0.5 : state === 2 ? 1 : 2;
-      skills[SKILL_MAP[cn]] = { value: fvttValue, ability: abil, bonuses: { check: "", pass: "", save: "" } };
+      skills[EN_SKILL_ABBR[key]] = { value: fvttValue, ability: abil, bonuses: { check: "", pass: "", save: "" } };
     }
   }
 

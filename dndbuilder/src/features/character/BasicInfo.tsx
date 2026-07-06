@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useCharacter } from "../../shared/storage/CharacterContext";
 import classIdentifiers from "../../../data/classIdentifiers.json";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface BasicInfoProps {
   className?: string;
@@ -94,6 +95,7 @@ function detectClassId(input: string): { classId: string; label: string } | null
 }
 
 export default function BasicInfo({ className }: BasicInfoProps) {
+  const { t } = useLanguage();
   const { character, updateCharacter } = useCharacter();
   const infoFields = character?.basicInfo ?? {
     职业: "",
@@ -117,12 +119,12 @@ export default function BasicInfo({ className }: BasicInfoProps) {
   return (
     <div className={`${className || ""}`} data-name="basic-info">
       <div className="absolute contents left-[396px] top-[30px]" data-name="character-info">
-        <InlineInfoField label="职业" value={infoFields.职业} left={396} top={30} onChange={(v) => handleFieldChange("职业", v)} />
-        <InlineInfoField label="种族" value={infoFields.种族} left={396} top={89} onChange={(v) => handleFieldChange("种族", v)} />
-        <InlineInfoField label="背景" value={infoFields.背景} left={589} top={30} onChange={(v) => handleFieldChange("背景", v)} />
-        <InlineInfoField label="阵营" value={infoFields.阵营} left={589} top={89} onChange={(v) => handleFieldChange("阵营", v)} />
-        <InlineInfoField label="玩家名" value={infoFields.玩家名} left={782} top={30} onChange={(v) => handleFieldChange("玩家名", v)} />
-        <InlineInfoField label="经验值" value={infoFields.经验值} left={782} top={89} onChange={(v) => handleFieldChange("经验值", v)} />
+        <InlineInfoField label={t('info.class')} value={infoFields.职业} left={396} top={30} onChange={(v) => handleFieldChange("职业", v)} />
+        <InlineInfoField label={t('info.race')} value={infoFields.种族} left={396} top={89} onChange={(v) => handleFieldChange("种族", v)} />
+        <InlineInfoField label={t('info.background')} value={infoFields.背景} left={589} top={30} onChange={(v) => handleFieldChange("背景", v)} />
+        <InlineInfoField label={t('info.alignment')} value={infoFields.阵营} left={589} top={89} onChange={(v) => handleFieldChange("阵营", v)} />
+        <InlineInfoField label={t('info.playerName')} value={infoFields.玩家名} left={782} top={30} onChange={(v) => handleFieldChange("玩家名", v)} />
+        <InlineInfoField label={t('info.exp')} value={infoFields.经验值} left={782} top={89} onChange={(v) => handleFieldChange("经验值", v)} />
       </div>
     </div>
   );

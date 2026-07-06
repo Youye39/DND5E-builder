@@ -1,5 +1,6 @@
 [
   {
+    "id": "all armor",
     "label": "全部护甲",
     "options": [
       { "id": "light",  "label": "轻甲" },
@@ -8,6 +9,7 @@
     ]
   },
   {
+    "id": "shield",
     "label": "盾牌",
     "options": [
       { "id": "shield", "label": "盾牌" }

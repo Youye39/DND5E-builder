@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ButtonComponent from "../../shared/ui/ButtonComponent";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface SavingThrowComponentProps {
   className?: string;
@@ -22,6 +23,7 @@ export default function SavingThrowComponent({
   customModifier = null,
   onCustomModifierChange,
 }: SavingThrowComponentProps) {
+  const { t } = useLanguage();
   const [inputValue, setInputValue] = useState<string>(customModifier ?? "");
 
   const calculatedModifier = checked ? modifier + proficiencyBonus : modifier;
@@ -110,7 +112,7 @@ export default function SavingThrowComponent({
       {customModifier && (
         <div className="absolute bottom-0 h-[16px] flex items-center justify-end group" style={{ left: "150px" }}>
           <div className="[word-break:break-word] flex flex-col font-serif-regular font-normal justify-center leading-[0] text-sheet-text-secondary text-[10px] text-center flex-shrink-0 w-fit" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
-            <p className="leading-[normal]">（自定义）</p>
+            <p className="leading-[normal]">{t('savingThrow.custom')}</p>
           </div>
           <button
             onClick={() => onCustomModifierChange?.(null)}

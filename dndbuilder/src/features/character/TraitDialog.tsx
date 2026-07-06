@@ -5,8 +5,9 @@ import type { TraitItem, SubTrait } from "../../shared/types/types";
 import { createDefaultSubTrait } from "../../shared/types/types";
 import traitTagPresets from "../../../data/traitTagPresets.json";
 import ScrollArea from "../../shared/ui/ScrollArea";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
-const TAG_PRESETS = traitTagPresets as string[];
+const TAG_PRESETS = traitTagPresets as { id: string; label: string }[];
 
 interface TraitDialogProps {
   open: boolean;
@@ -25,6 +26,7 @@ const LABEL: React.CSSProperties = {
 };
 
 export default function TraitDialog({ open, initialTrait, onSave, onDelete, onClose }: TraitDialogProps) {
+  const { t, lang } = useLanguage();
   const [data, setData] = useState<TraitItem>(() => initialTrait ?? { id: "", name: "", usage: "", description: "", tags: [] });
 
   // 当 initialTrait 变化时同步
@@ -53,7 +55,7 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
     }));
 
   const handleSave = () => {
-    const name = data.name.trim() || "新特质";
+    const name = data.name.trim() || t('traitDialog.newTrait');
     onSave({ ...data, name });
     onClose();
   };
@@ -80,7 +82,7 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: `1px solid ${sheetColors.hoverBg}`, flexShrink: 0 }}>
           <span className="text-base font-semibold" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}>
-            编辑特质
+            {t('traitDialog.title')}
           </span>
           <div style={{ display: "flex", gap: "8px" }}>
             {onDelete && (
@@ -91,7 +93,7 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.pageBg; e.currentTarget.style.borderColor = sheetColors.borderLight; e.currentTarget.style.color = "#000"; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; e.currentTarget.style.borderColor = "var(--color-border)"; e.currentTarget.style.color = sheetColors.textDark; }}
               >
-                删除
+                {t('traitDialog.delete')}
               </button>
             )}
             <button
@@ -101,7 +103,7 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkHover)}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkBg)}
             >
-              保存
+              {t('traitDialog.save')}
             </button>
           </div>
         </div>
@@ -111,11 +113,11 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
           {/* 名称 + 使用次数 同一行 */}
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <div style={{ flex: "none", width: "240px" }}>
-              <div style={LABEL}>名称</div>
+              <div style={LABEL}>{t('traitDialog.name')}</div>
               <input
                 value={data.name}
                 onChange={(e) => set("name", e.target.value)}
-                placeholder="名称"
+                placeholder={t('traitDialog.name')}
                 style={{
                   ...T, width: "100%", boxSizing: "border-box",
                   border: "1px solid var(--color-border)", borderRadius: "2px",
@@ -126,12 +128,12 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
               />
             </div>
             <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-              <div style={{ ...LABEL, width: 60 }}>使用次数</div>
+              <div style={{ ...LABEL, width: 60 }}>{t('traitDialog.usage')}</div>
               <input
                 type="text"
                 value={data.usage ?? ""}
                 onChange={(e) => set("usage", e.target.value)}
-                placeholder="（可选）"
+                placeholder={t('traitDialog.optional')}
                 style={{
                   ...T, width: 64, boxSizing: "border-box",
                   border: "none", borderBottom: "1px solid var(--color-border)", borderRadius: 0,
@@ -146,7 +148,10 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
           <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap", minHeight: 26, marginTop: 8 }}>
             {(data.tags ?? []).map((tag, idx) => (
               <span key={idx} style={{ display: "inline-flex", alignItems: "center", gap: 3, padding: "1px 6px", borderRadius: "2px", backgroundColor: sheetColors.hoverBg, fontSize: "11px", color: sheetColors.textDark, fontFamily: "var(--font-serif-regular)" }}>
-                {tag}
+                {(() => {
+                  const preset = TAG_PRESETS.find(p => p.label === tag || p.id === tag);
+                  return preset ? (lang === 'en' ? preset.id.charAt(0).toUpperCase() + preset.id.slice(1) : preset.label) : tag;
+                })()}
                 <span
                   onClick={() => setData(prev => ({ ...prev, tags: (prev.tags ?? []).filter((_, i) => i !== idx) }))}
                   style={{ cursor: "pointer", marginLeft: 2, color: sheetColors.textLighter }}
@@ -165,7 +170,7 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
           <textarea
             value={data.description ?? ""}
             onChange={(e) => set("description", e.target.value)}
-            placeholder="特性描述"
+            placeholder={t('traitDialog.desc')}
             rows={6}
             style={{
               ...T, width: "100%", resize: "vertical", boxSizing: "border-box",
@@ -177,7 +182,7 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
           />
 
           {/* ── 特质选项 ── */}
-          <div style={{ ...LABEL, marginTop: 16 }}>特质选项</div>
+          <div style={{ ...LABEL, marginTop: 16 }}>{t('traitDialog.options')}</div>
           {(data.subTraits ?? []).map((sub) => (
             <SubTraitRow
               key={sub.id}
@@ -196,7 +201,7 @@ export default function TraitDialog({ open, initialTrait, onSave, onDelete, onCl
             onMouseEnter={(e) => { e.currentTarget.style.borderColor = sheetColors.textSecondary; e.currentTarget.style.color = sheetColors.textSecondary; }}
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = sheetColors.iconDisabled; e.currentTarget.style.color = sheetColors.textLighter; }}
           >
-            + 添加特质选项
+            {t('traitDialog.addOption')}
           </button>
         </ScrollArea>
       </div>
@@ -214,6 +219,7 @@ function SubTraitRow({
   onUpdate: (id: string, field: keyof Omit<SubTrait, "id">, val: string) => void;
   onRemove: (id: string) => void;
 }) {
+  const { t } = useLanguage();
   return (
     <div style={{ marginBottom: 8 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
@@ -221,7 +227,7 @@ function SubTraitRow({
           type="text"
           value={subTrait.name}
           onChange={(e) => onUpdate(subTrait.id, "name", e.target.value)}
-          placeholder="选项名称"
+          placeholder={t('traitDialog.optionName')}
           style={{
             ...T, border: "1px solid transparent", borderRadius: "2px",
             padding: "2px 4px", outline: "none", backgroundColor: "transparent",
@@ -236,7 +242,7 @@ function SubTraitRow({
           type="text"
           value={subTrait.usage ?? ""}
           onChange={(e) => onUpdate(subTrait.id, "usage", e.target.value)}
-          placeholder="次数"
+          placeholder={t('traitDialog.usageCount')}
           style={{
             ...T, fontSize: 12, width: 44, textAlign: "center",
             border: "none", borderBottom: "1px solid var(--color-border)", borderRadius: 0,
@@ -259,7 +265,7 @@ function SubTraitRow({
       <textarea
         value={subTrait.description ?? ""}
         onChange={(e) => onUpdate(subTrait.id, "description", e.target.value)}
-        placeholder="选项描述"
+        placeholder={t('traitDialog.optionDesc')}
         rows={2}
         style={{
           ...T, width: "100%", resize: "vertical", boxSizing: "border-box",
@@ -276,6 +282,7 @@ function SubTraitRow({
 // ═══ 标签下拉选择器 ═════════════════════════════════════════════════════════
 
 function TagDropdown({ onAdd }: { onAdd: (tag: string) => void }) {
+  const { t, lang } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const [customText, setCustomText] = useState("");
   const ref = useRef<HTMLDivElement>(null);
@@ -302,7 +309,7 @@ function TagDropdown({ onAdd }: { onAdd: (tag: string) => void }) {
         style={{ ...T, fontSize: "11px", color: sheetColors.textPlaceholder, cursor: "pointer" }}
         onClick={() => setIsOpen(!isOpen)}
       >
-        + 标签
+        {t('traitDialog.addTag')}
       </span>
       {isOpen && (
         <div
@@ -319,8 +326,8 @@ function TagDropdown({ onAdd }: { onAdd: (tag: string) => void }) {
           {/* 预设项 */}
           {TAG_PRESETS.map((tag) => (
             <div
-              key={tag}
-              onClick={() => add(tag)}
+              key={tag.id}
+              onClick={() => add(tag.label)}
               style={{
                 padding: "4px 10px", cursor: "pointer",
                 ...T, fontSize: "13px",
@@ -328,7 +335,7 @@ function TagDropdown({ onAdd }: { onAdd: (tag: string) => void }) {
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.hoverBg; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
             >
-              {tag}
+              {lang === 'en' ? tag.id.charAt(0).toUpperCase() + tag.id.slice(1) : tag.label}
             </div>
           ))}
         </div>
@@ -345,6 +352,7 @@ function CustomTagInput({
   customText: string;
   setCustomText: (v: string) => void;
 }) {
+  const { t } = useLanguage();
   const [hovered, setHovered] = useState(false);
   return (
     <div
@@ -361,7 +369,7 @@ function CustomTagInput({
             onAdd(customText.trim());
           }
         }}
-        placeholder="自定义"
+        placeholder={t('traitDialog.customTag')}
         style={{
           ...T, fontSize: "13px", border: "none", borderRadius: 0,
           padding: "4px 10px", outline: "none", width: 100,

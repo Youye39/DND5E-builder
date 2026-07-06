@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import SkillButtonComponent from "./SkillButtonComponent";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface SkillComponentProps {
   className?: string;
@@ -24,6 +25,7 @@ export default function SkillComponent({
   customModifier = null,
   onCustomModifierChange,
 }: SkillComponentProps) {
+  const { t } = useLanguage();
   const [inputValue, setInputValue] = useState<string>(customModifier ?? "");
 
   // 计算自动加值
@@ -120,14 +122,14 @@ export default function SkillComponent({
       </div>
       <div className="absolute bottom-0 h-[16px] flex items-center justify-start" style={{ left: "87px" }}>
         <div className="[word-break:break-word] flex flex-col font-serif-regular font-normal justify-center leading-[0] text-sheet-text-secondary text-[10px] text-center flex-shrink-0 w-fit" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
-          <p className="leading-[normal]">（{attributeName}）</p>
+          <p className="leading-[normal]">{t('skill.attrFormat', { attr: attributeName })}</p>
         </div>
       </div>
       {/* 自定义标签 - 仅在有自定义值时显示 */}
       {customModifier && (
         <div className="absolute bottom-0 h-[16px] flex items-center justify-end group" style={{ left: "150px" }}>
           <div className="[word-break:break-word] flex flex-col font-serif-regular font-normal justify-center leading-[0] text-sheet-text-secondary text-[10px] text-center flex-shrink-0 w-fit" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
-            <p className="leading-[normal]">（自定义）</p>
+            <p className="leading-[normal]">{t('skill.custom')}</p>
           </div>
           <button
             onClick={() => onCustomModifierChange?.(null)}

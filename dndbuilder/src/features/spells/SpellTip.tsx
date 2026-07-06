@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import { sheetColors } from "../../shared/tokens/colors";
 import type { SpellData } from "../../shared/types/types";
 import spellDescriptionLabels from "../../../data/spellDescriptionLabels.json";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 const DESCRIPTON_LABELS = spellDescriptionLabels as string[];
 // 构建正则：同时匹配所有标签（如 "施法时间：|施法距离：|..."）
@@ -16,10 +17,10 @@ const SMALL: React.CSSProperties = { ...T, fontSize: "11px", color: sheetColors.
 
 const TOOLTIP_W = 240;
 
-const SCHOOL_LABELS: Record<string, string> = {
-  abjuration: "防护", conjuration: "咒法", divination: "预言",
-  enchantment: "附魔", evocation: "塑能", illusion: "幻术",
-  necromancy: "死灵", transmutation: "变化",
+const SCHOOL_KEYS: Record<string, string> = {
+  abjuration: "school.abjuration", conjuration: "school.conjuration", divination: "school.divination",
+  enchantment: "school.enchantment", evocation: "school.evocation", illusion: "school.illusion",
+  necromancy: "school.necromancy", transmutation: "school.transmutation",
 };
 
 interface SpellTipProps {
@@ -39,6 +40,7 @@ interface SpellTipProps {
 }
 
 export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, overrideLeft, overrideTop, overrideWidth, onMouseEnter, onMouseLeave, onChange }: SpellTipProps) {
+  const { t } = useLanguage();
   const hasOverride = overrideLeft !== undefined && overrideTop !== undefined;
   const w = overrideWidth ?? TOOLTIP_W;
   const tipRef = useRef<HTMLDivElement>(null);
@@ -97,7 +99,7 @@ export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, ove
           {spell.isInnate && (
             <span style={{ fontSize: "12px", whiteSpace: "nowrap", marginLeft: 8, display: "inline-flex", alignItems: "baseline", gap: 2 }}>
               <span style={{ ...SMALL, fontSize: "12px" }}>
-                {spell.innateAbility ? `${ABILITY_LABELS[spell.innateAbility] ?? spell.innateAbility} ` : ""}
+                {spell.innateAbility ? `${t('ability.' + spell.innateAbility)} ` : ""}
               </span>
               <input
                 type="text"
@@ -129,7 +131,7 @@ export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, ove
               backgroundColor: sheetColors.hoverBg, color: sheetColors.textDark,
               fontSize: "11px", fontFamily: "var(--font-serif-regular)", lineHeight: 1.4,
             }}>
-              {SCHOOL_LABELS[spell.school] ?? spell.school}
+              {t(SCHOOL_KEYS[spell.school] ?? 'school.abjuration')}
             </span>
           )}
           {spell.ritual && (
@@ -139,7 +141,7 @@ export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, ove
               backgroundColor: sheetColors.hoverBg, color: sheetColors.textDark,
               fontSize: "11px", fontFamily: "var(--font-serif-regular)", lineHeight: 1.4,
             }}>
-              仪式
+              {t('spell.ritual')}
             </span>
           )}
           {spell.concentration && (
@@ -149,7 +151,7 @@ export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, ove
               backgroundColor: sheetColors.hoverBg, color: sheetColors.textDark,
               fontSize: "11px", fontFamily: "var(--font-serif-regular)", lineHeight: 1.4,
             }}>
-              专注
+              {t('spell.concentration')}
             </span>
           )}
         </div>
@@ -171,4 +173,4 @@ export default function SpellTip({ spell, mouseY: initY, cardLeft: initLeft, ove
   );
 }
 
-const ABILITY_LABELS: Record<string, string> = { int: "智力", wis: "感知", cha: "魅力" };
+

@@ -18,6 +18,7 @@ import {
   importCharacterFromJSON,
 } from "../shared/storage/storageService";
 import { sheetColors } from "../shared/tokens/colors";
+import { useLanguage } from "../shared/i18n/LanguageContext";
 
 interface ArchiveDialogProps {
   open: boolean;
@@ -25,6 +26,7 @@ interface ArchiveDialogProps {
 }
 
 export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps) {
+  const { t } = useLanguage();
   const {
     saveList,
     currentId,
@@ -49,7 +51,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
   };
 
   const handleNew = () => {
-    newCharacter(`角色 ${saveList.length + 1}`);
+    newCharacter(t('archive.defaultName', { n: saveList.length + 1 }));
     onOpenChange(false);
   };
 
@@ -102,7 +104,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
         refreshSaveList();
         switchCharacter(char.id);
       } else {
-        alert("导入失败：文件格式不正确，请选择有效的 D&D Builder 存档文件。");
+        alert(t('archive.importFailed'));
       }
     };
     reader.readAsText(file);
@@ -121,7 +123,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
             className="text-base"
             style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}
           >
-            存档管理
+            {t('archive.title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -134,7 +136,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
               className="text-sm text-center py-4"
               style={{ color: sheetColors.textPlaceholder, fontFamily: "var(--font-serif-regular)" }}
             >
-              暂无存档
+              {t('archive.empty')}
             </p>
           )}
 
@@ -210,7 +212,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
                               color: sheetColors.textWhite,
                             }}
                           >
-                            当前
+                            {t('archive.current')}
                           </span>
                         )}
                       </div>
@@ -244,7 +246,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
                             backgroundColor: "black",
                           }}
                         >
-                          确认删除
+                          {t('archive.confirmDelete')}
                         </button>
                         <button
                           onClick={() => setConfirmDelete(null)}
@@ -256,7 +258,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
                             color: sheetColors.textMedium,
                           }}
                         >
-                          取消
+                          {t('archive.cancel')}
                         </button>
                       </div>
                     ) : (
@@ -270,7 +272,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
                             color: sheetColors.textPlaceholder,
                           }}
                         >
-                          复制
+                          {t('archive.duplicate')}
                         </button>
                         <button
                           onClick={() => handleExport(save.id, save.name)}
@@ -281,7 +283,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
                             color: sheetColors.textPlaceholder,
                           }}
                         >
-                          导出
+                          {t('archive.export')}
                         </button>
                         <button
                           onClick={() => setConfirmDelete(save.id)}
@@ -292,7 +294,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
                             color: sheetColors.textPlaceholder,
                           }}
                         >
-                          删除
+                          {t('archive.delete')}
                         </button>
                       </div>
                     )}
@@ -329,7 +331,7 @@ export default function ArchiveDialog({ open, onOpenChange }: ArchiveDialogProps
                   color: sheetColors.textLighter,
                 }}
               >
-                新建角色存档
+                {t('archive.newCharacter')}
               </span>
             </button>
             <button

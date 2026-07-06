@@ -7,9 +7,10 @@ import SpellBonusTooltip from "./SpellBonusTip";
 import { sheetColors } from "../../shared/tokens/colors";
 import ScrollArea from "../../shared/ui/ScrollArea";
 import classData from "../../../data/classData.json";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 /** Shared shell for an info field (label + value box + border) */
-function InfoFieldShell({ label, children }: { label: string; children: React.ReactNode }) {
+function InfoFieldShell({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
   return (
     <div className="h-[113px] relative w-[170px]" data-name="施法信息">
       <div className="absolute contents inset-0">
@@ -28,12 +29,13 @@ function InfoFieldShell({ label, children }: { label: string; children: React.Re
 }
 
 /** Spellcasting ability with dropdown (portal to body to avoid overflow clipping) */
-function AbilityField({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+function AbilityField({ value, onChange }: { value: string; onChange: (v: "int" | "wis" | "cha") => void }) {
+  const { t } = useLanguage();
   const [isOpen, setIsOpen] = useState(false);
   const triggerRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const [menuStyle, setMenuStyle] = useState<React.CSSProperties>({});
-  const options = ["智力", "感知", "魅力"];
+  const options = ["int", "wis", "cha"] as const;
 
   useEffect(() => {
     if (isOpen && triggerRef.current) {
@@ -65,14 +67,14 @@ function AbilityField({ value, onChange }: { value: string; onChange: (v: string
   }, [isOpen]);
 
   return (
-    <InfoFieldShell label="施法关键属性">
+    <InfoFieldShell label={t('spell.spellcastingAbility')}>
       <div
         ref={triggerRef}
         className="absolute bottom-[11px] h-[73px] right-[15px] w-[140px] cursor-pointer bg-sheet-content-bg hover:bg-sheet-hover-light/20"
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-regular-cjk font-normal h-[73px] justify-center leading-[0] left-[70px] text-[40px] text-black text-center top-[36.5px] w-[140px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
-          <p className="leading-[normal]">{value}</p>
+          <p className="leading-[normal]">{t('ability.' + value)}</p>
         </div>
       </div>
 
@@ -86,7 +88,7 @@ function AbilityField({ value, onChange }: { value: string; onChange: (v: string
               onClick={() => { onChange(opt); setIsOpen(false); }}
               onKeyDown={(e) => { if (e.key === "Enter") { onChange(opt); setIsOpen(false); } }}
             >
-              {opt}
+              {t('ability.' + opt)}
             </div>
           ))}
         </div>,
@@ -97,7 +99,7 @@ function AbilityField({ value, onChange }: { value: string; onChange: (v: string
 }
 
 /** Clickable value field that opens a tooltip */
-function ClickableField({ label, value, onClick }: { label: string; value: string; onClick: () => void }) {
+function ClickableField({ label, value, onClick }: { label: React.ReactNode; value: string; onClick: () => void }) {
   return (
     <div className="h-[113px] relative w-[170px] cursor-pointer" data-name="施法信息" onClick={onClick}>
       <div className="absolute contents inset-0">
@@ -120,13 +122,12 @@ function ClickableField({ label, value, onClick }: { label: string; value: strin
 }
 
 export default function Header() {
+  const { t } = useLanguage();
   const { character, setSpellcastingAbility, updateCharacter } = useCharacter();
   const spellcastingAbility = character?.spellcastingAbility ?? "int";
-  const abilityLabel: Record<string, string> = { int: "智力", wis: "感知", cha: "魅力" };
-  const abilityReverse: Record<string, "int" | "wis" | "cha"> = { 智力: "int", 感知: "wis", 魅力: "cha" };
 
-  // 内部用中文状态便于 UI 显示
-  const [abilityDisplay, setAbilityDisplay] = useState(abilityLabel[spellcastingAbility] ?? "智力");
+  // 内部用能力 key 存储
+  const [abilityKey, setAbilityKey] = useState<string>(spellcastingAbility);
 
   // 计算施法属性调整值和法术攻击相关数值
   const attrs = character?.attributes;
@@ -238,18 +239,17 @@ export default function Header() {
           <div aria-hidden className="absolute border-2 border-[#595959] border-solid inset-[-1px] pointer-events-none rounded-[3px]" />
         </div>
         <div className="[word-break:break-word] absolute flex flex-col font-serif-medium font-medium inset-[16.2%_81.51%_75.42%_2.87%] justify-center leading-[0] text-[#b3b3b3] text-[14px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
-          <p className="leading-[normal]">施法职业</p>
+          <p className="leading-[normal]">{t('spell.class')}</p>
         </div>
       </div>
 
       {/* Spellcasting ability — with dropdown */}
       <div className="absolute left-[448px] top-[29px]">
         <AbilityField
-        value={abilityDisplay}
+        value={abilityKey}
         onChange={(v) => {
-          setAbilityDisplay(v);
-          const key = abilityReverse[v];
-          if (key) setSpellcastingAbility(key);
+          setAbilityKey(v);
+          setSpellcastingAbility(v);
         }}
       />
       </div>
@@ -260,7 +260,7 @@ export default function Header() {
         onMouseEnter={() => openTooltip("saveDC")}
         onMouseLeave={scheduleHide}
       >
-        <ClickableField label="法术豁免DC" value={`${saveDC}`} onClick={() => openTooltip("saveDC")} />
+        <ClickableField label={t('spell.saveDC')} value={`${saveDC}`} onClick={() => openTooltip("saveDC")} />
       </div>
 
       {/* Spell attack bonus — clickable + hover */}
@@ -269,7 +269,7 @@ export default function Header() {
         onMouseEnter={() => openTooltip("attack")}
         onMouseLeave={scheduleHide}
       >
-        <ClickableField label="法术攻击加值" value={`${attackBonus >= 0 ? "+" : ""}${attackBonus}`} onClick={() => openTooltip("attack")} />
+        <ClickableField label={t('spell.attackBonus')} value={`${attackBonus >= 0 ? "+" : ""}${attackBonus}`} onClick={() => openTooltip("attack")} />
       </div>
 
       {/* Tooltip: 法术豁免DC额外加值 */}
@@ -316,7 +316,7 @@ export default function Header() {
           }}>
             {/* Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: `1px solid ${sheetColors.hoverBg}`, flexShrink: 0 }}>
-              <span className="text-base font-semibold" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}>编辑法术位</span>
+              <span className="text-base font-semibold" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}>{t('spell.editSlots')}</span>
               <div style={{ display: "flex", gap: "8px" }}>
                 <button
                   onClick={() => {
@@ -332,7 +332,7 @@ export default function Header() {
                   onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.pageBg; e.currentTarget.style.borderColor = sheetColors.borderLight; e.currentTarget.style.color = "#000"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; e.currentTarget.style.borderColor = "var(--color-border)"; e.currentTarget.style.color = sheetColors.textDark; }}
                 >
-                  重置
+                  {t('spell.reset')}
                 </button>
                 <button
                   onClick={handleSlotSave}
@@ -340,7 +340,7 @@ export default function Header() {
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkHover)}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkBg)}
                 >
-                  保存
+                  {t('spell.save')}
                 </button>
               </div>
             </div>
@@ -357,7 +357,7 @@ export default function Header() {
                       display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
                     }}>
                       <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPlaceholder, letterSpacing: "0.04em", flexShrink: 0, fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
-                        {lvl}环
+                        {t('spell.level', { lvl })}
                       </span>
                       <input
                         type="text"

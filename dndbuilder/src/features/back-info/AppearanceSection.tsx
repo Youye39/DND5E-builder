@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { saveImage, imageIdToUrl } from "../../shared/storage/imageStore";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface AppearanceSectionProps {
   imageId?: string;
@@ -7,6 +8,7 @@ interface AppearanceSectionProps {
 }
 
 export default function AppearanceSection({ imageId = "", onImageChange }: AppearanceSectionProps) {
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -55,7 +57,7 @@ export default function AppearanceSection({ imageId = "", onImageChange }: Appea
             {imageUrl ? (
               <img
                 src={imageUrl}
-                alt="角色外貌"
+                alt={t('charInfo.appearance')}
                 className="size-full object-cover"
               />
             ) : (
@@ -90,7 +92,7 @@ export default function AppearanceSection({ imageId = "", onImageChange }: Appea
             className="[word-break:break-word] absolute bottom-[12px] flex flex-col font-serif-medium font-medium justify-center leading-[0] left-[100px] right-[101px] text-[10px] text-black text-center translate-y-1/2"
             style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
           >
-            <p className="leading-[normal]">角色外貌</p>
+            <p className="leading-[normal]">{t('charInfo.appearance')}</p>
           </div>
         </div>
         <div
