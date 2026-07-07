@@ -9,12 +9,14 @@ import { ItemDialog } from "./ItemDialog";
 import { ItemTooltip } from "./ItemTooltip";
 import { sheetColors } from "../../shared/tokens/colors";
 import { useInteractionHandler } from "../../shared/dialogs/useInteractionHandler";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface EquipmentPanelProps {
   className?: string;
 }
 
 export default function EquipmentPanel({ className }: EquipmentPanelProps) {
+  const { t, lang } = useLanguage();
   const { character, updateCharacter } = useCharacter();
   const items = character?.items ?? [];
   const setItems = (newItems: Item[]) => updateCharacter({ items: newItems });
@@ -156,13 +158,13 @@ export default function EquipmentPanel({ className }: EquipmentPanelProps) {
 
   return (
     <>
-      <SectionContainer title="装备" className={`${className || ""} w-[358px] h-[437px]`}>
+      <SectionContainer title={t('equipment.title')} className={`${className || ""} w-[358px] h-[437px]`}>
         <ScrollArea className="absolute top-[56px] left-[9px] right-[9px] bottom-[33px] bg-sheet-content-bg rounded-[2px]">
           {/* 物品列表 + 尾部行内输入框 */}
           <div className="pl-[8px] pt-[5px] pb-[5px] min-h-full">
             {items.map((item, i) => (
               <span key={item.id} className="inline">
-                {i > 0 && <span className="text-sheet-text-secondary">、</span>}
+                {i > 0 && <span className="text-sheet-text-secondary">{lang === 'en' ? ', ' : '、'}</span>}
                 <span
                   onClick={() => { setEditingIndex(i); onClick(); }}
                   onContextMenu={(e) => handleContextMenu(e, i)}
@@ -213,7 +215,7 @@ export default function EquipmentPanel({ className }: EquipmentPanelProps) {
               onChange={handleInputChange}
               onKeyDown={handleInputKeyDown}
               onBlur={commitInput}
-              placeholder={items.length === 0 ? "输入物品" : "添加物品"}
+              placeholder={items.length === 0 ? t('equipment.inputItem') : t('equipment.addItem')}
               rows={1}
               className="block w-full bg-transparent border-none outline-none resize-none overflow-hidden font-serif-regular-cjk text-[18px] text-black placeholder:text-sheet-text-placeholder leading-normal pl-[2px]"
               style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}
@@ -285,7 +287,7 @@ export default function EquipmentPanel({ className }: EquipmentPanelProps) {
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.hoverBg; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
             >
-              移入库存
+              {t('equipment.moveToInventory')}
             </div>
             <div
               onClick={() => handleDeleteItemFromMenu(contextMenu.index)}
@@ -298,7 +300,7 @@ export default function EquipmentPanel({ className }: EquipmentPanelProps) {
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.hoverBg; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
             >
-              删除
+              {t('equipment.delete')}
             </div>
           </div>
         </div>,

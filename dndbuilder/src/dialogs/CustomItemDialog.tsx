@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "../shared/dialogs/dialog";
 import { sheetColors } from "../shared/tokens/colors";
+import { useLanguage } from "../shared/i18n/LanguageContext";
 import {
   EDITABLE_FILES,
   getDefaultRaw,
@@ -25,6 +26,7 @@ interface CustomItemDialogProps {
 }
 
 export default function CustomItemDialog({ open, onOpenChange }: CustomItemDialogProps) {
+  const { t } = useLanguage();
   const [selected, setSelected] = useState<string | null>(null);
   const [content, setContent] = useState("");
   const [saved, setSaved] = useState(false);
@@ -62,7 +64,7 @@ export default function CustomItemDialog({ open, onOpenChange }: CustomItemDialo
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
     } catch {
-      alert("JSON 格式错误，请检查后重试。");
+      alert(t('custom.jsonError'));
     }
   };
 
@@ -84,7 +86,7 @@ export default function CustomItemDialog({ open, onOpenChange }: CustomItemDialo
             className="text-base"
             style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}
           >
-            自定义项管理
+            {t('custom.title')}
           </DialogTitle>
         </DialogHeader>
 
@@ -133,7 +135,7 @@ export default function CustomItemDialog({ open, onOpenChange }: CustomItemDialo
                         fontFamily: "var(--font-serif-regular)",
                       }}
                     >
-                      自定义
+                      {t('custom.custom')}
                     </span>
                   )}
                 </div>
@@ -161,7 +163,7 @@ export default function CustomItemDialog({ open, onOpenChange }: CustomItemDialo
                       onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.pageBg; e.currentTarget.style.borderColor = sheetColors.borderLight; e.currentTarget.style.color = "#000"; }}
                       onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; e.currentTarget.style.borderColor = "var(--color-border)"; e.currentTarget.style.color = sheetColors.textDark; }}
                     >
-                      恢复默认
+                      {t('custom.restore')}
                     </button>
                     <button
                       onClick={handleSave}
@@ -174,7 +176,7 @@ export default function CustomItemDialog({ open, onOpenChange }: CustomItemDialo
                       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkHover)}
                       onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkBg)}
                     >
-                      {saved ? "已保存" : "保存"}
+                      {saved ? t('custom.saved') : t('custom.save')}
                     </button>
                   </div>
                 </div>
@@ -201,7 +203,7 @@ export default function CustomItemDialog({ open, onOpenChange }: CustomItemDialo
                 className="flex items-center justify-center h-full text-sm"
                 style={{ color: sheetColors.textPlaceholder, fontFamily: "var(--font-serif-regular)" }}
               >
-                请从左侧选择一个文件
+                {t('custom.selectFile')}
               </div>
             )}
           </div>

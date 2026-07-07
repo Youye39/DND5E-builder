@@ -9,12 +9,14 @@ import { sheetColors } from "../../shared/tokens/colors";
 import TraitDialog from "./TraitDialog";
 import { TraitTooltip } from "./TraitTooltip";
 import { useInteractionHandler } from "../../shared/dialogs/useInteractionHandler";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface TraitsPanelProps {
   className?: string;
 }
 
 export default function TraitsPanel({ className }: TraitsPanelProps) {
+  const { t } = useLanguage();
   const { character, updateCharacter } = useCharacter();
   const traitList = character?.traitList ?? [];
   const setTraitList = (list: TraitItem[]) => updateCharacter({ traitList: list });
@@ -250,7 +252,7 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
 
   return (
     <>
-      <SectionContainer title="特性和特质" className={`${className || ""} w-[358px] h-[770px]`}>
+      <SectionContainer title={t('traits.title')} className={`${className || ""} w-[358px] h-[770px]`}>
         <ScrollArea className="absolute top-[9px] left-[9px] right-[9px] bottom-[33px] bg-sheet-content-bg rounded-[2px] overflow-x-hidden">
           <div ref={traitsContainerRef} className="pl-[8px] pt-[5px] pb-[5px] min-h-full select-none">
             {traitList.map((trait, i) => (
@@ -361,7 +363,7 @@ export default function TraitsPanel({ className }: TraitsPanelProps) {
               onChange={handleInputChange}
               onKeyDown={handleInputKeyDown}
               onBlur={commitInput}
-              placeholder={traitList.length === 0 ? "输入特性" : "添加特性"}
+              placeholder={traitList.length === 0 ? t('traits.inputPlaceholder') : t('traits.addPlaceholder')}
               rows={1}
               className="block w-full bg-transparent border-none outline-none resize-none overflow-hidden font-serif-regular-cjk text-[18px] text-black placeholder:text-sheet-text-placeholder leading-normal"
               style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}

@@ -1,4 +1,6 @@
+import React, { useState } from "react";
 import ButtonComponent from "../../shared/ui/ButtonComponent";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface SavingThrowComponentProps {
   className?: string;
@@ -7,6 +9,8 @@ interface SavingThrowComponentProps {
   proficiencyBonus?: number;
   checked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
+  customModifier?: string | null;
+  onCustomModifierChange?: (value: string | null) => void;
 }
 
 export default function SavingThrowComponent({
@@ -15,19 +19,86 @@ export default function SavingThrowComponent({
   modifier,
   proficiencyBonus = 0,
   checked = false,
-  onCheckedChange
+  onCheckedChange,
+  customModifier = null,
+  onCustomModifierChange,
 }: SavingThrowComponentProps) {
-  const totalModifier = checked ? modifier + proficiencyBonus : modifier;
-  const modifierText = totalModifier >= 0 ? `+${totalModifier}` : `${totalModifier}`;
+  const { t } = useLanguage();
+  const [inputValue, setInputValue] = useState<string>(customModifier ?? "");
+
+  const calculatedModifier = checked ? modifier + proficiencyBonus : modifier;
+
+  // 验证和规范化输入
+  const validateModifier = (input: string): string | null => {
+    if (!input) return null;
+    
+    let normalized = input.trim();
+    if (/^-?\d+$/.test(normalized)) {
+      normalized = normalized.startsWith("-") ? normalized : `+${normalized}`;
+    }
+    
+    if (/^[+-]\d+$/.test(normalized)) {
+      return normalized;
+    }
+    return null;
+  };
+
+  // 获取最终显示的修饰符（始终是数字）
+  const finalModifier = customModifier !== null && customModifier !== ""
+    ? parseInt(customModifier, 10)
+    : calculatedModifier;
+  const modifierText = finalModifier >= 0 ? `+${finalModifier}` : `${finalModifier}`;
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleInputBlur = () => {
+    const validated = validateModifier(inputValue);
+    
+    if (!inputValue) {
+      onCustomModifierChange?.(null);
+      setInputValue("");
+    } else if (validated) {
+      const parsedValue = parseInt(validated, 10);
+      if (parsedValue === calculatedModifier) {
+        onCustomModifierChange?.(null);
+        setInputValue("");
+      } else {
+        onCustomModifierChange?.(validated);
+        setInputValue(validated);
+      }
+    } else {
+      setInputValue("");
+    }
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleInputBlur();
+    }
+  };
+
+  // 当 customModifier 从外部更新时，同步 inputValue
+  React.useEffect(() => {
+    setInputValue(customModifier ?? "");
+  }, [customModifier]);
 
   return (
-    <div className={className || "h-[16px] relative w-[87px]"} data-name="豁免">
-      <div className="absolute contents inset-[0_41.38%_0_26.44%]">
-        <div className="absolute bg-sheet-content-bg inset-[6.25%_42.53%_12.5%_27.59%]" />
-        <div className="[word-break:break-word] absolute flex flex-col font-serif-regular font-normal inset-[0_41.38%_12.5%_26.44%] justify-center leading-[0] text-[10px] text-black text-center" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
-          <p className="leading-[normal]">{modifierText}</p>
-        </div>
-        <div className="absolute bottom-0 left-[26.44%] right-[41.38%] top-full">
+    <div className={className || "h-[16px] relative w-[200px]"} data-name="豁免">
+      <div className="absolute contents" style={{ top: 0, bottom: 0, left: "23px" }}>
+        <div className="absolute bg-sheet-content-bg" style={{ top: "1px", right: "150px", bottom: "2px", left: "24px" }} />
+        <input
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          onBlur={handleInputBlur}
+          onKeyDown={handleInputKeyDown}
+          className="absolute text-[10px] text-black text-center font-serif-regular border-0 outline-none px-1 leading-[0] flex items-center justify-center placeholder:text-black"
+          style={{ top: 0, right: "149px", bottom: "2px", left: "23px", fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
+          placeholder={modifierText}
+        />
+        <div className="absolute" style={{ top: "100%", right: "149px", bottom: 0, left: "23px" }}>
           <div className="absolute inset-[-1px_0_0_0]">
             <svg className="block size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 28 1">
               <line id="Line 1" stroke="var(--stroke-0, black)" x2="28" y1="0.5" y2="0.5" />
@@ -35,14 +106,28 @@ export default function SavingThrowComponent({
           </div>
         </div>
       </div>
-      <div className="[word-break:break-word] absolute flex flex-col font-serif-regular-cjk font-normal inset-[0_0_0_70.11%] justify-center leading-[0] text-[12px] text-black text-center" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+      <div className="[word-break:break-word] absolute flex flex-col font-serif-regular-cjk font-normal justify-center leading-[0] text-[12px] text-black text-center" style={{ top: 0, bottom: 0, left: "61px", fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
         <p className="leading-[normal]">{label}</p>
       </div>
-      <ButtonComponent
-        className="absolute inset-[6.25%_85.06%_6.25%_-1.15%]"
-        checked={checked}
-        onChange={(v) => onCheckedChange?.(v)}
-      />
+      {customModifier && (
+        <div className="absolute bottom-0 h-[16px] flex items-center justify-end group" style={{ left: "150px" }}>
+          <div className="[word-break:break-word] flex flex-col font-serif-regular font-normal justify-center leading-[0] text-sheet-text-secondary text-[10px] text-center flex-shrink-0 w-fit" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
+            <p className="leading-[normal]">{t('savingThrow.custom')}</p>
+          </div>
+          <button
+            onClick={() => onCustomModifierChange?.(null)}
+            className="ml-0 text-sheet-text-secondary text-[10px] opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer hover:text-sheet-text-secondary bg-transparent border-0 p-0 leading-[0] w-2.5 h-4 flex items-center justify-center font-serif-regular flex-shrink-0"
+          >
+            ×
+          </button>
+        </div>
+      )}
+      <div className="absolute" style={{ top: "1px", right: "187px", bottom: "1px", left: "-1px" }}>
+        <ButtonComponent
+          checked={checked}
+          onChange={(v) => onCheckedChange?.(v)}
+        />
+      </div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { saveImage, imageIdToUrl } from "../../shared/storage/imageStore";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface EmblemSectionProps {
   emblem: string;          // IndexedDB 中的图片 ID
@@ -14,6 +15,7 @@ export default function EmblemSection({
   onEmblemChange,
   onOrganizationChange,
 }: EmblemSectionProps) {
+  const { t } = useLanguage();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isEmblemHovered, setIsEmblemHovered] = useState(false);
   const [emblemImageUrl, setEmblemImageUrl] = useState<string | null>(null);
@@ -52,7 +54,7 @@ export default function EmblemSection({
           type="text"
           value={organization}
           onChange={(e) => onOrganizationChange(e.target.value)}
-          placeholder="信仰/组织/家族"
+          placeholder={t('charInfo.orgPlaceholder')}
           className={`w-full h-full bg-transparent outline-none border-0 p-0 text-center font-serif-regular text-[12px] leading-[normal] ${orgTextColor}`}
           style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
         />
@@ -68,7 +70,7 @@ export default function EmblemSection({
         {/* Content container with 2px padding */}
         <div className="absolute inset-[2px] overflow-hidden">
           {emblemImageUrl ? (
-            <img src={emblemImageUrl} alt="徽记" className="size-full object-cover" />
+            <img src={emblemImageUrl} alt={t('charInfo.emblem')} className="size-full object-cover" />
           ) : (
             <div className="size-full bg-white" />
           )}
@@ -79,7 +81,7 @@ export default function EmblemSection({
               className="absolute inset-0 flex items-center justify-center font-serif-regular font-normal text-sheet-content-bg text-[12px]"
               style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}
             >
-              徽记
+              {t('charInfo.emblem')}
             </p>
           )}
         </div>

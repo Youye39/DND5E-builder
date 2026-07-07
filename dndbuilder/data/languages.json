@@ -1,5 +1,6 @@
 [
   {
+    "id": "standard",
     "label": "标准语言",
     "options": [
       { "id": "common",   "label": "通用语"   },
@@ -12,6 +13,7 @@
     ]
   },
   {
+    "id": "exotic",
     "label": "特种语言",
     "options": [
       { "id": "abyssal",     "label": "深渊语"     },
@@ -25,6 +27,7 @@
     ]
   },
   {
+    "id": "secret",
     "label": "秘密语言",
     "options": [
       { "id": "druidic",      "label": "德鲁伊语" },

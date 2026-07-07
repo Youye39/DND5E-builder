@@ -1,5 +1,6 @@
 import SectionContainer from "../../shared/ui/SectionContainer";
 import EditableScrollArea from "../../shared/ui/EditableScrollArea";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 interface BackgroundStorySectionProps {
   value: string;
@@ -7,8 +8,9 @@ interface BackgroundStorySectionProps {
 }
 
 export default function BackgroundStorySection({ value, onChange }: BackgroundStorySectionProps) {
+  const { t } = useLanguage();
   return (
-    <SectionContainer title="角色背景故事" className="h-[945px] left-[55px] top-[587px] w-[415px]">
+    <SectionContainer title={t('backstory.title')} className="h-[945px] left-[55px] top-[587px] w-[415px]">
       <EditableScrollArea
         value={value}
         onChange={onChange}

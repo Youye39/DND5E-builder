@@ -1,5 +1,6 @@
 [
   {
+    "id": "simple melee",
     "label": "简易近战武器",
     "options": [
       { "id": "club",          "label": "短棒"   },
@@ -15,6 +16,7 @@
     ]
   },
   {
+    "id": "simple ranged",
     "label": "简易远程武器",
     "options": [
       { "id": "lightcrossbow", "label": "轻弩"   },
@@ -24,6 +26,7 @@
     ]
   },
   {
+    "id": "martial melee",
     "label": "军用近战武器",
     "options": [
       { "id": "battleaxe",   "label": "战斧"   },
@@ -47,6 +50,7 @@
     ]
   },
   {
+    "id": "martial ranged",
     "label": "军用远程武器",
     "options": [
       { "id": "blowgun",      "label": "吹箭筒"   },

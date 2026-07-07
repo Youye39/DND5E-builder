@@ -13,6 +13,8 @@ import type { Item, AttackEntry, SpellData, ExtraBonus } from "../../shared/type
 import { ItemDialog } from "./ItemDialog";
 import { SpellDialog } from "../spells/SpellDialog";
 import SpellTip from "../spells/SpellTip";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
+import { displayDamageType } from "../../shared/i18n/displayUtils";
 
 interface AttackPanelProps {
   className?: string;
@@ -43,7 +45,7 @@ function parseDice(raw: string): { dice: string; flat: number } {
 }
 
 /** 合并所有伤害来源（基础 + 额外），按伤害类型归类合并 */
-function consolidateItemDamage(item: Item, attrs: AttrMap): string {
+function consolidateItemDamage(item: Item, attrs: AttrMap, lang?: string): string {
   if (!item.damageDice) return "";
 
   const groups: Record<string, { dice: string[]; flat: number }> = {};
@@ -75,7 +77,7 @@ function consolidateItemDamage(item: Item, attrs: AttrMap): string {
       if (g.dice.length > 0) parts.push(g.dice.join("+"));
       if (g.flat > 0) parts.push(`${g.flat}`);
       else if (g.flat < 0) parts.push(`${g.flat}`);
-      return parts.join("+") + type;
+      return parts.join("+") + displayDamageType(type, lang || 'en');
     })
     .join("+") || "—";
 }
@@ -152,6 +154,7 @@ interface HoverState {
 // ═══ 主组件 ═════════════════════════════════════════════════════════════
 
 export default function AttackPanel({ className }: AttackPanelProps) {
+  const { t, lang } = useLanguage();
   const { character, updateCharacter } = useCharacter();
   if (!character) return null;
 
@@ -251,7 +254,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
         result.push({
           name: item.name,
           attackBonus: getItemAttackBonus(item, attrs, proficiencyBonus),
-          damage: consolidateItemDamage(item, attrs),
+          damage: consolidateItemDamage(item, attrs, lang),
           item,
         });
       } else {
@@ -422,11 +425,11 @@ export default function AttackPanel({ className }: AttackPanelProps) {
 
   return (
     <>
-      <SectionContainer title="攻击" className={`${className || ""} w-[358px] h-[304px]`}>
+      <SectionContainer title={t('attack.title')} className={`${className || ""} w-[358px] h-[304px]`}>
         <div className="absolute top-[7px] left-[13px] right-[14px] flex text-[10px] text-sheet-text-secondary font-serif-regular gap-[5px]">
-          <span className="w-[130px]">武器/法术</span>
-          <span className="w-[61px]">攻击加值</span>
-          <span className="w-[130px]">伤害/类型</span>
+          <span className="w-[130px]">{t('attack.weapon')}</span>
+          <span className="w-[61px]">{t('attack.bonus')}</span>
+          <span className="w-[130px]">{t('attack.damage')}</span>
         </div>
 
         <ScrollArea className="absolute top-[23px] left-[13px] right-[3px] bottom-[33px]">
@@ -567,7 +570,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
             boxShadow: "0 8px 32px rgba(0,0,0,0.11)", fontVariationSettings: FVAR,
           }}>
             <div className="text-base" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary, fontWeight: 600, marginBottom: 12 }}>
-              选择攻击来源
+              {t('attack.selectSource')}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <button
@@ -580,7 +583,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.contentBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
-                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>新建武器</span>
+                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>{t('attack.newWeapon')}</span>
               </button>
               <button
                 onClick={() => { setSelectMode(false); setEquipmentPickerOpen(true); }}
@@ -592,7 +595,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.contentBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
-                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>从装备选择</span>
+                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>{t('attack.fromEquipment')}</span>
               </button>
               <button
                 onClick={() => { setSelectMode(false); setSpellPickerOpen(true); }}
@@ -604,7 +607,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.contentBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
-                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>从法术选择</span>
+                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>{t('attack.fromSpell')}</span>
               </button>
             </div>
           </div>
@@ -626,12 +629,12 @@ export default function AttackPanel({ className }: AttackPanelProps) {
             boxShadow: "0 8px 32px rgba(0,0,0,0.11)", fontVariationSettings: FVAR,
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: `1px solid ${sheetColors.hoverBg}` }}>
-              <span className="text-base font-semibold" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}>选择法术</span>
-              <button onClick={() => setSpellPickerOpen(false)} style={{ ...T, border: "none", background: "transparent", cursor: "pointer", color: sheetColors.textPlaceholder }}>取消</button>
+              <span className="text-base font-semibold" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}>{t('attack.selectSpell')}</span>
+              <button onClick={() => setSpellPickerOpen(false)} style={{ ...T, border: "none", background: "transparent", cursor: "pointer", color: sheetColors.textPlaceholder }}>{t('attack.cancel')}</button>
             </div>
             <ScrollArea style={{ flex: 1, padding: "12px 16px" }}>
               {allSpells.filter(s => s.name && s.saveType !== undefined && !safeEntries.some(e => e.type === "spell" && e.refId === s.id)).length === 0 ? (
-                <div style={{ ...T, color: sheetColors.textPlaceholder, textAlign: "center", padding: 24 }}>暂无</div>
+                <div style={{ ...T, color: sheetColors.textPlaceholder, textAlign: "center", padding: 24 }}>{t('attack.none')}</div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   {allSpells.filter(s => s.name && s.saveType !== undefined && !safeEntries.some(e => e.type === "spell" && e.refId === s.id)).map((spell) => (
@@ -678,12 +681,12 @@ export default function AttackPanel({ className }: AttackPanelProps) {
             boxShadow: "0 8px 32px rgba(0,0,0,0.11)", fontVariationSettings: FVAR,
           }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", borderBottom: `1px solid ${sheetColors.hoverBg}` }}>
-              <span className="text-base font-semibold" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}>选择装备武器</span>
-              <button onClick={() => setEquipmentPickerOpen(false)} style={{ ...T, border: "none", background: "transparent", cursor: "pointer", color: sheetColors.textPlaceholder }}>取消</button>
+              <span className="text-base font-semibold" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}>{t('attack.selectEquipment')}</span>
+              <button onClick={() => setEquipmentPickerOpen(false)} style={{ ...T, border: "none", background: "transparent", cursor: "pointer", color: sheetColors.textPlaceholder }}>{t('attack.cancel')}</button>
             </div>
             <ScrollArea style={{ flex: 1, padding: "12px 16px" }}>
               {items.filter(i => i.isWeapon && i.name && !safeEntries.some(e => e.type === "weapon" && e.refId === i.id)).length === 0 ? (
-                <div style={{ ...T, color: sheetColors.textPlaceholder, textAlign: "center", padding: 24 }}>暂无</div>
+                <div style={{ ...T, color: sheetColors.textPlaceholder, textAlign: "center", padding: 24 }}>{t('attack.none')}</div>
               ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   {items.filter(i => i.isWeapon && i.name && !safeEntries.some(e => e.type === "weapon" && e.refId === i.id)).map((weapon) => (
@@ -749,7 +752,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.hoverBg; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
             >
-              删除
+              {t('attack.delete')}
             </div>
           </div>
         </div>,

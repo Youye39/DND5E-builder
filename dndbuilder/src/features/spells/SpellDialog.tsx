@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../../shared/tokens/colors";
 import { createDefaultSpell } from "../../shared/types/types";
@@ -6,7 +6,11 @@ import type { SpellData, ExtraBonus } from "../../shared/types/types";
 import ScrollArea from "../../shared/ui/ScrollArea";
 import ButtonComponent from "../../shared/ui/ButtonComponent";
 import { useCharacter } from "../../shared/storage/CharacterContext";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
+import { toDamageId, displayDamageType } from "../../shared/i18n/displayUtils";
+import damageTypes from "../../../data/damageTypes.json";
 
+const DAMAGE_TYPES = damageTypes as { id: string; label: string }[];
 const FVAR = "'CTGR' 0, 'wdth' 100";
 
 const T: React.CSSProperties = {
@@ -31,29 +35,26 @@ interface SpellDialogProps {
   onClose: () => void;
 }
 
-import damageTypes from "../../../data/damageTypes.json";
-
-const ABILITY_LABELS: Record<string, string> = { int: "智力", wis: "感知", cha: "魅力" };
-const DAMAGE_TYPES = damageTypes as string[];
-
-const SCHOOLS: { id: string; label: string }[] = [
-  { id: "abjuration", label: "防护" },
-  { id: "conjuration", label: "咒法" },
-  { id: "divination", label: "预言" },
-  { id: "enchantment", label: "附魔" },
-  { id: "evocation", label: "塑能" },
-  { id: "illusion", label: "幻术" },
-  { id: "necromancy", label: "死灵" },
-  { id: "transmutation", label: "变化" },
+const SCHOOLS: { id: string; label: string; labelKey: string }[] = [
+  { id: "abjuration", label: "防护", labelKey: "school.abjuration" },
+  { id: "conjuration", label: "咒法", labelKey: "school.conjuration" },
+  { id: "divination", label: "预言", labelKey: "school.divination" },
+  { id: "enchantment", label: "附魔", labelKey: "school.enchantment" },
+  { id: "evocation", label: "塑能", labelKey: "school.evocation" },
+  { id: "illusion", label: "幻术", labelKey: "school.illusion" },
+  { id: "necromancy", label: "死灵", labelKey: "school.necromancy" },
+  { id: "transmutation", label: "变化", labelKey: "school.transmutation" },
 ];
 
 export function SpellDialog({
   open, initialSpell, isCantrip = false,
   onSave, onDelete, onClose,
 }: SpellDialogProps) {
+  const { t, lang } = useLanguage();
   const { character, updateCharacter } = useCharacter();
   const [data, setData] = useState<SpellData>(initialSpell ?? createDefaultSpell());
   const [showAbilityPicker, setShowAbilityPicker] = useState(false);
+  const mouseDownOnOverlay = useRef(false);
   const [showSchoolPicker, setShowSchoolPicker] = useState(false);
 
   useEffect(() => {
@@ -93,7 +94,8 @@ export function SpellDialog({
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center"
       style={{ backgroundColor: "rgba(0,0,0,0.18)" }}
-      onClick={(e) => e.target === e.currentTarget && onClose()}
+      onMouseDown={(e) => { mouseDownOnOverlay.current = e.target === e.currentTarget; }}
+      onClick={(e) => { if (e.target === e.currentTarget && mouseDownOnOverlay.current) onClose(); }}
     >
       <div
         style={{
@@ -107,7 +109,7 @@ export function SpellDialog({
         {/* ════ Header ════ */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: `1px solid ${sheetColors.hoverBg}`, flexShrink: 0 }}>
           <span className="text-base font-semibold" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}>
-            {isCantrip ? "编辑戏法" : "编辑法术"}
+            {isCantrip ? t('spell.editCantrip') : t('spell.editSpell')}
           </span>
           <div style={{ display: "flex", gap: "8px" }}>
             <button
@@ -116,7 +118,7 @@ export function SpellDialog({
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.pageBg; e.currentTarget.style.borderColor = sheetColors.borderLight; e.currentTarget.style.color = "#000"; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; e.currentTarget.style.borderColor = "var(--color-border)"; e.currentTarget.style.color = sheetColors.textDark; }}
             >
-              删除
+              {t('spell.delete')}
             </button>
             <button
               onClick={handleSave}
@@ -124,7 +126,7 @@ export function SpellDialog({
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkHover)}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkBg)}
             >
-              保存
+              {t('spell.save')}
             </button>
           </div>
         </div>
@@ -132,11 +134,11 @@ export function SpellDialog({
         {/* ════ Body ════ */}
         <ScrollArea style={{ flex: 1, padding: "6px 16px 16px", minHeight: 0 }}>
           {/* ── 法术名称 ── */}
-          <SectionLabel>名称</SectionLabel>
+          <SectionLabel>{t('item.name')}</SectionLabel>
           <input
             value={data.name}
             onChange={(e) => set("name", e.target.value)}
-            placeholder={isCantrip ? "戏法名称" : "法术名称"}
+            placeholder={t('spell.spellName')}
             style={{
               ...T, width: "100%", boxSizing: "border-box",
               border: "1px solid var(--color-border)", borderRadius: "2px",
@@ -159,7 +161,7 @@ export function SpellDialog({
                   fontSize: "11px", fontFamily: "var(--font-serif-regular)", lineHeight: 1.4,
                 }}
               >
-                {SCHOOLS.find((s) => s.id === data.school)?.label ?? "防护"}
+                {t(SCHOOLS.find((s) => s.id === data.school)?.labelKey ?? "school.abjuration")}
               </span>
               {showSchoolPicker && (
                 <div
@@ -182,7 +184,7 @@ export function SpellDialog({
                       onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = sheetColors.hoverBg)}
                       onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = data.school === s.id ? sheetColors.hoverBg : "transparent"; }}
                     >
-                      {s.label}
+                      {t(s.labelKey)}
                     </div>
                   ))}
                 </div>
@@ -196,24 +198,24 @@ export function SpellDialog({
                   checked={!!data.ritual}
                   onChange={() => set("ritual", !data.ritual)}
                 />
-                <span style={{ ...T, color: sheetColors.textMedium }}>仪式</span>
+                <span style={{ ...T, color: sheetColors.textMedium }}>{t('spell.ritual')}</span>
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 5, userSelect: "none" }}>
                 <ButtonComponent
                   checked={!!data.concentration}
                   onChange={() => set("concentration", !data.concentration)}
                 />
-                <span style={{ ...T, color: sheetColors.textMedium }}>专注</span>
+                <span style={{ ...T, color: sheetColors.textMedium }}>{t('spell.concentration')}</span>
               </div>
             </div>
           </div>
 
           {/* ── 法术描述 ── */}
-          <SectionLabel>描述</SectionLabel>
+          <SectionLabel>{t('spell.description')}</SectionLabel>
           <textarea
             value={data.description}
             onChange={(e) => set("description", e.target.value)}
-            placeholder="法术描述"
+            placeholder={t('spell.spellDescription')}
             rows={3}
             style={{
               ...T, width: "100%", resize: "vertical", boxSizing: "border-box",
@@ -240,14 +242,14 @@ export function SpellDialog({
                     }
                   }}
                 />
-                <span style={{ ...T, color: sheetColors.textMedium, fontSize: "13px" }}>天生施法与其他来源施法</span>
+                <span style={{ ...T, color: sheetColors.textMedium, fontSize: "13px" }}>{t('spell.innate')}</span>
               </div>
 
               {data.isInnate && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginLeft: 20 }}>
                   {/* 施法属性 + 计算值 */}
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ ...LABEL, margin: 0, whiteSpace: "nowrap" }}>施法属性</span>
+                    <span style={{ ...LABEL, margin: 0, whiteSpace: "nowrap" }}>{t('spell.innateAbility')}</span>
                     <button
                       onClick={() => setShowAbilityPicker(!showAbilityPicker)}
                       style={{
@@ -257,7 +259,7 @@ export function SpellDialog({
                         backgroundColor: "transparent", cursor: "pointer", position: "relative",
                       }}
                     >
-                      {ABILITY_LABELS[data.innateAbility ?? "int"]}
+                      {t('ability.' + (data.innateAbility ?? 'int'))}
                       {showAbilityPicker && (
                         <div style={{
                           position: "absolute", top: "100%", right: 0, zIndex: 10,
@@ -277,7 +279,7 @@ export function SpellDialog({
                               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.hoverBg; }}
                               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "transparent"; }}
                             >
-                              {ABILITY_LABELS[a]}
+                              {t('ability.' + a)}
                             </div>
                           ))}
                         </div>
@@ -285,7 +287,7 @@ export function SpellDialog({
                     </button>
 
                     {/* 法术豁免DC */}
-                    <span style={{ ...LABEL, margin: "0 0 0 12px", whiteSpace: "nowrap" }}>法术豁免DC</span>
+                    <span style={{ ...LABEL, margin: "0 0 0 12px", whiteSpace: "nowrap" }}>{t('spell.saveDCField')}</span>
                     <span style={{ ...T, minWidth: 28, textAlign: "center" }}>
                       {(() => {
                         if (!character) return "—";
@@ -303,7 +305,7 @@ export function SpellDialog({
                     </span>
 
                     {/* 法术攻击加值 */}
-                    <span style={{ ...LABEL, margin: "0 0 0 8px", whiteSpace: "nowrap" }}>法术攻击加值</span>
+                    <span style={{ ...LABEL, margin: "0 0 0 8px", whiteSpace: "nowrap" }}>{t('spell.attackBonusField')}</span>
                     <span style={{ ...T, minWidth: 28, textAlign: "center" }}>
                       {(() => {
                         if (!character) return "—";
@@ -323,7 +325,7 @@ export function SpellDialog({
 
                   {/* 使用次数 */}
                   <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                    <span style={{ ...LABEL, margin: 0, whiteSpace: "nowrap" }}>使用次数</span>
+                    <span style={{ ...LABEL, margin: 0, whiteSpace: "nowrap" }}>{t('spell.usage')}</span>
                     <input
                       type="text"
                       value={data.usage ?? "1/1"}
@@ -364,12 +366,12 @@ export function SpellDialog({
                     }
                   }}
                 />
-                <span style={{ ...T, color: sheetColors.textMedium, fontSize: "13px" }}>保存为伤害法术</span>
+                <span style={{ ...T, color: sheetColors.textMedium, fontSize: "13px" }}>{t('spell.saveAsDamage')}</span>
               </div>
               <div style={{ flex: 1 }} />
               {data.saveType !== undefined && (
                 <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ ...T, color: sheetColors.textPlaceholder, fontSize: "13px" }}>显示</span>
+                  <span style={{ ...T, color: sheetColors.textPlaceholder, fontSize: "13px" }}>{t('spell.display')}</span>
                   <select
                     value={data.saveType || ""}
                     onChange={(e) => set("saveType", e.target.value as "attack" | "save" | "")}
@@ -381,9 +383,9 @@ export function SpellDialog({
                     backgroundRepeat: "no-repeat", backgroundPosition: "right 2px center",
                   }}
                 >
-                  <option value="attack">攻击加值</option>
-                  <option value="save">豁免DC</option>
-                  <option value="">空白</option>
+                  <option value="attack">{t('spell.attackBonusOption')}</option>
+                  <option value="save">{t('spell.saveDCOption')}</option>
+                  <option value="">{t('spell.blank')}</option>
                 </select>
                 </span>
               )}
@@ -408,7 +410,7 @@ export function SpellDialog({
                   }}
                 />
                 <select
-                  value={data.damageType ?? "火焰"}
+                  value={toDamageId(data.damageType ?? "Fire")}
                   onChange={(e) => set("damageType", e.target.value)}
                   style={{
                     ...T, border: "none", borderBottom: "1px solid var(--color-border)", borderRadius: 0,
@@ -418,8 +420,8 @@ export function SpellDialog({
                     backgroundRepeat: "no-repeat", backgroundPosition: "right 2px center",
                   }}
                 >
-                  {DAMAGE_TYPES.map((t) => (
-                    <option key={t} value={t}>{t}</option>
+                  {DAMAGE_TYPES.map((dt) => (
+                    <option key={dt.id} value={dt.id}>{displayDamageType(dt.id, lang)}</option>
                   ))}
                 </select>
               </div>

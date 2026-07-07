@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../../shared/tokens/colors";
 import type { Item } from "../../shared/types/types";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
+import { displayDamageType } from "../../shared/i18n/displayUtils";
 
 const FVAR = "'CTGR' 0, 'wdth' 100";
 const T: React.CSSProperties = {
@@ -36,9 +38,10 @@ interface DamageTooltipProps extends TooltipProps {
 
 // ─── Hit Tooltip ──────────────────────────────────────────────────────────────
 
-const ATTRIBUTE_LABELS: Record<string, string> = { str: "力量", dex: "敏捷", custom: "自定义" };
+const ATTRIBUTE_LABELS: Record<string, string> = { str: "attr.strFull", dex: "attr.dexFull", custom: "attr.custom" };
 
 export function HitTooltip({ weapon, mouseY: initY, cardLeft: initLeft, onMouseEnter, onMouseLeave }: TooltipProps) {
+  const { t } = useLanguage();
   const [pos] = useState(() => ({ left: initLeft - 20, top: initY + 12 }));
   return ReactDOM.createPortal(
     <div
@@ -46,18 +49,18 @@ export function HitTooltip({ weapon, mouseY: initY, cardLeft: initLeft, onMouseE
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div style={{ ...T, fontWeight: 600, fontSize: "14px", marginBottom: 6 }}>攻击</div>
+      <div style={{ ...T, fontWeight: 600, fontSize: "14px", marginBottom: 6 }}>{t('weaponTip.attack')}</div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-        <span style={LABEL}>属性</span>
-        <span style={T}>{ATTRIBUTE_LABELS[weapon.attackAttr ?? "str"] || weapon.attackAttr}</span>
+        <span style={LABEL}>{t('weaponTip.attribute')}</span>
+        <span style={T}>{t(ATTRIBUTE_LABELS[weapon.attackAttr ?? "str"] ?? weapon.attackAttr ?? "")}</span>
       </div>
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
-        <span style={LABEL}>熟练</span>
-        <span style={T}>{weapon.proficient ? "是" : "否"}</span>
+        <span style={LABEL}>{t('weaponTip.proficient')}</span>
+        <span style={T}>{weapon.proficient ? t('weaponTip.yes') : t('weaponTip.no')}</span>
       </div>
       {weapon.extraAttackBonus && (
         <div style={{ display: "flex", justifyContent: "space-between" }}>
-          <span style={LABEL}>额外加值</span>
+          <span style={LABEL}>{t('weaponTip.extraBonus')}</span>
           <span style={T}>{weapon.extraAttackBonus}</span>
         </div>
       )}
@@ -69,6 +72,7 @@ export function HitTooltip({ weapon, mouseY: initY, cardLeft: initLeft, onMouseE
 // ─── Damage Tooltip ───────────────────────────────────────────────────────────
 
 export function DamageTooltip({ weapon, mouseY: initY, cardLeft: initLeft, onMouseEnter, onMouseLeave, computedMod }: DamageTooltipProps) {
+  const { t, lang } = useLanguage();
   const [pos] = useState(() => ({ left: initLeft - 20, top: initY + 12 }));
   return ReactDOM.createPortal(
     <div
@@ -76,22 +80,22 @@ export function DamageTooltip({ weapon, mouseY: initY, cardLeft: initLeft, onMou
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
     >
-      <div style={{ ...T, fontWeight: 600, fontSize: "14px", marginBottom: 6 }}>伤害</div>
-      <div style={LABEL}>基础</div>
+      <div style={{ ...T, fontWeight: 600, fontSize: "14px", marginBottom: 6 }}>{t('weaponTip.damage')}</div>
+      <div style={LABEL}>{t('weaponTip.base')}</div>
       <div style={{ display: "flex", justifyContent: "space-between", paddingLeft: 12, marginBottom: 4 }}>
         <span style={T}>
           {weapon.damageDice || "—"}
           {computedMod ? ` ${computedMod.startsWith("+") || computedMod.startsWith("-") ? "" : "+"}${computedMod}` : ""}
         </span>
-        <span style={T}>{weapon.damageType || "—"}</span>
+        <span style={T}>{displayDamageType(weapon.damageType, lang)}</span>
       </div>
       {(weapon.extraDamages ?? []).length > 0 && (
         <div>
-          <div style={LABEL}>额外</div>
+          <div style={LABEL}>{t('weaponTip.extra')}</div>
           {(weapon.extraDamages ?? []).map((ed) => (
             <div key={ed.id} style={{ display: "flex", justifyContent: "space-between", paddingLeft: 12, marginBottom: 2 }}>
               <span style={T}>{ed.dice}</span>
-              <span style={T}>{ed.type}</span>
+              <span style={T}>{displayDamageType(ed.type, lang)}</span>
             </div>
           ))}
         </div>

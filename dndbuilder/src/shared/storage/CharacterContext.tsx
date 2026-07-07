@@ -78,6 +78,65 @@ interface CharacterContextValue {
   refreshSaveList: () => void;
 }
 
+// ============================================================================
+// 数据迁移 —— 兼容旧版本存档
+// ============================================================================
+
+/** 旧版中文技能名 → 新版英文技能 key 映射 */
+const LEGACY_SKILL_KEYS: Record<string, string> = {
+  "体操": "acrobatics",
+  "驯兽": "animalHandling",
+  "奥秘": "arcana",
+  "运动": "athletics",
+  "欺瞒": "deception",
+  "历史": "history",
+  "洞悉": "insight",
+  "威吓": "intimidation",
+  "调查": "investigation",
+  "医药": "medicine",
+  "自然": "nature",
+  "察觉": "perception",
+  "表演": "performance",
+  "游说": "persuasion",
+  "宗教": "religion",
+  "巧手": "sleightOfHand",
+  "隐匿": "stealth",
+  "求生": "survival",
+};
+
+/** 迁移旧版角色数据到当前版本 */
+function migrateCharacterData(data: CharacterData): CharacterData {
+  let changed = false;
+  const result = { ...data };
+
+  // 1. 技能键名迁移：中文 → 英文
+  if (result.skills) {
+    const migratedSkills: Record<string, 0 | 1 | 2 | 3> = {};
+    for (const [key, val] of Object.entries(result.skills)) {
+      const newKey = LEGACY_SKILL_KEYS[key] ?? key;
+      migratedSkills[newKey] = val;
+      if (newKey !== key) changed = true;
+    }
+    result.skills = migratedSkills;
+  }
+  if (result.skillCustomModifiers) {
+    const migratedMods: Record<string, string | null> = {};
+    for (const [key, val] of Object.entries(result.skillCustomModifiers)) {
+      const newKey = LEGACY_SKILL_KEYS[key] ?? key;
+      migratedMods[newKey] = val;
+      if (newKey !== key) changed = true;
+    }
+    result.skillCustomModifiers = migratedMods;
+  }
+
+  if (changed) {
+    result.updatedAt = Date.now();
+    setTimeout(() => saveCharacter(result), 0);
+  }
+
+  return result;
+}
+
 const CharacterContext = createContext<CharacterContextValue | null>(null);
 
 // ============================================================================
@@ -88,9 +147,9 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
   // 首次加载时，如果无存档则自动创建默认角色
   const [character, setCharacterState] = useState<CharacterData | null>(() => {
     const existing = getCurrentCharacter();
-    if (existing) return existing;
+    if (existing) return migrateCharacterData(existing);
     // 无存档 → 自动创建一个
-    const fresh = createCharacter("新角色");
+    const fresh = createCharacter("New Character");
     return fresh;
   });
   const [saveList, setSaveList] = useState<
@@ -222,7 +281,7 @@ export function CharacterProvider({ children }: { children: ReactNode }) {
     (id: string) => {
       const char = switchStorageCharacter(id);
       if (char) {
-        setCharacterState(char);
+        setCharacterState(migrateCharacterData(char));
         setCurrentId(id);
         refreshSaveList();
       }

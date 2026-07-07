@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import ReactDOM from "react-dom";
 import svgPaths from "../assets/dnd.ts";
 import { sheetColors } from "../shared/tokens/colors";
+import { useLanguage } from "../shared/i18n/LanguageContext";
+import { ARMOR_TYPE_EN, armorDisplayFormula, idToDisplay } from "../shared/i18n/displayUtils";
 import ScrollArea from "../shared/ui/ScrollArea";
 import AttributeComponent from "../features/character/AttributeComponent.tsx";
 import PersonalityTraitComponent from "../features/character/PersonalityTraitComponent.tsx";
@@ -82,8 +84,13 @@ function BasicInfoSection({ level, onLevelChange, characterName, onCharacterName
 // ============================================================================
 
 function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
+  const { t, lang } = useLanguage();
   const { character, updateCharacter } = useCharacter();
   const [armorDialogOpen, setArmorDialogOpen] = useState(false);
+
+  // ── 护甲双语辅助 ──────────────────────────────────────────────
+  const armorDisplayName = (id: string): string =>
+    lang === 'en' ? idToDisplay(id) : ARMOR_OPTIONS.find(a => a.id === id)?.name ?? id;
 
   const strMod = Math.floor(((attributes?.str_value ?? 10) - 10) / 2);
   const dexMod = Math.floor(((attributes?.dex_value ?? 10) - 10) / 2);
@@ -178,13 +185,13 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
   return (
     <div className="absolute contents">
       <div className="absolute left-[14px] top-[15px]">
-        <CombatStatBox label="护甲等级" value={acValue} onClick={() => setArmorDialogOpen(true)} />
+        <CombatStatBox label={t('combat.armorClass')} value={acValue} onClick={() => setArmorDialogOpen(true)} />
       </div>
       <div className="absolute left-[129px] top-[15px]">
-        <CombatStatBox label="先攻" value={initValue >= 0 ? `+${initValue}` : `${initValue}`} editable hoverable={false} onChange={handleInitiativeChange} />
+        <CombatStatBox label={t('combat.initiative')} value={initValue >= 0 ? `+${initValue}` : `${initValue}`} editable hoverable={false} onChange={handleInitiativeChange} />
       </div>
       <div className="absolute left-[244px] top-[15px]">
-        <CombatStatBox label="速度" value={speedValue} editable hoverable={false} onChange={handleSpeedChange} />
+        <CombatStatBox label={t('combat.speed')} value={speedValue} editable hoverable={false} onChange={handleSpeedChange} />
       </div>
 
       {/* 护甲选择弹窗 */}
@@ -203,7 +210,7 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
           }}>
             {/* Header: 参考 ItemDialog */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 16px", borderBottom: `1px solid ${sheetColors.hoverBg}`, flexShrink: 0 }}>
-              <span className="text-base font-semibold" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}>选择护甲</span>
+              <span className="text-base font-semibold" style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary }}>{t('combat.selectArmor')}</span>
               <div style={{ display: "flex", gap: "8px" }}>
                 <button
                   onClick={() => {
@@ -214,7 +221,7 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
                   onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.pageBg; e.currentTarget.style.borderColor = sheetColors.borderLight; e.currentTarget.style.color = "#000"; }}
                   onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; e.currentTarget.style.borderColor = "var(--color-border)"; e.currentTarget.style.color = sheetColors.textDark; }}
                 >
-                  清空
+                  {t('combat.clear')}
                 </button>
                 <button
                   onClick={() => setArmorDialogOpen(false)}
@@ -222,7 +229,7 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
                   onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkHover)}
                   onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkBg)}
                 >
-                  保存
+                  {t('combat.save')}
                 </button>
               </div>
             </div>
@@ -230,7 +237,7 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
             <ScrollArea style={{ flex: 1, padding: "6px 16px 16px", minHeight: 0 }}>
               {/* 附加项（多选、可自定义） */}
               <div style={{ marginTop: 14, marginBottom: 6, fontSize: "13px", color: sheetColors.textPlaceholder, fontFamily: "var(--font-serif-medium)", letterSpacing: "0.04em" }}>
-                附加
+                {t('combat.attachment')}
               </div>
               {/* 预设项：盾牌 */}
               <div
@@ -251,7 +258,7 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
                 onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.contentBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = (character?.acExtras ?? []).some(e => e.id === "shield") ? sheetColors.contentBg : "transparent"; }}
               >
-                <span style={{ ...T, fontSize: "13px" }}>盾牌</span>
+                <span style={{ ...T, fontSize: "13px" }}>{t('combat.shield')}</span>
                 {(character?.acExtras ?? []).some(e => e.id === "shield") && (
                   <input
                     type="text"
@@ -293,7 +300,7 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
                         if (i >= 0) { extras[i] = { ...extras[i], label: e.target.value }; }
                         updateCharacter({ acExtras: extras });
                       }}
-                      placeholder="自定义"
+                      placeholder={t('combat.custom')}
                       style={{
                         ...T, width: nameW, border: "none", borderRadius: 0,
                         padding: "1px 0", outline: "none", backgroundColor: "transparent",
@@ -334,14 +341,14 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
                 }}
                 style={{ padding: "2px 10px", cursor: "pointer", ...T, fontSize: "12px", color: sheetColors.textPlaceholder }}
               >
-                + 自定义
+                {t('combat.addCustom')}
               </div>
 
               {/* 护甲列表 */}
               {armorGroups.map((group) => (
                 <div key={group.label}>
                   <div style={{ marginTop: 14, marginBottom: 6, fontSize: "13px", color: sheetColors.textPlaceholder, fontFamily: "var(--font-serif-medium)", letterSpacing: "0.04em" }}>
-                    {group.label}
+                    {lang === 'en' ? (ARMOR_TYPE_EN[group.label] ?? group.label) : group.label}
                   </div>
                   {group.options.map((armor) => (
                     <div key={armor.id}>
@@ -356,7 +363,7 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
                         onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = character?.selectedArmorId === armor.id ? sheetColors.contentBg : "transparent"; }}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          <span style={{ ...T, fontSize: "13px" }}>{armor.name}</span>
+                          <span style={{ ...T, fontSize: "13px" }}>{armorDisplayName(armor.id)}</span>
                           {character?.selectedArmorId === armor.id && (
                             armor.id === "custom" ? null : (
                               <input
@@ -382,7 +389,7 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
                                 updateCharacter({ customACFormula: val });
                               }}
                               onClick={(e) => e.stopPropagation()}
-                              placeholder="自定义公式"
+                              placeholder={t('combat.customFormula')}
                               style={{
                                 ...T, width: 160, border: "none", borderBottom: "1px solid var(--color-border)", borderRadius: 0,
                                 padding: "1px 4px", outline: "none", backgroundColor: "transparent", textAlign: "right",
@@ -396,7 +403,7 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
                           </div>
                         ) : (
                           <span style={{ ...T, fontSize: "12px", color: sheetColors.textPlaceholder }}>
-                            {armor.formula} = {armor.calcAC(dexMod, conMod, wisMod)}
+                            {armorDisplayFormula(armor.formula, lang)} = {armor.calcAC(dexMod, conMod, wisMod)}
                           </span>
                         )}
                       </div>
@@ -418,6 +425,7 @@ function CombatStatsRow({ attributes }: { attributes?: Attributes }) {
 // ============================================================================
 
 function TempHPDisplay() {
+  const { t } = useLanguage();
   const { character, updateCharacter } = useCharacter();
   const tempHP = character?.tempHP ?? 0;
   const tempDisplay = tempHP === 0 ? "" : tempHP;
@@ -435,7 +443,7 @@ function TempHPDisplay() {
     <div className="absolute bg-white h-[103px] left-[14px] rounded-[2px] top-[268px] w-[330px]" data-name="temp-hp">
       <div className="overflow-clip relative rounded-[inherit] size-full">
         <div className="[word-break:break-word] absolute bottom-[16px] flex flex-col font-serif-medium-cjk font-medium justify-center leading-[0] left-0 right-0 text-[12px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
-          <p className="leading-[normal]">临时生命值</p>
+          <p className="leading-[normal]">{t('hp.tempHP')}</p>
         </div>
         <div className="absolute bg-sheet-content-bg h-[62px] left-[9px] top-[10px] w-[312px]" />
         <AutoFontInput
@@ -502,6 +510,7 @@ function AutoFontInput({ value, onChange, className, style, maxSize = 48 }: {
 }
 
 function HPDisplay() {
+  const { t } = useLanguage();
   const { character, updateCharacter } = useCharacter();
 
   // 计算默认生命值上限（用户未覆盖时使用）
@@ -551,10 +560,10 @@ function HPDisplay() {
     <div className="absolute bg-white bottom-[234px] h-[124px] right-[14px] rounded-[2px] w-[330px]" data-name="hp">
       <div className="overflow-clip relative rounded-[inherit] size-full">
         <div className="[word-break:break-word] absolute bottom-[16px] flex flex-col font-serif-medium-cjk font-medium justify-center leading-[0] left-[165px] right-0 text-[12px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
-          <p className="leading-[normal]">生命值上限</p>
+          <p className="leading-[normal]">{t('hp.maxHP')}</p>
         </div>
         <div className="[word-break:break-word] absolute bottom-[16px] flex flex-col font-serif-medium-cjk font-medium justify-center leading-[0] left-0 right-[165px] text-[12px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
-          <p className="leading-[normal]">当前生命值</p>
+          <p className="leading-[normal]">{t('hp.currentHP')}</p>
         </div>
         <div className="absolute bg-sheet-content-bg h-[83px] left-[9px] top-[10px] w-[141px]" />
         <div className="absolute bg-[#efefef] h-[83px] left-[180px] top-[10px] w-[141px]" />
@@ -603,7 +612,8 @@ function RestIcon({ type, onShortRest, onLongRest, onPopupClose, shortRollLog, s
 }) {
   const { character, updateCharacter } = useCharacter();
   const Icon = type === "short" ? ShortRestClock : LongRestClock;
-  const label = type === "short" ? "短休" : "长休";
+  const { t } = useLanguage();
+  const label = type === "short" ? t('rest.short') : t('rest.long');
   const [showPopup, setShowPopup] = useState(false);
   const popupRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLDivElement>(null);
@@ -656,7 +666,7 @@ function RestIcon({ type, onShortRest, onLongRest, onPopupClose, shortRollLog, s
   }, [showPopup]);
 
   return (
-    <div className="bg-black h-[42px] rounded-[2px] w-[45px]" data-name={`${type}-rest`}>
+    <div className="bg-black h-[42px] rounded-[2px] w-[70px]" data-name={`${type}-rest`}>
       <div className="overflow-visible relative rounded-[inherit] size-full">
         <div
           ref={btnRef}
@@ -665,7 +675,7 @@ function RestIcon({ type, onShortRest, onLongRest, onPopupClose, shortRollLog, s
           onMouseLeave={handleMouseLeave}
         >
           <Icon />
-          <div className="-translate-x-1/2 -translate-y-1/2 [word-break:break-word] absolute flex flex-col font-serif-medium-cjk font-medium h-[8px] justify-center leading-[0] left-1/2 text-[10px] text-center text-white top-[calc(50%+10px)] w-[21px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
+          <div className="[word-break:break-word] absolute flex flex-col font-serif-medium-cjk font-medium h-[8px] justify-center leading-[0] left-[12px] text-[10px] text-center text-white top-[calc(50%+7px)] w-[21px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
             <p className="leading-[normal]">{label}</p>
           </div>
         </div>
@@ -708,6 +718,7 @@ function RestIcon({ type, onShortRest, onLongRest, onPopupClose, shortRollLog, s
 }
 
 function HitDiceDisplay({ remainingHitDice: forcedRemaining }: { remainingHitDice?: number }) {
+  const { t } = useLanguage();
   const { character } = useCharacter();
   const hitDiceText = useMemo(() => {
     if (!character) return "0";
@@ -729,7 +740,7 @@ function HitDiceDisplay({ remainingHitDice: forcedRemaining }: { remainingHitDic
             </div>
           </div>
           <div className="[word-break:break-word] absolute bottom-[12px] flex flex-col font-serif-medium-cjk font-medium justify-center leading-[0] right-[74.5px] text-[10px] text-black text-center translate-x-1/2 translate-y-1/2 w-[131px]" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
-            <p className="leading-[normal]">生命骰</p>
+            <p className="leading-[normal]">{t('rest.hitDice')}</p>
           </div>
         </div>
       </div>
@@ -739,6 +750,7 @@ function HitDiceDisplay({ remainingHitDice: forcedRemaining }: { remainingHitDic
 }
 
 function DeathSaveDisplay() {
+  const { t, lang } = useLanguage();
   const { character, updateCharacter } = useCharacter();
   const deathSaves = character?.deathSaves ?? { success: 0, failure: 0 };
 
@@ -747,18 +759,18 @@ function DeathSaveDisplay() {
       <div className="overflow-clip relative rounded-[inherit] size-full">
         <div className="-translate-x-1/2 -translate-y-1/2 absolute h-[24px] left-[calc(50%-0.5px)] overflow-clip top-[calc(50%+33px)] w-[117px]">
           <div className="[word-break:break-word] absolute bottom-[12px] flex flex-col font-serif-medium-cjk font-medium justify-center leading-[0] left-0 right-0 text-[10px] text-black text-center translate-y-1/2" style={{ fontVariationSettings: "'CTGR' 0, 'wdth' 100" }}>
-            <p className="leading-[normal]">死亡豁免</p>
+            <p className="leading-[normal]">{t('deathSave.title')}</p>
           </div>
         </div>
         <DeathSaveComponent
           className="-translate-x-1/2 -translate-y-1/2 absolute h-[14px] left-1/2 top-[calc(50%-18px)] w-[80px]"
-          label="成功"
+          label={lang === 'en' ? t('deathSave.successAbbr') : t('deathSave.success')}
           value={deathSaves.success}
           onChange={(v) => updateCharacter({ deathSaves: { ...deathSaves, success: v } })}
         />
         <DeathSaveComponent
           className="-translate-x-1/2 -translate-y-1/2 absolute h-[14px] left-1/2 top-[calc(50%+4px)] w-[80px]"
-          label="失败"
+          label={lang === 'en' ? t('deathSave.failureAbbr') : t('deathSave.failure')}
           value={deathSaves.failure}
           onChange={(v) => updateCharacter({ deathSaves: { ...deathSaves, failure: v } })}
         />
@@ -816,11 +828,11 @@ function RestsAndDeathSection() {
   }, []);
 
   const handleLongRest = useCallback(() => {
-    setUsedHitDice(0);
+    setUsedHitDice(prev => Math.max(0, prev - Math.max(1, Math.floor(level / 2))));
     setRollLog([]);
     setShortHealInfo(undefined);
     setSessionStartHP(undefined);
-  }, []);
+  }, [level]);
 
   return (
     <div className="absolute contents">
@@ -857,6 +869,7 @@ function CombatSection({ attributes }: { attributes?: Attributes }) {
 // ============================================================================
 
 function PersonalityPanel() {
+  const { t } = useLanguage();
   const { character, updateCharacter } = useCharacter();
   const personality = character?.personality ?? { 个性特点: "", 理想: "", 牵绊: "", 缺点: "" };
 
@@ -868,25 +881,25 @@ function PersonalityPanel() {
     <div className="absolute bg-sheet-panel-bg h-[491px] left-[811px] overflow-clip shadow-[0px_0px_2px_0px_rgba(0,0,0,0.25)] top-[254px] w-[358px]" data-name="personality">
       <PersonalityTraitComponent
         className="absolute bg-white h-[107px] left-[14px] rounded-[2px] top-[15px] w-[330px]"
-        label="个性特点"
+        label={t('personality.traits')}
         value={personality.个性特点}
         onValueChange={(v) => setPersonalityField("个性特点", v)}
       />
       <PersonalityTraitComponent
         className="absolute bg-white h-[107px] left-[14px] rounded-[2px] top-[133px] w-[330px]"
-        label="理想"
+        label={t('personality.ideal')}
         value={personality.理想}
         onValueChange={(v) => setPersonalityField("理想", v)}
       />
       <PersonalityTraitComponent
         className="absolute bg-white h-[107px] left-[14px] rounded-[2px] top-[251px] w-[330px]"
-        label="牵绊"
+        label={t('personality.bond')}
         value={personality.牵绊}
         onValueChange={(v) => setPersonalityField("牵绊", v)}
       />
       <PersonalityTraitComponent
         className="absolute bg-white h-[107px] left-[14px] rounded-[2px] top-[369px] w-[330px]"
-        label="缺点"
+        label={t('personality.flaw')}
         value={personality.缺点}
         onValueChange={(v) => setPersonalityField("缺点", v)}
       />
@@ -962,6 +975,7 @@ function AttributesPanel({
   attributes?: Attributes;
   onAttributeChange?: (field: string, value: number) => void;
 }) {
+  const { t } = useLanguage();
   const finalAttributes = attributes || {
     str_value: 10,
     dex_value: 10,
@@ -976,37 +990,37 @@ function AttributesPanel({
       <div className="absolute contents left-[12px] top-[29px]">
         <AttributeComponent 
           className="absolute h-[125px] left-[12px] top-[29px] w-[97px]" 
-          label="力量" 
+          label={t('attr.str')} 
           initialValue={finalAttributes.str_value || 10}
           onValueChange={(val) => onAttributeChange?.('str_value', val)}
         />
         <AttributeComponent 
           className="absolute h-[125px] left-[12px] top-[173px] w-[97px]" 
-          label="敏捷" 
+          label={t('attr.dex')} 
           initialValue={finalAttributes.dex_value || 10}
           onValueChange={(val) => onAttributeChange?.('dex_value', val)}
         />
         <AttributeComponent 
           className="absolute h-[125px] left-[12px] top-[317px] w-[97px]" 
-          label="体质" 
+          label={t('attr.con')} 
           initialValue={finalAttributes.con_value || 10}
           onValueChange={(val) => onAttributeChange?.('con_value', val)}
         />
         <AttributeComponent 
           className="absolute h-[125px] left-[12px] top-[461px] w-[97px]" 
-          label="智力" 
+          label={t('attr.int')} 
           initialValue={finalAttributes.int_value || 10}
           onValueChange={(val) => onAttributeChange?.('int_value', val)}
         />
         <AttributeComponent 
           className="absolute h-[125px] left-[12px] top-[605px] w-[97px]" 
-          label="感知" 
+          label={t('attr.wis')} 
           initialValue={finalAttributes.wis_value || 10}
           onValueChange={(val) => onAttributeChange?.('wis_value', val)}
         />
         <AttributeComponent 
           className="absolute h-[125px] left-[12px] top-[749px] w-[97px]" 
-          label="魅力" 
+          label={t('attr.cha')} 
           initialValue={finalAttributes.cha_value || 10}
           onValueChange={(val) => onAttributeChange?.('cha_value', val)}
         />
@@ -1047,19 +1061,22 @@ function SkillsPanel({
 }
 
 function CharacterCardContent() {
+  const { t } = useLanguage();
   const { character, setAttributes, setLevel, setProficiencyBonus, updateCharacter } = useCharacter();
   if (!character) return null;
 
   const { attributes, level, proficiencyBonus } = character;
   const wisdomMod = Math.floor(((attributes?.wis_value ?? 10) - 10) / 2);
-  // 察觉技能总加值 = 属性调整值 + (熟练/专精加值)
+  // 察觉技能总加值 = 属性调整值 + (半熟练/熟练/专精加值)
   const perceptionSkillState = character.skills?.察觉 ?? 0;
-  const perceptionTotal =
-    perceptionSkillState === 0
-      ? wisdomMod
-      : perceptionSkillState === 1
-        ? wisdomMod + (proficiencyBonus ?? 2)
-        : wisdomMod + 2 * (proficiencyBonus ?? 2);
+  const pb = proficiencyBonus ?? 2;
+  const halfProf = Math.floor(pb / 2);
+  const perceptionTotal = wisdomMod + (
+    perceptionSkillState === 3 ? pb * 2 :
+    perceptionSkillState === 2 ? pb :
+    perceptionSkillState === 1 ? halfProf :
+    0
+  );
 
   const handleAttributeChange = (field: string, value: number) => {
     const updated = { ...attributes, [field]: value };
@@ -1095,7 +1112,7 @@ function CharacterCardContent() {
       </div>
       <ProficiencyBonusComponent
         className="absolute h-[44px] left-[190px] rounded-[2px] top-[318px] w-[223px]"
-        label="熟练加值"
+        label={t('proficiency.bonus')}
         level={level}
         initialValue={proficiencyBonus}
         showDice={false}
@@ -1104,7 +1121,7 @@ function CharacterCardContent() {
       />
       <ProficiencyBonusComponent
         className="absolute h-[44px] left-[190px] rounded-[2px] top-[255px] w-[223px]"
-        label="激励"
+        label={t('proficiency.inspiration')}
         initialValue={0}
         showDice={true}
         diceClickable={true}

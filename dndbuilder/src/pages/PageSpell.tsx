@@ -1,4 +1,5 @@
 import { useCharacter } from "../shared/storage/CharacterContext";
+import { useLanguage } from "../shared/i18n/LanguageContext";
 import SpellBox from "../features/spells/SpellBox";
 import Header from "../features/spells/Header";
 import type { SpellData } from "../shared/types/types";
@@ -119,6 +120,7 @@ function computeMaxAllowedHeight(
 
 
 export default function SpellSheet() {
+  const { t } = useLanguage();
   const { character, updateCharacter } = useCharacter();
 
   if (!character) return null;
@@ -170,16 +172,16 @@ export default function SpellSheet() {
     <div className="absolute bg-white h-[1584px] left-0 overflow-clip top-[75px] w-[1224px]">
       <Header />
 
-      {/* 已知戏法 / 已知法术 / 已准备法术 信息行 */}
+      {/* Spell info summary line */}
       <div className="absolute top-[236px] left-[55px] w-[358px] pointer-events-none flex justify-between leading-none">
         <span className="font-serif-regular-cjk text-sheet-text-spell-placeholder text-[13px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
-          已知戏法：{spellBoxes.filter(b => b.isCantrip).flatMap(b => b.spells).filter(s => s.name.trim()).length}
+          {t('spell.cantripsKnown')}：{spellBoxes.filter(b => b.isCantrip).flatMap(b => b.spells).filter(s => s.name.trim()).length}
         </span>
         <span className="font-serif-regular-cjk text-sheet-text-spell-placeholder text-[13px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
-          已知法术：{spellBoxes.filter(b => !b.isCantrip).flatMap(b => b.spells).filter(s => s.name.trim()).length}
+          {t('spell.spellsKnown')}：{spellBoxes.filter(b => !b.isCantrip).flatMap(b => b.spells).filter(s => s.name.trim()).length}
         </span>
         <span className="font-serif-regular-cjk text-sheet-text-spell-placeholder text-[13px]" style={{ fontVariationSettings: '"CTGR" 0, "wdth" 100' }}>
-          已准备法术：{spellBoxes.flatMap(b => b.spells).filter(s => s.prepared && s.name.trim()).length}
+          {t('spell.spellsPrepared')}：{spellBoxes.flatMap(b => b.spells).filter(s => s.prepared && s.name.trim()).length}
         </span>
       </div>
 

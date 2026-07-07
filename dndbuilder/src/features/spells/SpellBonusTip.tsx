@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../../shared/tokens/colors";
 import type { ExtraBonus } from "../../shared/types/types";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 const FVAR = "'CTGR' 0, 'wdth' 100";
 const T: React.CSSProperties = {
@@ -38,6 +39,7 @@ export default function SpellBonusTooltip({
   onMouseEnter, onMouseLeave,
   onFocusLock, onFocusUnlock,
 }: SpellBonusTooltipProps) {
+  const { t } = useLanguage();
   const [pos] = useState(() => ({
     left: Math.max(8, Math.min(initLeft, window.innerWidth - TOOLTIP_W - 8)),
     top: initY,
@@ -81,7 +83,7 @@ export default function SpellBonusTooltip({
       onMouseLeave={onMouseLeave}
     >
       {/* 额外加值 */}
-      <div style={{ ...T, fontFamily: "var(--font-serif-medium)", fontSize: "13px", color: sheetColors.textPlaceholder, letterSpacing: "0.04em", marginBottom: 6 }}>额外加值</div>
+      <div style={{ ...T, fontFamily: "var(--font-serif-medium)", fontSize: "13px", color: sheetColors.textPlaceholder, letterSpacing: "0.04em", marginBottom: 6 }}>{t('spell.extraBonus')}</div>
       {extras.map((eb) => (
         <div key={eb.id} style={{ display: "flex", alignItems: "center", gap: 4, marginBottom: 4 }}>
           <input
@@ -103,7 +105,7 @@ export default function SpellBonusTooltip({
           <input
             type="text"
             value={eb.source ?? ""}
-            placeholder="来源"
+            placeholder={t('spell.source')}
             onChange={(e) => onUpdate(extras.map((ex) => ex.id === eb.id ? { ...ex, source: e.target.value } : ex))}
             onFocus={() => onFocusLock?.()}
             onBlur={() => onFocusUnlock?.()}
@@ -129,7 +131,7 @@ export default function SpellBonusTooltip({
         onMouseEnter={(e) => { e.currentTarget.style.color = sheetColors.textSecondary; e.currentTarget.style.borderColor = sheetColors.textSecondary; }}
         onMouseLeave={(e) => { e.currentTarget.style.color = sheetColors.textPlaceholder; e.currentTarget.style.borderColor = sheetColors.iconDisabled; }}
       >
-        + 添加额外加值
+        {t('spell.addExtraBonus')}
       </button>
     </div>,
     document.body

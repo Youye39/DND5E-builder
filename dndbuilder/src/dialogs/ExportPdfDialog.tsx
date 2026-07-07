@@ -11,6 +11,7 @@ import { toOwlbearJSON, toFVTTJSON } from "../shared/storage/exportService";
 import CharacterSheet from "../pages/PageFront";
 import CharacterBackSide from "../pages/PageBack";
 import SpellSheet from "../pages/PageSpell";
+import { useLanguage } from "../shared/i18n/LanguageContext";
 
 interface ExportDialogProps {
   open: boolean;
@@ -22,6 +23,7 @@ const PAGE_W = 1224;
 const PAGE_H = 1659;
 
 export default function ExportDialog({ open, onOpenChange }: ExportDialogProps) {
+  const { t } = useLanguage();
   const { character } = useCharacter();
   const [exporting, setExporting] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
@@ -114,14 +116,14 @@ export default function ExportDialog({ open, onOpenChange }: ExportDialogProps) 
   const exportOwlbear = () => {
     if (!character) return;
     const json = toOwlbearJSON(character);
-    downloadJSON(json, `枭熊_${character.name ?? "角色"}.json`);
+    downloadJSON(json, `owlbear_${character.name ?? "character"}.json`);
     onOpenChange(false);
   };
 
   const exportFVTT = () => {
     if (!character) return;
     const json = toFVTTJSON(character);
-    downloadJSON(json, `fvtt_${character.name ?? "角色"}.json`);
+    downloadJSON(json, `fvtt_${character.name ?? "character"}.json`);
     onOpenChange(false);
   };
 
@@ -148,7 +150,7 @@ export default function ExportDialog({ open, onOpenChange }: ExportDialogProps) 
     try {
       await new Promise((r) => setTimeout(r, 400));
       const pages = printRef.current;
-      if (!pages) throw new Error("容器未就绪");
+      if (!pages) throw new Error(t('export.containerNotReady'));
       const pageEls = pages.querySelectorAll(".pdf-page");
 
       // 提取所有样式
@@ -184,6 +186,75 @@ export default function ExportDialog({ open, onOpenChange }: ExportDialogProps) 
             }
           }
         }
+
+        // ── 修改导出 HTML 的交互行为 ──
+        // 1. 移除攻击面板单元格和护甲等级的 hover 效果（hover:bg-sheet-hover-bg / hover:bg-sheet-bg）
+        tempDiv.querySelectorAll('[class*="hover:bg-sheet-hover-bg"], [class*="hover:bg-sheet-bg"]').forEach(el => {
+          if (typeof el.className === 'string') {
+            el.className = el.className
+              .replace(/\s*hover:[^\s"]+/g, '')
+              .replace(/\s*cursor-pointer/g, '')
+              .replace(/\s+/g, ' ')
+              .trim();
+          }
+        });
+        // 2. 攻击面板：使名称(w-[130px])/加值(w-[61px])/伤害(w-[130px])单元格文本可编辑
+        tempDiv.querySelectorAll('[class*="bg-sheet-content-bg"][class*="flex"][class*="items-center"]').forEach(el => {
+          const cls = typeof el.className === 'string' ? el.className : '';
+          if (cls.includes('w-[130px]') || cls.includes('w-[61px]')) {
+            el.setAttribute('contenteditable', 'true');
+          }
+        });
+        // 3. 护甲等级、先攻、速度：移除 hover 并使数值可编辑
+        (['护甲等级', '先攻', '速度'] as const).forEach(name => {
+          const box = tempDiv.querySelector(`[data-name="${name}"]`);
+          if (box) {
+            box.querySelectorAll('[class*="cursor-pointer"]').forEach(el => {
+              if (typeof el.className === 'string') {
+                el.className = el.className.replace(/\s*cursor-pointer/g, '').replace(/\s+/g, ' ').trim();
+              }
+            });
+            const valueDiv = box.querySelector('[class*="text-[36px]"]');
+            if (valueDiv) valueDiv.setAttribute('contenteditable', 'true');
+          }
+        });
+        // 4. 生命值(hp)、临时生命值(temp-hp)的输入框已自带可编辑，仅确保不被隐藏
+        // （之前隐藏它们的 CSS 规则已移除，无需额外操作）
+        // 生命骰(hit-dice)为自动计算值，保留原样
+        // 5. 保留技能、豁免中的按钮样式，去掉所有交互（pointer-events）
+        tempDiv.querySelectorAll('[data-name="技能"] [data-name="按钮"], [data-name="豁免"] [data-name="按钮"]').forEach(el => {
+          el.setAttribute('style', (el.getAttribute('style') || '') + '; pointer-events: none; cursor: default;');
+        });
+        // 6. 法术书页：施法关键属性、法术豁免DC、法术攻击加值 → 移除hover、数值可编辑
+        tempDiv.querySelectorAll('[data-name="施法信息"]').forEach(el => {
+          el.querySelectorAll('[class*="hover:bg-sheet-hover-light"]').forEach(cell => {
+            if (typeof cell.className === 'string') {
+              cell.className = cell.className.replace(/\s*hover:[^\s"]+/g, '').replace(/\s*cursor-pointer/g, '').replace(/\s+/g, ' ').trim();
+            }
+          });
+          const valueDiv = el.querySelector('[class*="text-["]');
+          if (valueDiv) valueDiv.setAttribute('contenteditable', 'true');
+        });
+        // 7. 法术书页：施法职业数值可编辑
+        const spellHeader = tempDiv.querySelector('[class*="bg-black"][class*="rounded-tl"]');
+        if (spellHeader) {
+          const classValue = spellHeader.querySelector('[class*="text-[24px]"]');
+          if (classValue) classValue.setAttribute('contenteditable', 'true');
+          spellHeader.querySelectorAll('[class*="cursor-pointer"]').forEach(el => {
+            if (typeof el.className === 'string') {
+              el.className = el.className.replace(/\s*cursor-pointer/g, '').replace(/\s+/g, ' ').trim();
+            }
+          });
+        }
+        // 8. 标记法术位指示按钮（slot-btn）以便后续添加点击切换功能，并初始化状态
+        tempDiv.querySelectorAll('[class*="size-\\[14px\\]"]').forEach(el => {
+          const cls = typeof el.className === 'string' ? el.className : '';
+          if (cls.includes('top-1/2') && cls.includes('-translate-y-1/2') && cls.includes('cursor-pointer') && el.closest('[class*="bg-black"]')) {
+            el.setAttribute('data-name', 'slot-btn');
+            var indicator = el.querySelector('[class*="size-\\[10px\\]"]');
+            el.setAttribute('data-filled', indicator && indicator.className.indexOf('bg-white') >= 0 ? '1' : '0');
+          }
+        });
 
         pageContents.push(tempDiv.innerHTML);
       }
@@ -243,16 +314,12 @@ ${stylesHTML}
   .page-content .border-dashed { display: none !important; }
   /* 隐藏添加法术按钮 */
   .page-content [data-name="add-spell"] { display: none !important; }
-  /* 隐藏生命值和临时生命值输入框 */
-  .page-content [data-name="hp"] input:first-of-type,
-  .page-content [data-name="temp-hp"] input { display: none !important; }
   /* 隐藏钱币输入框 */
   .page-content [data-name="钱币"] input { display: none !important; }
-  /* 法术准备按钮始终未选中 */
-  .page-content [data-name="法术"] [data-name="按钮"] svg circle:nth-child(3),
-  .page-content [data-name="戏法"] [data-name="按钮"] svg circle:nth-child(3) { display: none !important; }
   /* 隐藏已知信息行 */
   .page-content .pointer-events-none.flex.justify-between { display: none !important; }
+  /* 内容可编辑的文本 */
+  .page-content [contenteditable="true"] { cursor: text; outline: none; }
   .tooltip-popup {
     position: fixed; width: 240px; z-index: 99999; pointer-events: auto;
     background: #fff; border-radius: 8px; border: 1px solid #e0e0e0;
@@ -401,6 +468,76 @@ ${stylesHTML}
       }
       hideTooltip();
     });
+
+    // ── 死亡豁免按钮点击切换 ──
+    document.querySelectorAll('[data-name="death-save"]').forEach(function(container) {
+      container.addEventListener('click', function(e) {
+        var btn = e.target.closest('[data-name="按钮"]');
+        if (!btn) return;
+        var row = btn.closest('[data-name="死豁"]');
+        if (!row) return;
+        var buttons = row.querySelectorAll('[data-name="按钮"]');
+        var idx = Array.prototype.indexOf.call(buttons, btn);
+        var wasChecked = !!btn.querySelector('svg circle[r="3"]');
+
+        buttons.forEach(function(b, i) {
+          var svg = b.querySelector('svg');
+          if (!svg) return;
+          var dot = Array.from(svg.querySelectorAll('circle')).find(function(c) { return c.getAttribute('r') === '3'; });
+          if (wasChecked) {
+            if (dot) dot.remove();
+          } else {
+            if (i <= idx) {
+              if (!dot) {
+                var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', '7'); circle.setAttribute('cy', '7');
+                circle.setAttribute('r', '3'); circle.setAttribute('fill', 'var(--fill-0, black)');
+                svg.appendChild(circle);
+              }
+            } else {
+              if (dot) dot.remove();
+            }
+          }
+        });
+      });
+    });
+
+    // ── 法术准备按钮点击切换 ──
+    document.querySelectorAll('[data-name="法术"]').forEach(function(container) {
+      container.addEventListener('click', function(e) {
+        var btn = e.target.closest('[data-name="按钮"]');
+        if (!btn) return;
+        e.stopPropagation();
+        var svg = btn.querySelector('svg');
+        if (!svg) return;
+        var dot = Array.from(svg.querySelectorAll('circle')).find(function(c) { return c.getAttribute('r') === '3'; });
+        if (dot) {
+          dot.remove();
+        } else {
+          var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+          circle.setAttribute('cx', '7'); circle.setAttribute('cy', '7');
+          circle.setAttribute('r', '3'); circle.setAttribute('fill', 'var(--fill-0, black)');
+          svg.appendChild(circle);
+        }
+      });
+    });
+
+    // ── 法术位指示按钮（slot-btn）点击切换（单个独立切换，用 data-filled 跟踪状态） ──
+    document.querySelectorAll('[data-name="slot-btn"]').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var inner = this.querySelector('[class*="size-\\[10px\\]"]');
+        if (!inner) return;
+        var filled = this.getAttribute('data-filled') === '1';
+        if (filled) {
+          inner.className = 'absolute left-[2px] rounded-[5px] size-[10px] top-[2px] bg-black';
+          this.setAttribute('data-filled', '0');
+        } else {
+          inner.className = 'absolute left-[2px] rounded-[5px] size-[10px] top-[2px] bg-white border-2 border-black border-solid';
+          this.setAttribute('data-filled', '1');
+        }
+      });
+    });
   <\/script>
   <script>
     function switchPage(i) {
@@ -418,11 +555,11 @@ ${stylesHTML}
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `角色卡_${character?.name ?? "角色"}.html`;
+        a.download = `character-sheet_${character?.name ?? "character"}.html`;
         a.click();
         URL.revokeObjectURL(url);
       } catch (e) {
-        alert("HTML 导出失败: " + (e instanceof Error ? e.message : "未知错误"));
+        alert(t('export.htmlFailed') + (e instanceof Error ? e.message : t('export.unknownError')));
       } finally {
         setExporting(false);
         onOpenChange(false);
@@ -446,7 +583,7 @@ ${stylesHTML}
               className="text-base"
               style={{ fontFamily: "var(--font-serif-bold)", color: sheetColors.textPrimary, fontWeight: 600, marginBottom: 16 }}
             >
-              导出文件
+              {t('export.title')}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               <button disabled={exporting} onClick={exportLocalArchive} style={{
@@ -458,7 +595,7 @@ ${stylesHTML}
                 onMouseEnter={(e) => { if (!exporting) e.currentTarget.style.backgroundColor = sheetColors.contentBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
-                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>导出当前存档于本地</span>
+                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>{t('export.saveLocally')}</span>
               </button>
               <button disabled={exporting} onClick={exportOwlbear} style={{
                 display: "flex", flexDirection: "column", gap: 2, padding: "10px 14px", borderRadius: "2px",
@@ -469,7 +606,7 @@ ${stylesHTML}
                 onMouseEnter={(e) => { if (!exporting) e.currentTarget.style.backgroundColor = sheetColors.contentBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
-                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>导出为枭熊 json</span>
+                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>{t('export.owlbear')}</span>
               </button>
               <button disabled={exporting} onClick={exportFVTT} style={{
                 display: "flex", flexDirection: "column", gap: 2, padding: "10px 14px", borderRadius: "2px",
@@ -480,7 +617,7 @@ ${stylesHTML}
                 onMouseEnter={(e) => { if (!exporting) e.currentTarget.style.backgroundColor = sheetColors.contentBg; }}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
-                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>导出为 fvtt json</span>
+                <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>{t('export.fvtt')}</span>
               </button>
               <button disabled={exporting} onClick={exportHTML} style={{
                 display: "flex", flexDirection: "column", gap: 2, padding: "10px 14px", borderRadius: "2px",
@@ -492,7 +629,7 @@ ${stylesHTML}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
                 <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>
-                  {exporting ? "导出中" : "导出为 html"}
+                  {exporting ? t('export.exporting') : t('export.html')}
                 </span>
               </button>
               <button disabled={exporting} onClick={exportPDF} style={{
@@ -505,7 +642,7 @@ ${stylesHTML}
                 onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; }}
               >
                 <span style={{ fontSize: "13px", fontFamily: "var(--font-serif-medium)", color: sheetColors.textPrimary }}>
-                  {exporting ? "导出中" : "导出为 pdf"}
+                  {exporting ? t('export.exporting') : t('export.pdf')}
                 </span>
               </button>
             </div>

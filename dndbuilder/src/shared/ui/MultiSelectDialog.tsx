@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import { sheetColors } from "../../shared/tokens/colors";
 import ScrollArea from "../ui/ScrollArea";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export interface MultiSelectOption {
   id: string;
@@ -30,6 +31,7 @@ export function MultiSelectDialog({
   onSave,
   onClose,
 }: MultiSelectDialogProps) {
+  const { t } = useLanguage();
   const [draft, setDraft] = useState<string[]>([]);
 
   // Sync draft when dialog opens
@@ -116,7 +118,7 @@ export function MultiSelectDialog({
               onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = sheetColors.pageBg; e.currentTarget.style.borderColor = sheetColors.borderLight; }}
               onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = sheetColors.cardBg; e.currentTarget.style.borderColor = "var(--color-border)"; }}
             >
-              清空
+              {t('multiSelect.clear')}
             </button>
             <button
               onClick={handleSave}
@@ -134,7 +136,7 @@ export function MultiSelectDialog({
               onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkHover)}
               onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = sheetColors.buttonDarkBg)}
             >
-              保存
+              {t('multiSelect.save')}
             </button>
           </div>
         </div>
@@ -155,7 +157,7 @@ export function MultiSelectDialog({
                     letterSpacing: "0.04em",
                   }}
                 >
-                  {group.label}
+                  {t(group.label) !== group.label ? t(group.label) : group.label}
                 </div>
                 <button
                   onClick={() => toggleAll(group)}
@@ -171,7 +173,7 @@ export function MultiSelectDialog({
                     transition: "all 0.1s",
                   }}
                 >
-                  全选
+                  {t('multiSelect.selectAll')}
                 </button>
               </div>
               {/* Option chips */}
@@ -207,7 +209,7 @@ export function MultiSelectDialog({
                         }
                       }}
                     >
-                      {opt.label}
+                      {t(opt.id) !== opt.id ? t(opt.id) : opt.label}
                     </button>
                   );
                 })}
