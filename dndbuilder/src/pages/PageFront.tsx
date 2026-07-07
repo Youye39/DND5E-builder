@@ -828,7 +828,7 @@ function RestsAndDeathSection() {
   }, []);
 
   const handleLongRest = useCallback(() => {
-    setUsedHitDice(prev => Math.max(0, prev - Math.floor(level / 2)));
+    setUsedHitDice(prev => Math.max(0, prev - Math.max(1, Math.floor(level / 2))));
     setRollLog([]);
     setShortHealInfo(undefined);
     setSessionStartHP(undefined);
