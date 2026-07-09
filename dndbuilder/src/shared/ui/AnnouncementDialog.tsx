@@ -133,7 +133,9 @@ interface Announcement {
   id: string;
   version: string;
   title: string;
+  titleEn?: string;
   content: string;
+  contentEn?: string;
   date: string;
 }
 
@@ -141,7 +143,7 @@ const ANNOUNCEMENTS = announcementsData as Announcement[];
 const STORAGE_KEY = "dndbuilder_last_dismissed_announcement";
 
 export default function AnnouncementDialog() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [dismissed, setDismissed] = useState(() => {
     try {
       return localStorage.getItem(STORAGE_KEY) === ANNOUNCEMENTS[0]?.id;
@@ -193,7 +195,7 @@ export default function AnnouncementDialog() {
             className="font-serif-bold-cjk font-bold"
             style={{ fontSize: "16px", color: sheetColors.textDark }}
           >
-            {latest.title}
+            {lang === 'en' && latest.titleEn ? latest.titleEn : latest.title}
           </span>
           <span style={{ fontSize: "11px", color: sheetColors.textPlaceholder }}>
             {latest.date}
@@ -209,7 +211,7 @@ export default function AnnouncementDialog() {
           fontFamily: "var(--font-serif-regular)",
           fontVariationSettings: FVAR,
         }}>
-          {renderMarkdown(latest.content)}
+          {renderMarkdown(lang === 'en' && latest.contentEn ? latest.contentEn : latest.content)}
         </div>
 
         {/* 底部按钮 */}

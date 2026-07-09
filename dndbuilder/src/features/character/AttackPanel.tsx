@@ -101,9 +101,9 @@ function getItemAttackBonus(item: Item, attrs: AttrMap, profBonus: number): stri
   return total >= 0 ? `+${total}` : `${total}`;
 }
 
-function getSpellDamage(spell: SpellData): string {
+function getSpellDamage(spell: SpellData, lang: string): string {
   if (!spell.damageDice) return "";
-  return spell.damageDice + (spell.damageType ?? "");
+  return spell.damageDice + displayDamageType(spell.damageType, lang);
 }
 
 function getSpellAttackDisplay(
@@ -267,7 +267,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
         result.push({
           name: spell.name,
           attackBonus: getSpellAttackDisplay(spell, spellcastingAbility, attrs, proficiencyBonus, spellAttackExtras, spellSaveDCExtras),
-          damage: getSpellDamage(spell),
+          damage: getSpellDamage(spell, lang),
           spell,
         });
       }
@@ -275,7 +275,7 @@ export default function AttackPanel({ className }: AttackPanelProps) {
     // 末尾始终留一个空行（+号）
     result.push({ name: "", attackBonus: "", damage: "" });
     return result;
-  }, [safeEntries, items, allSpells, attrs, proficiencyBonus, spellcastingAbility, attributes, spellAttackExtras, spellSaveDCExtras]);
+  }, [safeEntries, items, allSpells, attrs, proficiencyBonus, spellcastingAbility, attributes, spellAttackExtras, spellSaveDCExtras, lang]);
 
   // ── 保存物品条目 ──
   const handleSaveItem = useCallback((item: Item) => {

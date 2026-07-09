@@ -3,9 +3,26 @@ import ReactDOM from "react-dom";
 import { sheetColors } from "../../shared/tokens/colors";
 import type { TraitItem, SubTrait } from "../../shared/types/types";
 import traitKeywords from "../../../data/traitKeywords.json";
+import traitTagPresets from "../../../data/traitTagPresets.json";
+import { useLanguage } from "../../shared/i18n/LanguageContext";
 
 const KEYWORD_PATTERNS = traitKeywords as string[];
 const HIGHLIGHT_RE = new RegExp(`(${KEYWORD_PATTERNS.join('|')})`, 'g');
+
+const TAG_PRESETS = traitTagPresets as { id: string; label: string }[];
+const TAG_LABEL_TO_ID: Record<string, string> = {};
+for (const t of TAG_PRESETS) {
+  TAG_LABEL_TO_ID[t.label] = t.id;
+}
+
+/** 标签双语显示：中文存的是 label，英文时反查 ID 显示 */
+function displayTag(tag: string, lang: string): string {
+  if (lang === 'en') {
+    const id = TAG_LABEL_TO_ID[tag];
+    if (id) return id.charAt(0).toUpperCase() + id.slice(1);
+  }
+  return tag;
+}
 
 const FVAR = "'CTGR' 0, 'wdth' 100";
 const TOOLTIP_W = 220;
@@ -31,6 +48,7 @@ export const TraitTooltip = React.memo(function TraitTooltip({
   trait, subTrait, mouseY: initY, cardLeft: initLeft,
   onMouseEnter, onMouseLeave,
 }: TraitTooltipProps) {
+  const { lang } = useLanguage();
   const tooltipRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState({ left: 0, top: 0 });
 
@@ -86,7 +104,7 @@ export const TraitTooltip = React.memo(function TraitTooltip({
             <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginBottom: 6 }}>
               {trait!.tags.map((tag, idx) => (
                 <span key={idx} style={{ padding: "1px 6px", borderRadius: "2px", backgroundColor: sheetColors.hoverBg, fontSize: "11px", color: sheetColors.textDark, fontFamily: "var(--font-serif-regular)" }}>
-                  {tag}
+                  {displayTag(tag, lang)}
                 </span>
               ))}
             </div>

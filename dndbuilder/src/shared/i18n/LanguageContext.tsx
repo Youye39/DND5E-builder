@@ -16,6 +16,13 @@ function getInitialLang(): Language {
     const saved = localStorage.getItem("dndbuilder_lang");
     if (saved === "en" || saved === "zh") return saved;
   } catch { /* localStorage 不可用 */ }
+
+  try {
+    const browserLang = navigator.language?.toLowerCase() ?? "";
+    if (browserLang.startsWith("zh")) return "zh";
+    if (browserLang.startsWith("en")) return "en";
+  } catch { /* navigator 不可用 */ }
+
   return "zh";
 }
 

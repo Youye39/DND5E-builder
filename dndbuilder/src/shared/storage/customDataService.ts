@@ -13,12 +13,12 @@ const STORAGE_PREFIX = "customData_";
 
 /** 可编辑的数据文件列表 */
 export const EDITABLE_FILES = [
-  { key: "tools", label: "工具选项" },
-  { key: "languages", label: "语言选项" },
-  { key: "weaponPresets", label: "武器预设" },
-  { key: "weaponTags", label: "武器标签预设" },
-  { key: "traitKeywords", label: "特性关键词高亮" },
-  { key: "traitTagPresets", label: "特质标签预设" },
+  { key: "tools", labelKey: "custom.file.tools" },
+  { key: "languages", labelKey: "custom.file.languages" },
+  { key: "weaponPresets", labelKey: "custom.file.weaponPresets" },
+  { key: "weaponTags", labelKey: "custom.file.weaponTags" },
+  { key: "traitKeywords", labelKey: "custom.file.traitKeywords" },
+  { key: "traitTagPresets", labelKey: "custom.file.traitTagPresets" },
 ] as const;
 
 /** 默认文件内容映射（构建时导入的 JSON） */

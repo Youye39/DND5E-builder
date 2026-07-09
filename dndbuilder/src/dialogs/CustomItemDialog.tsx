@@ -125,7 +125,7 @@ export default function CustomItemDialog({ open, onOpenChange }: CustomItemDialo
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="truncate">{f.label}</span>
+                  <span className="truncate">{t(f.labelKey)}</span>
                   {hasCustom(f.key) && (
                     <span
                       className="shrink-0 ml-1 px-1.5 py-0.5 rounded-[2px] text-[10px]"

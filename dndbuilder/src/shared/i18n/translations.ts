@@ -45,6 +45,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'custom.save': '保存',
     'custom.selectFile': '请从左侧选择文件',
     'custom.jsonError': 'JSON 格式错误，请检查后重试。',
+    'custom.file.tools': '工具选项',
+    'custom.file.languages': '语言选项',
+    'custom.file.weaponPresets': '武器预设',
+    'custom.file.weaponTags': '武器标签预设',
+    'custom.file.traitKeywords': '特性关键词高亮',
+    'custom.file.traitTagPresets': '特质标签预设',
 
     // ===================== ExportPdfDialog =====================
     'export.title': '导出',
@@ -228,14 +234,14 @@ export const translations: Record<Language, Record<string, string>> = {
     'spell.addExtraBonus': '+ 添加额外加值',
 
     // ===================== School of Magic =====================
-    'school.abjuration': '防护学派',
-    'school.conjuration': '咒法学派',
-    'school.divination': '预言学派',
-    'school.enchantment': '附魔学派',
-    'school.evocation': '塑能学派',
-    'school.illusion': '幻术学派',
-    'school.necromancy': '死灵学派',
-    'school.transmutation': '变化学派',
+    'school.abjuration': '防护',
+    'school.conjuration': '咒法',
+    'school.divination': '预言',
+    'school.enchantment': '附魔',
+    'school.evocation': '塑能',
+    'school.illusion': '幻术',
+    'school.necromancy': '死灵',
+    'school.transmutation': '变化',
 
     // ===================== Death Save =====================
     'deathSave.title': '死亡豁免',
@@ -403,6 +409,12 @@ export const translations: Record<Language, Record<string, string>> = {
     'custom.save': 'Save',
     'custom.selectFile': 'Select a file from the left',
     'custom.jsonError': 'JSON format error, please check and retry.',
+    'custom.file.tools': 'Tools',
+    'custom.file.languages': 'Languages',
+    'custom.file.weaponPresets': 'Weapon Presets',
+    'custom.file.weaponTags': 'Weapon Tags',
+    'custom.file.traitKeywords': 'Trait Keywords',
+    'custom.file.traitTagPresets': 'Trait Tag Presets',
 
     // ===================== ExportPdfDialog =====================
     'export.title': 'Export',
